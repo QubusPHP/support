@@ -217,7 +217,14 @@ class Assets
     public function config(array $config): Assets
     {
         // Set regex options
-        foreach (['asset_regex', 'css_regex', 'js_regex', 'no_minification_regex'] as $option) {
+        foreach (
+            [
+                'asset_regex',
+                'css_regex',
+                'js_regex',
+                'no_minification_regex',
+            ] as $option
+        ) {
             $propertyOption = camel_case($option);
             if (isset($config[$option]) && (@preg_match($config[$option], null) !== false)) {
                 $this->$propertyOption = $config[$option];
@@ -225,7 +232,17 @@ class Assets
         }
 
         // Set common options
-        foreach (['public_dir', 'css_dir', 'js_dir', 'packages_dir', 'pipeline', 'pipeline_dir', 'pipeline_gzip'] as $option) {
+        foreach (
+            [
+                'public_dir',
+                'css_dir',
+                'js_dir',
+                'packages_dir',
+                'pipeline',
+                'pipeline_dir',
+                'pipeline_gzip',
+            ] as $option
+        ) {
             $propertyOption = camel_case($option);
 
             if (isset($config[$option])) {
@@ -234,7 +251,14 @@ class Assets
         }
 
         // Set pipeline options
-        foreach (['fetch_command', 'notify_command', 'css_minifier', 'js_minifier'] as $option) {
+        foreach (
+            [
+                'fetch_command',
+                'notify_command',
+                'css_minifier',
+                'js_minifier',
+            ] as $option
+        ) {
             $propertyOption = camel_case($option);
 
             if (isset($config[$option]) && $config[$option] instanceof Closure) {
@@ -580,14 +604,15 @@ class Assets
     /**
      * Minifiy and concatenate files.
      *
-     * @param array   $assets
+     * @param array $assets
      */
     protected function pipeline(array $assets, string $extension, string $subdirectory, Closure $minifier): string
     {
         // Create destination dir if it doesn't exist.
-        $pipelineDir = $this->publicDir . DIRECTORY_SEPARATOR . $subdirectory . DIRECTORY_SEPARATOR . $this->pipelineDir;
+        $pipelineDir = $this->publicDir . DIRECTORY_SEPARATOR
+        . $subdirectory . DIRECTORY_SEPARATOR . $this->pipelineDir;
         if (! is_dir($pipelineDir)) {
-            mkdir($pipelineDir, 0777, true);
+            mkdir($pipelineDir, 0755, true);
         }
 
         // Generate paths
@@ -673,7 +698,7 @@ class Assets
                 // Add current protocol to agnostic links
                 if (substr($link, 0, 2) === '//') {
                     $protocol = isset($_SERVER['HTTPS']) &&
-                    !empty($_SERVER['HTTPS']) &&
+                    ! empty($_SERVER['HTTPS']) &&
                     $_SERVER['HTTPS'] !== 'off' ? 'https:' : 'http:';
                     $link     = $protocol . $link;
                 }
@@ -685,7 +710,9 @@ class Assets
             }
 
             // Fetch link content
-            $content = $this->fetchCommand instanceof Closure ? $this->fetchCommand->__invoke($link) : file_get_contents($link);
+            $content = $this->fetchCommand instanceof Closure
+            ? $this->fetchCommand->__invoke($link)
+            : file_get_contents($link);
 
             // Minify
             $buffer .= preg_match($this->noMinificationRegex, $originalLink) ? $content : $minifier->__invoke($content);

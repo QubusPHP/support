@@ -14,6 +14,11 @@ declare(strict_types=1);
 
 namespace Qubus\Support\Serializer\Strategy;
 
+use function json_decode;
+use function json_encode;
+
+use const JSON_UNESCAPED_UNICODE;
+
 class JsonStrategy implements Strategy
 {
     /**

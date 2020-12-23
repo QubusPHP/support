@@ -18,9 +18,6 @@ use Qubus\Support\Serializer\Strategy\XmlStrategy;
 
 class XmlSerializer extends Serializer
 {
-    /**
-     *
-     */
     public function __construct()
     {
         parent::__construct(new XmlStrategy());
