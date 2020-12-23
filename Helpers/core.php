@@ -17,6 +17,45 @@ namespace Qubus\Support\Helpers;
 use ArrayAccess;
 use Closure;
 use Qubus\Exception\Data\TypeException;
+use Qubus\Support\DataType;
+
+use function array_key_exists;
+use function array_merge;
+use function array_unique;
+use function array_values;
+use function count;
+use function ctype_lower;
+use function debug_backtrace;
+use function explode;
+use function file_exists;
+use function htmlentities;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_bool;
+use function is_object;
+use function is_string;
+use function lcfirst;
+use function ltrim;
+use function next;
+use function ord;
+use function preg_match;
+use function preg_quote;
+use function preg_replace;
+use function rtrim;
+use function sprintf;
+use function str_replace;
+use function str_split;
+use function strpos;
+use function strrpos;
+use function strtolower;
+use function substr;
+use function trigger_error;
+use function trim;
+use function ucwords;
+
+use const E_USER_NOTICE;
+use const ENT_NOQUOTES;
 
 /**
  * Wrapper function for the core PHP function: trigger_error.
@@ -33,8 +72,8 @@ function trigger_error__(string $message, string $level = E_USER_NOTICE)
     $caller = next($debug);
     echo '<div class="alerts alerts-error center">';
     trigger_error(
-        $message . ' used <strong>' . $caller['function'] . '()</strong> called from <strong>' .
-    $caller['file'] . '</strong> on line <strong>' . $caller['line'] . '</strong>' . "\n<br />error handler",
+        $message . ' used <strong>' . $caller['function'] . '()</strong> called from <strong>'
+        . $caller['file'] . '</strong> on line <strong>' . $caller['line'] . '</strong>' . "\n<br />error handler",
         $level
     );
     echo '</div>';
@@ -107,7 +146,6 @@ function return_empty_string__()
  */
 function return_void__(): void
 {
-    //
 }
 
 /**
@@ -124,9 +162,9 @@ function load_file(string $file, bool $once = true, $showErrors = true)
 {
     if (file_exists("'$file'")) {
         if ($once) {
-            return require_once("'$file'");
+            return require_once "'$file'";
         } else {
-            return require("'$file'");
+            return require "'$file'";
         }
     } elseif (is_bool($showErrors) && $showErrors) {
         trigger_error__(
@@ -181,10 +219,10 @@ function remove_trailing_slash(string $string): string
  */
 function explode_array($delimiters, $string): array
 {
-    if (!is_array(($delimiters)) && !is_array($string)) {
+    if (! is_array($delimiters) && ! is_array($string)) {
         //if neither the delimiter nor the string are arrays
         return explode($delimiters, $string);
-    } elseif (!is_array($delimiters) && is_array($string)) {
+    } elseif (! is_array($delimiters) && is_array($string)) {
         //if the delimiter is not an array but the string is
         foreach ($string as $item) {
             foreach (explode($delimiters, $item) as $subItem) {
@@ -192,7 +230,7 @@ function explode_array($delimiters, $string): array
             }
         }
         return $items;
-    } elseif (is_array($delimiters) && !is_array($string)) {
+    } elseif (is_array($delimiters) && ! is_array($string)) {
         //if the delimiter is an array but the string is not
         $stringArray[] = $string;
         foreach ($delimiters as $delimiter) {
@@ -238,28 +276,18 @@ function is_null__($var): bool
 }
 
 /**
- * Truncate a string to a specified length without cutting a word off
+ * Truncates a string to the given length. It will optionally preserve
+ * HTML tags if $isHtml is set to true.
  *
- * @param   string  $string  The string to truncate
- * @param   int     $length  The length to truncate the string to
- * @param   string  $append  Text to append to the string IF it gets
- *                           truncated, defaults to '...'
- * @return  string Truncated string.
+ * @param string  $string        The string to truncate.
+ * @param int     $limit         The number of characters to truncate too.
+ * @param string  $continuation  The string to use to denote it was truncated.
+ * @param bool    $isHtml        Whether the string has HTML.
+ * @return string The truncated string.
  */
-function truncate_string(string $string, int $length, string $append = '...'): string
+function truncate_string($string, $limit, $continuation = '...', $isHtml = false): string
 {
-    $ret = substr($string, 0, $length);
-    $lastSpace = strrpos($ret, ' ');
-
-    if ($lastSpace !== false && $string != $ret) {
-        $ret = substr($ret, 0, $lastSpace);
-    }
-
-    if ($ret != $string) {
-        $ret .= $append;
-    }
-
-    return $ret;
+    return (new DataType())->string->truncate($string, $limit, $continuation, $isHtml);
 }
 
 /**
@@ -290,7 +318,7 @@ function compact_unique_array($a)
     $i = 0;
     foreach ($tmparr as $v) {
         $newarr[$i] = $v;
-        $i ++;
+        $i++;
     }
     return $newarr;
 }
@@ -325,7 +353,6 @@ function convert_array_to_object(array $array)
  *
  * @param string $pattern
  * @param string $subject
- * @return bool
  */
 function php_like($pattern, $subject): bool
 {
@@ -336,46 +363,43 @@ function php_like($pattern, $subject): bool
 /**
  * SQL Where operator in PHP.
  *
- * @param string $key
- * @param string $operator
  * @param type $pattern
- * @return bool
- * @throws \Qubus\Exception\Data\TypeException
+ * @throws TypeException
  */
 function php_where(string $key, string $operator, $pattern): bool
 {
     switch ($operator) {
-    case '=':
-        $filter = $key == $pattern;
-        break;
-    case '>':
-        $filter = $key > $pattern;
-        break;
-    case '>=':
-        $filter = $key >= $pattern;
-        break;
-    case '<':
-        $filter = $key < $pattern;
-        break;
-    case '<=':
-        $filter = $key <= $pattern;
-        break;
-    case 'in':
-        $filter = in_array($key, (array) $pattern);
-        break;
-    case 'not in':
-        $filter = !in_array($key, (array) $pattern);
-        break;
-    case 'match':
-        $filter = (bool) preg_match($pattern, $key);
-        break;
-    case 'between':
-        if (!is_array($pattern) || count($pattern) < 2) {
-            throw new TypeException("Query 'between' needs exactly 2 items in array.");
-        }
-        $filter = $key >= $pattern[0] && $key <= $pattern[1];
-        break;
-}
+        case '=':
+            $filter = $key === $pattern;
+            break;
+        case '>':
+            $filter = $key > $pattern;
+            break;
+        case '>=':
+            $filter = $key >= $pattern;
+            break;
+        case '<':
+            $filter = $key < $pattern;
+            break;
+        case '<=':
+            $filter = $key <= $pattern;
+            break;
+        case 'in':
+            $filter = in_array($key, (array) $pattern);
+            break;
+        case 'not in':
+            $filter = ! in_array($key, (array) $pattern);
+            break;
+        case 'match':
+            $filter = (bool) preg_match($pattern, $key);
+            break;
+        case 'between':
+            if (! is_array($pattern) || count($pattern) < 2) {
+                throw new TypeException("Query 'between' needs exactly 2 items in array.");
+            }
+            $filter = $key >= $pattern[0] && $key <= $pattern[1];
+            break;
+    }
     return $filter;
 }
 
@@ -389,26 +413,24 @@ function php_where(string $key, string $operator, $pattern): bool
  */
 function sort_element_callback(array $a, array $b)
 {
-    $a_name = (is_array($a) && isset($a['Name'])) ? $a['Name'] : 0;
-    $b_name = (is_array($b) && isset($b['Name'])) ? $b['Name'] : 0;
-    if ($a_name == $b_name) {
+    $aname = is_array($a) && isset($a['Name']) ? $a['Name'] : 0;
+    $bname = is_array($b) && isset($b['Name']) ? $b['Name'] : 0;
+    if ($aname === $bname) {
         return 0;
     }
-    return ($a_name < $b_name) ? -1 : 1;
+    return $aname < $bname ? -1 : 1;
 }
 
 /**
  * Return array specific item.
  *
  * @param array  $array
- * @param string $key
  * @param mixed  $default
- *
  * @return mixed
  */
 function return_array(array $array, ?string $key, $default = null)
 {
-    if (!array_accessible($array)) {
+    if (! array_accessible($array)) {
         return value($default);
     }
 
@@ -435,7 +457,6 @@ function return_array(array $array, ?string $key, $default = null)
  * Flatten a multi-dimensional associative array with dots.
  *
  * @param  array   $array
- * @param  string  $prepend
  * @return array
  */
 function array_dot(array $array, string $prepend = ''): array
@@ -444,9 +465,9 @@ function array_dot(array $array, string $prepend = ''): array
 
     foreach ($array as $key => $value) {
         if (is_array($value)) {
-            $results = array_merge($results, array_dot($value, $prepend.$key.'.'));
+            $results = array_merge($results, array_dot($value, $prepend . $key . '.'));
         } else {
-            $results[$prepend.$key] = $value;
+            $results[$prepend . $key] = $value;
         }
     }
 
@@ -457,7 +478,6 @@ function array_dot(array $array, string $prepend = ''): array
  * Check input is array accessable.
  *
  * @param mixed $value
- * @return bool
  */
 function array_accessible($value): bool
 {
@@ -468,8 +488,6 @@ function array_accessible($value): bool
  * Check array key exists.
  *
  * @param array  $array
- * @param string $key
- * @return bool
  */
 function array_exists(array $array, string $key): bool
 {
@@ -482,23 +500,16 @@ function array_exists(array $array, string $key): bool
 
 /**
  * Convert a string to snake case.
- *
- * @param string $string
- * @param string $delimiter
- * @return string
  */
 function snake_case(string $string, string $delimiter = '_'): string
 {
-    $replace = '$1'.$delimiter.'$2';
+    $replace = '$1' . $delimiter . '$2';
 
     return ctype_lower($string) ? $string : strtolower(preg_replace('/(.)([A-Z])/', $replace, $string));
 }
 
 /**
  * Convert a value to studly caps case.
- *
- * @param string $string
- * @return string
  */
 function studly_case(string $string): string
 {
@@ -510,7 +521,6 @@ function studly_case(string $string): string
 /**
  * Convert a value to camel caps case.
  *
- * @param string $str
  * @param array $noStrip
  * @return string
  */
@@ -568,4 +578,38 @@ function remove_accents(string $string, string $encoding = 'utf-8')
     $string = preg_replace('#&[^;]+;#', '', $string);
 
     return $string;
+}
+
+/**
+ * Alternative to call_user_func_array().
+ *
+ * @param string|array $callback
+ */
+function call_qubus_func_array($callback, array $args)
+{
+    // deal with "class::method" syntax
+    if (is_string($callback) && strpos($callback, '::') !== false) {
+        $callback = explode('::', $callback);
+    }
+
+    // dynamic call on an object?
+    if (is_array($callback) && isset($callback[1]) && is_object($callback[0])) {
+        // make sure our arguments array is indexed
+        if ($count = count($args)) {
+            $args = array_values($args);
+        }
+
+        [$instance, $method] = $callback;
+
+        return $instance->{$method}(...$args);
+    } elseif (is_array($callback) && isset($callback[1]) && is_string($callback[0])) { // static call?
+        [$class, $method] = $callback;
+        $class = '\\' . ltrim($class, '\\');
+
+        return $class::{$method}(...$args);
+    } elseif (is_string($callback) || $callback instanceof Closure) {
+        is_string($callback) && $callback = ltrim($callback, '\\');
+    }
+
+    return $callback(...$args);
 }

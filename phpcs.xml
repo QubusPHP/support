@@ -15,12 +15,14 @@
     <file>./DateTime</file>
     <file>./Helpers</file>
     <file>./Serializer</file>
-    <file>./Tests</file>
-    <file>Arr.php</file>
+    <file>ArrayHelper.php</file>
     <file>Assets.php</file>
     <file>Container.php</file>
     <file>DataContainer.php</file>
+    <file>DataObjectCollection.php</file>
+    <file>DataType.php</file>
     <file>Inflector.php</file>
+    <file>StringHelper.php</file>
 
     <!-- Additional QubusPHP Coding Standard rules. -->
 

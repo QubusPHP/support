@@ -16,98 +16,132 @@ namespace Qubus\Support;
 
 use Cocur\Slugify\Slugify;
 
+use function filter_var;
+use function html_entity_decode;
+use function in_array;
+use function is_array;
+use function is_numeric;
+use function preg_match;
+use function preg_replace;
+use function preg_replace_callback;
 use function Qubus\Support\Helpers\remove_accents;
+use function range;
+use function str_replace;
+use function strip_tags;
+use function strrpos;
+use function strtolower;
+use function strtoupper;
+use function strval;
+use function substr;
+use function trim;
+use function ucfirst;
+use function ucwords;
+
+use const ENT_QUOTES;
+use const FILTER_SANITIZE_STRING;
 
 /**
  * Pluralize and singularize English words.
  */
 class Inflector
 {
-    /**
-     * @var  array  default list of uncountable words, in English
-     */
+    /** @var  array  default list of uncountable words, in English */
     protected static $uncountableWords = [
-        'equipment', 'information', 'rice', 'money',
-        'species', 'series', 'fish', 'meta', 'feedback',
-        'people','stadia', 'chassis', 'clippers', 'debris',
-        'diabetes', 'gallows', 'graffiti', 'headquarters',
-        'innings', 'news', 'nexus', 'proceedings', 'research',
-        'weather'
+        'equipment',
+        'information',
+        'rice',
+        'money',
+        'species',
+        'series',
+        'fish',
+        'meta',
+        'feedback',
+        'people',
+        'stadia',
+        'chassis',
+        'clippers',
+        'debris',
+        'diabetes',
+        'gallows',
+        'graffiti',
+        'headquarters',
+        'innings',
+        'news',
+        'nexus',
+        'proceedings',
+        'research',
+        'weather',
     ];
 
-    /**
-     * @var array Default list of iregular plural words, in English
-     */
+    /** @var array Default list of iregular plural words, in English */
     protected static $pluralRules = [
-        '/^(ox)$/i'                 => '\1\2en',     // ox
-        '/([m|l])ouse$/i'           => '\1ice',      // mouse, louse
-        '/(matr|vert|ind)ix|ex$/i'  => '\1ices',     // matrix, vertex, index
-        '/(x|ch|ss|sh)$/i'          => '\1es',       // search, switch, fix, box, process, address
-        '/([^aeiouy]|qu)y$/i'       => '\1ies',      // query, ability, agency
-        '/(hive)$/i'                => '\1s',        // archive, hive
-        '/(chef)$/i'                => '\1s',        // chef
-        '/(?:([^f])fe|([lr])f)$/i'  => '\1\2ves',    // half, safe, wife
-        '/sis$/i'                   => 'ses',        // basis, diagnosis
-        '/([ti])um$/i'              => '\1a',        // datum, medium
-        '/(p)erson$/i'              => '\1eople',    // person, salesperson
-        '/(m)an$/i'                 => '\1en',       // man, woman, spokesman
-        '/(c)hild$/i'               => '\1hildren',  // child
-        '/(buffal|tomat)o$/i'       => '\1\2oes',    // buffalo, tomato
-        '/(bu|campu)s$/i'           => '\1\2ses',    // bus, campus
-        '/(alumn|bacill|cact|foc|fung|nucle|radi|stimul|syllab|termin)us$/i' => '\1i',  // alumnus, cactus, fungus
-        '/(alias|status|virus)$/i'  => '\1es',       // alias
-        '/(octop)us$/i'             => '\1i',        // octopus
-        '/(ax|cris|test)is$/i'      => '\1es',       // axis, crisis
-        '/(quiz)$/i'                => '\1zes',      // quiz
-        '/s$/'                      => 's',          // no change (compatibility)
-        '/^$/'                      => '',
-        '/$/'                       => 's',
+        '/^(ox)$/i'                => '\1\2en', // ox
+        '/([m|l])ouse$/i'          => '\1ice', // mouse, louse
+        '/(matr|vert|ind)ix|ex$/i' => '\1ices', // matrix, vertex, index
+        '/(x|ch|ss|sh)$/i'         => '\1es', // search, switch, fix, box, process, address
+        '/([^aeiouy]|qu)y$/i'      => '\1ies', // query, ability, agency
+        '/(hive)$/i'               => '\1s', // archive, hive
+        '/(chef)$/i'               => '\1s', // chef
+        '/(?:([^f])fe|([lr])f)$/i' => '\1\2ves', // half, safe, wife
+        '/sis$/i'                  => 'ses', // basis, diagnosis
+        '/([ti])um$/i'             => '\1a', // datum, medium
+        '/(p)erson$/i'             => '\1eople', // person, salesperson
+        '/(m)an$/i'                => '\1en', // man, woman, spokesman
+        '/(c)hild$/i'              => '\1hildren', // child
+        '/(buffal|tomat)o$/i'      => '\1\2oes', // buffalo, tomato
+        '/(bu|campu)s$/i'          => '\1\2ses', // bus, campus
+        '/(alumn|bacill|cact|foc|fung|nucle|radi|stimul|syllab|termin)us$/i' => '\1i', // alumnus, cactus, fungus
+        '/(alias|status|virus)$/i'                                           => '\1es', // alias
+        '/(octop)us$/i'                                                      => '\1i', // octopus
+        '/(ax|cris|test)is$/i'                                               => '\1es', // axis, crisis
+        '/(quiz)$/i'                                                         => '\1zes', // quiz
+        '/s$/'                                                               => 's', // no change (compatibility)
+        '/^$/'                                                               => '',
+        '/$/'                                                                => 's',
     ];
 
-    /**
-     * @var  array  default list of iregular singular words, in English
-     */
+    /** @var  array  default list of iregular singular words, in English */
     protected static $singularRules = [
-        '/(matr)ices$/i'         => '\1ix',
-        '/(s)tatuses$/i'         => '\1\2tatus',
-        '/^(.*)(menu)s$/i'       => '\1\2',
-        '/(quiz)zes$/i'          => '\\1',
-        '/(vert|ind)ices$/i'     => '\1ex',
-        '/^(ox)en/i'             => '\1',
-        '/(alias)es$/i'          => '\1',
-        '/([octop|vir])i$/i'     => '\1us',
+        '/(matr)ices$/i'     => '\1ix',
+        '/(s)tatuses$/i'     => '\1\2tatus',
+        '/^(.*)(menu)s$/i'   => '\1\2',
+        '/(quiz)zes$/i'      => '\\1',
+        '/(vert|ind)ices$/i' => '\1ex',
+        '/^(ox)en/i'         => '\1',
+        '/(alias)es$/i'      => '\1',
+        '/([octop|vir])i$/i' => '\1us',
         '/(alumn|bacill|cact|foc|fung|nucle|radi|stimul|syllab|termin|viri?)i$/i' => '\1us',
-        '/([ftw]ax)es/i'         => '\1',
-        '/(cris|ax|test)es$/i'   => '\1is',
-        '/(shoe)s$/i'            => '\1',
-        '/(o)es$/i'              => '\1',
-        '/(bus|campus)es$/i'     => '\1',
-        '/([^a])uses$/'          => '\1us',
-        '/ouses$/'               => 'ouse',
-        '/([m|l])ice$/i'         => '\1ouse',
-        '/(x|ch|ss|sh)es$/i'     => '\1',
-        '/(m)ovies$/i'           => '\1\2ovie',
-        '/(s)eries$/i'           => '\1\2eries',
-        '/([^aeiouy]|qu)ies$/i'  => '\1y',
-        '/([lr])ves$/i'          => '\1f',
-        '/(tive)s$/i'            => '\1',
-        '/(hive)s$/i'            => '\1',
-        '/(drive)s$/i'           => '\1',
-        '/([^f])ves$/i'          => '\1fe',
-        '/([le])ves$/i'          => '\1f',
-        '/([^rfoa])ves$/i'       => '\1fe',
-        '/(^analy)ses$/i'        => '\1sis',
+        '/([ftw]ax)es/i'        => '\1',
+        '/(cris|ax|test)es$/i'  => '\1is',
+        '/(shoe)s$/i'           => '\1',
+        '/(o)es$/i'             => '\1',
+        '/(bus|campus)es$/i'    => '\1',
+        '/([^a])uses$/'         => '\1us',
+        '/ouses$/'              => 'ouse',
+        '/([m|l])ice$/i'        => '\1ouse',
+        '/(x|ch|ss|sh)es$/i'    => '\1',
+        '/(m)ovies$/i'          => '\1\2ovie',
+        '/(s)eries$/i'          => '\1\2eries',
+        '/([^aeiouy]|qu)ies$/i' => '\1y',
+        '/([lr])ves$/i'         => '\1f',
+        '/(tive)s$/i'           => '\1',
+        '/(hive)s$/i'           => '\1',
+        '/(drive)s$/i'          => '\1',
+        '/([^f])ves$/i'         => '\1fe',
+        '/([le])ves$/i'         => '\1f',
+        '/([^rfoa])ves$/i'      => '\1fe',
+        '/(^analy)ses$/i'       => '\1sis',
         '/((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$/i' => '\1\2sis',
-        '/([ti])a$/i'            => '\1um',
-        '/(p)eople$/i'           => '\1\2erson',
-        '/(m)en$/i'              => '\1an',
-        '/(s)tatuses$/i'         => '\1\2tatus',
-        '/(c)hildren$/i'         => '\1\2hild',
-        '/(n)ews$/i'             => '\1\2ews',
-        '/eaus$/'                => 'eau',
-        '/([^us])s$/i'           => '\1',
-        '/^(.*us)$/'             => '\\1',
-        '/s$/i'                  => '',
+        '/([ti])a$/i'    => '\1um',
+        '/(p)eople$/i'   => '\1\2erson',
+        '/(m)en$/i'      => '\1an',
+        '/(s)tatuses$/i' => '\1\2tatus',
+        '/(c)hildren$/i' => '\1\2hild',
+        '/(n)ews$/i'     => '\1\2ews',
+        '/eaus$/'        => 'eau',
+        '/([^us])s$/i'   => '\1',
+        '/^(.*us)$/'     => '\\1',
+        '/s$/i'          => '',
     ];
 
     protected static bool $init = false;
@@ -126,9 +160,10 @@ class Inflector
     /**
      * Add order suffix to numbers ex. 1st 2nd 3rd 4th 5th.
      *
+     * @link    http://snipplr.com/view/4627/a-function-to-add-a-prefix-to-numbers-ex-1st-2nd-3rd-4th-5th/
+     *
      * @param   int     $number the number to ordinalize
      * @return  string  the ordinalized version of $number
-     * @link    http://snipplr.com/view/4627/a-function-to-add-a-prefix-to-numbers-ex-1st-2nd-3rd-4th-5th/
      */
     public static function ordinalize($number)
     {
@@ -136,22 +171,22 @@ class Inflector
             return $number;
         }
 
-        if (in_array(($number % 100), range(11, 13))) {
+        if (in_array($number % 100, range(11, 13))) {
             return $number . 'th';
         } else {
             switch ($number % 10) {
                 case 1:
                     return $number . 'st';
-                    break;
+                break;
                 case 2:
                     return $number . 'nd';
-                    break;
+                break;
                 case 3:
                     return $number . 'rd';
-                    break;
+                break;
                 default:
                     return $number . 'th';
-                    break;
+                break;
             }
         }
     }
@@ -290,7 +325,7 @@ class Inflector
         if (! is_array($string)) {
             $string = filter_var($string, FILTER_SANITIZE_STRING);
         }
-        
+
         // Remove tags
         if (is_array($string)) {
             foreach ($string as $k => $v) {
@@ -301,9 +336,7 @@ class Inflector
         // Decode all entities to their simpler forms
         $string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 
-        $slugify = (new Slugify($constructorOptions))->slugify($string, $onTheFlyOptions);
-
-        return $slugify;
+        return (new Slugify($constructorOptions))->slugify($string, $onTheFlyOptions);
     }
 
     /**
@@ -317,7 +350,7 @@ class Inflector
     public static function humanize($str, $sep = '_', $lowercase = true)
     {
         // Allow dash, otherwise default to underscore
-        $sep = $sep != '-' ? '_' : $sep;
+        $sep = $sep !== '-' ? '_' : $sep;
 
         if ($lowercase === true) {
             $str = ucfirst($str);
@@ -401,7 +434,7 @@ class Inflector
      */
     public static function classify($name, $forceSingular = true)
     {
-        $class = ($forceSingular) ? static::singularize($name) : $name;
+        $class = $forceSingular ? static::singularize($name) : $name;
         return static::wordsToUpper($class);
     }
 
@@ -415,6 +448,6 @@ class Inflector
     {
         static::$init || static::initialize();
 
-        return ! (in_array(strtolower(strval($word)), static::$uncountableWords));
+        return ! in_array(strtolower(strval($word)), static::$uncountableWords);
     }
 }

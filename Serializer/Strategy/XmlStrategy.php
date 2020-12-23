@@ -14,19 +14,28 @@ declare(strict_types=1);
 
 namespace Qubus\Support\Serializer\Strategy;
 
-use SimpleXMLElement;
 use Qubus\Support\Serializer\Serializer;
+use SimpleXMLElement;
+
+use function array_flip;
+use function array_keys;
+use function array_values;
+use function explode;
+use function gettype;
+use function is_array;
+use function is_numeric;
+use function simplexml_load_string;
+use function str_replace;
+use function strpos;
 
 class XmlStrategy implements Strategy
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $replacements = [
         Serializer::CLASS_IDENTIFIER_KEY => 'serializer_type',
-        Serializer::SCALAR_TYPE => 'serializer_scalar',
-        Serializer::SCALAR_VALUE => 'serializer_value',
-        Serializer::MAP_TYPE => 'serializer_map',
+        Serializer::SCALAR_TYPE          => 'serializer_scalar',
+        Serializer::SCALAR_VALUE         => 'serializer_value',
+        Serializer::MAP_TYPE             => 'serializer_map',
     ];
 
     /**
@@ -67,14 +76,13 @@ class XmlStrategy implements Strategy
      * Converts an array to XML using SimpleXMLElement.
      *
      * @param array            $data
-     * @param SimpleXMLElement $xmlData
      */
     private function arrayToXml(array &$data, SimpleXMLElement $xmlData)
     {
         foreach ($data as $key => $value) {
             if (is_array($value)) {
                 if (is_numeric($key)) {
-                    $key = 'serializer_element_'.gettype($key).'_'.$key;
+                    $key = 'serializer_element_' . gettype($key) . '_' . $key;
                 }
                 $subnode = $xmlData->addChild($key);
                 $this->arrayToXml($value, $subnode);
@@ -85,8 +93,7 @@ class XmlStrategy implements Strategy
     }
 
     /**
-     * @param $value
-     *
+     * @param mixed $value
      * @return array
      */
     public function unserialize($value)
@@ -137,8 +144,7 @@ class XmlStrategy implements Strategy
     }
 
     /**
-     * @param $key
-     *
+     * @param mixed $key
      * @return float|int
      */
     private static function getNumericKeyValue($key)

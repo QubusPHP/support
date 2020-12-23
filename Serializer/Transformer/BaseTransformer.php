@@ -15,8 +15,16 @@ declare(strict_types=1);
 namespace Qubus\Support\Serializer\Transformer;
 
 use Qubus\Exception\Data\TypeException;
-use Qubus\Support\Serializer\Strategy\Strategy;
 use Qubus\Support\Serializer\Serializer;
+use Qubus\Support\Serializer\Strategy\Strategy;
+
+use function array_key_exists;
+use function array_pop;
+use function count;
+use function end;
+use function is_array;
+use function is_scalar;
+use function sprintf;
 
 abstract class BaseTransformer implements Strategy
 {
@@ -48,7 +56,7 @@ abstract class BaseTransformer implements Strategy
             $array = $array[Serializer::SCALAR_VALUE];
         }
 
-        if (is_array($array) && !array_key_exists(Serializer::SCALAR_VALUE, $array)) {
+        if (is_array($array) && ! array_key_exists(Serializer::SCALAR_VALUE, $array)) {
             foreach ($array as &$value) {
                 if (is_array($value)) {
                     $this->recursiveSetValues($value);
@@ -67,8 +75,8 @@ abstract class BaseTransformer implements Strategy
         $parentKey = null,
         $currentKey = null
     ) {
-        if (1 === count($array) && is_scalar(\end($array))) {
-            if ($parentKey == $currentKey) {
+        if (1 === count($array) && is_scalar(end($array))) {
+            if ($parentKey === $currentKey) {
                 $array = array_pop($array);
             }
         }
@@ -89,12 +97,12 @@ abstract class BaseTransformer implements Strategy
     }
 
     /**
-     * @param $value
+     * @param mixed $value
      * @throws TypeException
-     * @return array
+     * @return void
      */
     public function unserialize($value)
     {
-        throw new TypeException(sprintf('%s does not perform unserializations.', __CLASS__));
+        throw new TypeException(sprintf('%s does not perform unserializations.', self::class));
     }
 }

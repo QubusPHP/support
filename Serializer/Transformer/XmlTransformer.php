@@ -14,8 +14,12 @@ declare(strict_types=1);
 
 namespace Qubus\Support\Serializer\Transformer;
 
-use SimpleXMLElement;
 use DOMDocument;
+use SimpleXMLElement;
+
+use function gettype;
+use function is_array;
+use function is_numeric;
 
 class XmlTransformer extends ArrayTransformer
 {
@@ -43,7 +47,6 @@ class XmlTransformer extends ArrayTransformer
      * Converts an array to XML using SimpleXMLElement.
      *
      * @param array            $data
-     * @param SimpleXMLElement $xmlData
      */
     private function arrayToXml(array &$data, SimpleXMLElement $xmlData)
     {

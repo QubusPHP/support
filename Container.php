@@ -25,6 +25,7 @@ use function array_key_exists;
 use function array_keys;
 use function count;
 use function is_object;
+use function is_string;
 use function method_exists;
 
 class Container implements ContainerInterface, ArrayAccess, Countable, IteratorAggregate
@@ -60,11 +61,11 @@ class Container implements ContainerInterface, ArrayAccess, Countable, IteratorA
      *
      * @param  string $key The data key
      * @return mixed The data value.
-     * @throws \Qubus\Exception\Exception;
+     * @throws Exception
      */
     public function get($key)
     {
-        if (!is_string($id) || empty($id)) {
+        if (! is_string($id) || empty($id)) {
             throw new Exception('The key must be a non-empty string.');
         }
 
@@ -198,8 +199,6 @@ class Container implements ContainerInterface, ArrayAccess, Countable, IteratorA
 
     /**
      * Countable
-     *
-     * @return int
      */
     public function count(): int
     {
