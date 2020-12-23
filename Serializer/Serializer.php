@@ -14,13 +14,41 @@ declare(strict_types=1);
 
 namespace Qubus\Support\Serializer;
 
-use Qubus\Exception\Data\TypeException;
-use SplObjectStorage;
 use Closure;
 use DatePeriod;
+use Qubus\Support\Serializer\Strategy\Strategy;
 use ReflectionClass;
 use ReflectionException;
-use Qubus\Support\Serializer\Strategy\Strategy;
+use ReflectionProperty;
+use SplObjectStorage;
+
+use function array_key_exists;
+use function array_keys;
+use function array_map;
+use function array_merge;
+use function array_unique;
+use function class_exists;
+use function floatval;
+use function get_class;
+use function get_object_vars;
+use function gettype;
+use function intval;
+use function is_array;
+use function is_object;
+use function is_resource;
+use function is_string;
+use function is_subclass_of;
+use function method_exists;
+use function preg_match;
+use function preg_replace;
+use function serialize;
+use function strcmp;
+use function strlen;
+use function strpos;
+use function strtolower;
+use function substr;
+use function trim;
+use function unserialize;
 
 class Serializer implements Serializeable
 {
@@ -35,8 +63,6 @@ class Serializer implements Serializeable
      * Storage for object.
      *
      * Used for recursion
-     *
-     * @var SplObjectStorage
      */
     protected SplObjectStorage $storage;
 
@@ -49,35 +75,23 @@ class Serializer implements Serializeable
 
     /**
      * Object mapping index.
-     *
-     * @var int
      */
     protected int $mappingIndex = 0;
 
-    /**
-     * @var Strategy $strategy
-     */
     protected Strategy $strategy;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $dateTimeClassType = ['DateTime', 'DateTimeImmutable', 'DateTimeZone', 'DateInterval', 'DatePeriod'];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $serializationMap = [
-        'array' => 'serializeArray',
+        'array'   => 'serializeArray',
         'integer' => 'serializeScalar',
-        'double' => 'serializeScalar',
+        'double'  => 'serializeScalar',
         'boolean' => 'serializeScalar',
-        'string' => 'serializeScalar',
+        'string'  => 'serializeScalar',
     ];
 
-    /**
-     * @param Strategy $strategy
-     */
     public function __construct(Strategy $strategy)
     {
         $this->strategy = $strategy;
@@ -137,7 +151,7 @@ class Serializer implements Serializeable
             return $this->serializeObject($data);
         }
 
-        $type = (gettype($data) && $data !== null) ? gettype($data) : 'string';
+        $type = gettype($data) && $data !== null ? gettype($data) : 'string';
         $func = $this->serializationMap[$type];
 
         return $this->$func($data);
@@ -148,7 +162,6 @@ class Serializer implements Serializeable
      *
      * @param mixed  $value
      * @param string $classFqn
-     *
      * @return bool
      */
     private function isInstanceOf($value, $classFqn)
@@ -203,11 +216,11 @@ class Serializer implements Serializeable
      */
     protected function unserializeData($data)
     {
-        if (null === $data || !is_array($data)) {
+        if (null === $data || ! is_array($data)) {
             return $data;
         }
 
-        if (isset($data[self::MAP_TYPE]) && !isset($data[self::CLASS_IDENTIFIER_KEY])) {
+        if (isset($data[self::MAP_TYPE]) && ! isset($data[self::CLASS_IDENTIFIER_KEY])) {
             $data = $data[self::SCALAR_VALUE];
 
             return $this->unserializeData($data);
@@ -229,7 +242,7 @@ class Serializer implements Serializeable
     }
 
     /**
-     * @param $value
+     * @param mixed $value
      * @return float|int|null|bool
      */
     protected function getScalarValue($value)
@@ -269,18 +282,17 @@ class Serializer implements Serializeable
             return $this->mapping[substr($className, 1)];
         }
 
-        if (!class_exists($className)) {
-            throw new SerializerException('Unable to find class '.$className);
+        if (! class_exists($className)) {
+            throw new SerializerException('Unable to find class ' . $className);
         }
 
-        return (null === ($obj = $this->unserializeDateTimeFamilyObject($data, $className)))
-            ? $this->unserializeUserDefinedObject($data, $className) : $obj;
+        return null === ($obj = $this->unserializeDateTimeFamilyObject($data, $className))
+        ? $this->unserializeUserDefinedObject($data, $className) : $obj;
     }
 
     /**
      * @param array  $data
      * @param string $className
-     *
      * @return mixed
      */
     protected function unserializeDateTimeFamilyObject(array $data, $className)
@@ -297,7 +309,6 @@ class Serializer implements Serializeable
 
     /**
      * @param string $className
-     *
      * @return bool
      */
     protected function isDateTimeFamilyObject($className)
@@ -314,7 +325,6 @@ class Serializer implements Serializeable
     /**
      * @param string $className
      * @param array  $attributes
-     *
      * @return mixed
      */
     protected function restoreUsingUnserialize($className, array $attributes)
@@ -326,7 +336,7 @@ class Serializer implements Serializeable
         $obj = (object) $attributes;
         $serialized = preg_replace(
             '|^O:\d+:"\w+":|',
-            'O:'.strlen($className).':"'.$className.'":',
+            'O:' . strlen($className) . ':"' . $className . '":',
             serialize($obj)
         );
 
@@ -336,7 +346,6 @@ class Serializer implements Serializeable
     /**
      * @param array  $data
      * @param string $className
-     *
      * @return object
      */
     protected function unserializeUserDefinedObject(array $data, $className)
@@ -356,7 +365,6 @@ class Serializer implements Serializeable
 
     /**
      * @param array           $data
-     * @param ReflectionClass $ref
      * @param mixed           $obj
      * @return mixed
      */
@@ -377,7 +385,6 @@ class Serializer implements Serializeable
 
     /**
      * @param $data
-     *
      * @return string
      */
     protected function serializeScalar($data)
@@ -388,7 +395,7 @@ class Serializer implements Serializeable
         }
 
         return [
-            self::SCALAR_TYPE => $type,
+            self::SCALAR_TYPE  => $type,
             self::SCALAR_VALUE => $data,
         ];
     }
@@ -415,13 +422,12 @@ class Serializer implements Serializeable
      * Extract the data from an object.
      *
      * @param mixed $data
-     *
      * @return array
      */
     protected function serializeObject($data)
     {
         if ($this->storage->contains($data)) {
-            return [self::CLASS_IDENTIFIER_KEY => '@'.$this->storage[$data]];
+            return [self::CLASS_IDENTIFIER_KEY => '@' . $this->storage[$data]];
         }
 
         $this->storage->attach($data, $this->mappingIndex++);
@@ -435,8 +441,6 @@ class Serializer implements Serializeable
     /**
      * @param mixed           $value
      * @param string          $className
-     * @param ReflectionClass $ref
-     *
      * @return array
      */
     protected function serializeInternalClass($value, $className, ReflectionClass $ref)
@@ -451,9 +455,7 @@ class Serializer implements Serializeable
     /**
      * Return the list of properties to be serialized.
      *
-     * @param ReflectionClass $ref
-     * @param $data
-     *
+     * @param object $data
      * @return array
      */
     protected function getObjectProperties(ReflectionClass $ref, $data)
@@ -470,9 +472,7 @@ class Serializer implements Serializeable
      * Extract the object data.
      *
      * @param mixed            $value
-     * @param \ReflectionClass $rc
      * @param array            $properties
-     *
      * @return array
      */
     protected function extractObjectData($value, ReflectionClass $rc, array $properties)
@@ -487,7 +487,6 @@ class Serializer implements Serializeable
 
     /**
      * @param mixed           $value
-     * @param ReflectionClass $rc
      * @param array           $properties
      * @param array           $data
      */
@@ -506,14 +505,13 @@ class Serializer implements Serializeable
 
     /**
      * @param mixed           $value
-     * @param ReflectionClass $rc
      * @param array           $data
      */
     protected function extractAllInhertitedProperties($value, ReflectionClass $rc, array &$data)
     {
         do {
             $rp = [];
-            /* @var $property \ReflectionProperty */
+            /** @var ReflectionProperty $property */
             foreach ($rc->getProperties() as $property) {
                 $property->setAccessible(true);
                 $rp[$property->getName()] = $property->getValue($value);
@@ -526,8 +524,6 @@ class Serializer implements Serializeable
      * Checks if data is serialized.
      *
      * @param string|array|object $data
-     * @param bool $strict
-     * @return bool
      */
     private function isSerialized($data, bool $strict = true): bool
     {

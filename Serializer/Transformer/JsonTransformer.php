@@ -14,11 +14,16 @@ declare(strict_types=1);
 
 namespace Qubus\Support\Serializer\Transformer;
 
+use function json_encode;
+
+use const JSON_PRETTY_PRINT;
+use const JSON_UNESCAPED_SLASHES;
+use const JSON_UNESCAPED_UNICODE;
+
 class JsonTransformer extends ArrayTransformer
 {
     /**
      * @param mixed $value
-     *
      * @return string
      */
     public function serialize($value)

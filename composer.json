@@ -18,12 +18,14 @@
     ],
     "require": {
         "php": "^7.4",
+        "ext-mbstring": "*",
         "cocur/slugify": "^4.0",
         "mrclay/minify": "^3.0",
         "nesbot/carbon": "^2.41",
         "psr/container": "^1.0",
+        "psr/log": "^1.1",
         "qubus/event-dispatcher": "^1.0",
-        "qubus/exception": "^1.1"
+        "qubus/exception": "^1.2"
     },
     "require-dev": {
         "laminas/laminas-coding-standard": "^2.0",

@@ -18,7 +18,6 @@ class NullStrategy implements Strategy
 {
     /**
      * @param mixed $value
-     *
      * @return string
      */
     public function serialize($value)
@@ -28,7 +27,6 @@ class NullStrategy implements Strategy
 
     /**
      * @param string $value
-     *
      * @return array
      */
     public function unserialize($value)
