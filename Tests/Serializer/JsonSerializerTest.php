@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Support\Serializer;
 
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use DateTime;
 use Qubus\Support\Serializer\JsonSerializer;
@@ -22,7 +23,7 @@ class JsonSerializerTest extends TestCase
         $serializer = new JsonSerializer();
         $serializedObject = $serializer->serialize($object);
 
-        $this->assertEquals($object, $serializer->unserialize($serializedObject));
+        Assert::assertEquals($object, $serializer->unserialize($serializedObject));
     }
 
     private function getObject()
@@ -55,6 +56,6 @@ class JsonSerializerTest extends TestCase
         $serializer = new JsonSerializer();
         $serializedObject = $serializer->serialize($arrayOfObjects);
 
-        $this->assertEquals($arrayOfObjects, $serializer->unserialize($serializedObject));
+        Assert::assertEquals($arrayOfObjects, $serializer->unserialize($serializedObject));
     }
 }

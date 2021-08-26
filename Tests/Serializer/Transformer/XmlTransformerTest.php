@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Support\Serializer\Transformer;
 
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use DateTime;
 use Qubus\Exception\Data\TypeException;
@@ -51,7 +52,7 @@ class XmlTransformerTest extends TestCase
 </data>\n
 STRING;
 
-        $this->assertEquals($expected, $xml);
+        Assert::assertEquals($expected, $xml);
     }
 
     /**
@@ -138,7 +139,7 @@ STRING;
 </data>\n
 STRING;
 
-        $this->assertEquals($expected, $serializer->serialize($arrayOfObjects));
+        Assert::assertEquals($expected, $serializer->serialize($arrayOfObjects));
     }
 
     public function testUnserializeWillThrowException()

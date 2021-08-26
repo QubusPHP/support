@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Support\Serializer\Transformer;
 
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use DateTime;
 use Qubus\Exception\Data\TypeException;
@@ -38,7 +39,7 @@ class FlatArrayTransformerTest extends TestCase
 
         ];
 
-        $this->assertEquals($expected, $serializer->serialize($object));
+        Assert::assertEquals($expected, $serializer->serialize($object));
     }
 
     /**
@@ -98,7 +99,7 @@ class FlatArrayTransformerTest extends TestCase
             '1.comments.0.user.name' => 'Barristan Selmy',
         ];
 
-        $this->assertEquals($expected, $serializer->serialize($arrayOfObjects));
+        Assert::assertEquals($expected, $serializer->serialize($arrayOfObjects));
     }
 
     public function testUnserializeWillThrowException()
