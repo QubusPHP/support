@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Support\Serializer;
 
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use DateTime;
 use SplFixedArray;
@@ -26,7 +27,7 @@ class DeepCopySerializerTest extends TestCase
         $serializer = new DeepCopySerializer(new NullStrategy());
         $serializedObject = $serializer->serialize($object);
 
-        $this->assertEquals($object, $serializer->unserialize($serializedObject));
+        Assert::assertEquals($object, $serializer->unserialize($serializedObject));
     }
 
     private function getObject()
@@ -59,7 +60,7 @@ class DeepCopySerializerTest extends TestCase
         $serializer = new DeepCopySerializer(new NullStrategy());
         $serializedObject = $serializer->serialize($arrayOfObjects);
 
-        $this->assertEquals($arrayOfObjects, $serializer->unserialize($serializedObject));
+        Assert::assertEquals($arrayOfObjects, $serializer->unserialize($serializedObject));
     }
 
     public function testObjectStorageCopyDuringSerialization()
@@ -73,7 +74,7 @@ class DeepCopySerializerTest extends TestCase
         $serializer = new DeepCopySerializer(new NullStrategy());
         $serializedObject = $serializer->serialize($stdClass);
 
-        $this->assertEquals($stdClass, $serializer->unserialize($serializedObject));
+        Assert::assertEquals($stdClass, $serializer->unserialize($serializedObject));
     }
 
     public function testSplFixedArraySerialization()
@@ -86,7 +87,7 @@ class DeepCopySerializerTest extends TestCase
         $serializer = new DeepCopySerializer(new NullStrategy());
         $serializedObject = $serializer->serialize($splFixedArray);
 
-        $this->assertEquals($splFixedArray, $serializer->unserialize($serializedObject));
+        Assert::assertEquals($splFixedArray, $serializer->unserialize($serializedObject));
     }
 
     public function testSplFixedArrayChildSerialization()
@@ -99,6 +100,6 @@ class DeepCopySerializerTest extends TestCase
         $serializer = new DeepCopySerializer(new NullStrategy());
         $serializedObject = $serializer->serialize($splFixedArray);
 
-        $this->assertEquals($splFixedArray, $serializer->unserialize($serializedObject));
+        Assert::assertEquals($splFixedArray, $serializer->unserialize($serializedObject));
     }
 }

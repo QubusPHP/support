@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Support\Serializer;
 
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Qubus\Support\Serializer\Serializer;
 use Qubus\Support\Serializer\Strategy\JsonStrategy;
@@ -22,7 +23,7 @@ class SerializerTest extends TestCase
     /**
      * Test case setup.
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->serializer = new Serializer(new JsonStrategy());
     }
@@ -38,8 +39,8 @@ class SerializerTest extends TestCase
         $date = (new DateTime('2014-06-15 12:00:00', new DateTimeZone('UTC')))->format('c');
 
         $obj = $this->serializer->unserialize($this->serializer->serialize($date));
-        $this->assertSame($date, $obj);
-        $this->assertEquals($date, $obj);
+        Assert::assertSame($date, $obj);
+        Assert::assertEquals($date, $obj);
     }
 
     /**
@@ -52,7 +53,7 @@ class SerializerTest extends TestCase
      */
     public function testSerializeScalar($scalar, $jsoned)
     {
-        $this->assertSame($jsoned, $this->serializer->serialize($scalar));
+        Assert::assertSame($jsoned, $this->serializer->serialize($scalar));
     }
 
     /**
@@ -65,7 +66,7 @@ class SerializerTest extends TestCase
      */
     public function testUnserializeScalar($scalar, $jsoned)
     {
-        $this->assertSame($scalar, $this->serializer->unserialize($jsoned));
+        Assert::assertSame($scalar, $this->serializer->unserialize($jsoned));
     }
 
     /**
@@ -121,7 +122,7 @@ class SerializerTest extends TestCase
      */
     public function testSerializeArrayNoObject($array, $jsoned)
     {
-        $this->assertSame($jsoned, $this->serializer->serialize($array));
+        Assert::assertSame($jsoned, $this->serializer->serialize($array));
     }
 
     /**
@@ -134,7 +135,7 @@ class SerializerTest extends TestCase
      */
     public function testUnserializeArrayNoObject($array, $jsoned)
     {
-        $this->assertSame($array, $this->serializer->unserialize($jsoned));
+        Assert::assertSame($array, $this->serializer->unserialize($jsoned));
     }
 
     /**
@@ -171,8 +172,8 @@ class SerializerTest extends TestCase
         $date = (new DateTimeImmutable('2014-06-15 12:00:00', new DateTimeZone('UTC')))->format('c');
         $obj = $this->serializer->unserialize($this->serializer->serialize($date));
 
-        $this->assertSame($date, $obj);
-        $this->assertEquals($date, $obj);
+        Assert::assertSame($date, $obj);
+        Assert::assertEquals($date, $obj);
     }
 
     /**
@@ -185,8 +186,8 @@ class SerializerTest extends TestCase
     {
         $date = new DateInterval('P2Y4DT6H8M');
         $obj = $this->serializer->unserialize($this->serializer->serialize($date));
-        $this->assertEquals($date, $obj);
-        $this->assertSame($date->d, $obj->d);
+        Assert::assertEquals($date, $obj);
+        Assert::assertSame($date->d, $obj->d);
     }
 
     /**
@@ -225,17 +226,17 @@ class SerializerTest extends TestCase
         $obj->param1 = true;
         $obj->param2 = 'store me, please';
         $serialized = '{"@type":"stdClass","param1":{"@scalar":"boolean","@value":true},"param2":{"@scalar":"string","@value":"store me, please"}}';
-        $this->assertSame($serialized, $this->serializer->serialize($obj));
+        Assert::assertSame($serialized, $this->serializer->serialize($obj));
 
         $obj2 = $this->serializer->unserialize($serialized);
-        $this->assertInstanceOf('stdClass', $obj2);
-        $this->assertTrue($obj2->param1);
-        $this->assertSame('store me, please', $obj2->param2);
+        Assert::assertInstanceOf('stdClass', $obj2);
+        Assert::assertTrue($obj2->param1);
+        Assert::assertSame('store me, please', $obj2->param2);
 
         $serialized = '{"@type":"stdClass","sub":{"@type":"stdClass","key":"value"}}';
         $obj = $this->serializer->unserialize($serialized);
-        $this->assertInstanceOf('stdClass', $obj->sub);
-        $this->assertSame('value', $obj->sub->key);
+        Assert::assertInstanceOf('stdClass', $obj->sub);
+        Assert::assertSame('value', $obj->sub->key);
     }
 
     /**
@@ -251,12 +252,12 @@ class SerializerTest extends TestCase
         $c1->c2->c3->ok = true;
 
         $expected = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},"ok":{"@scalar":"boolean","@value":true}}},"something":{"@scalar":"string","@value":"ok"}}';
-        $this->assertSame($expected, $this->serializer->serialize($c1));
+        Assert::assertSame($expected, $this->serializer->serialize($c1));
 
         $c1 = new stdClass();
         $c1->mirror = $c1;
         $expected = '{"@type":"stdClass","mirror":{"@type":"@0"}}';
-        $this->assertSame($expected, $this->serializer->serialize($c1));
+        Assert::assertSame($expected, $this->serializer->serialize($c1));
     }
 
     /**
@@ -266,16 +267,16 @@ class SerializerTest extends TestCase
     {
         $serialized = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},"ok":{"@scalar":"boolean","@value":true}}},"something":{"@scalar":"string","@value":"ok"}}';
         $obj = $this->serializer->unserialize($serialized);
-        $this->assertTrue($obj->c2->c3->ok);
-        $this->assertSame($obj, $obj->c2->c3->c1);
-        $this->assertNotSame($obj, $obj->c2);
+        Assert::assertTrue($obj->c2->c3->ok);
+        Assert::assertSame($obj, $obj->c2->c3->c1);
+        Assert::assertNotSame($obj, $obj->c2);
 
         $serialized = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},"c2":{"@type":"@1"},"c3":{"@type":"@2"}},"c3_copy":{"@type":"@2"}}}';
         $obj = $this->serializer->unserialize($serialized);
-        $this->assertSame($obj, $obj->c2->c3->c1);
-        $this->assertSame($obj->c2, $obj->c2->c3->c2);
-        $this->assertSame($obj->c2->c3, $obj->c2->c3->c3);
-        $this->assertSame($obj->c2->c3_copy, $obj->c2->c3);
+        Assert::assertSame($obj, $obj->c2->c3->c1);
+        Assert::assertSame($obj->c2, $obj->c2->c3->c2);
+        Assert::assertSame($obj->c2->c3, $obj->c2->c3->c3);
+        Assert::assertSame($obj->c2->c3_copy, $obj->c2->c3);
     }
 
     public function testItCanGetTransformer()
@@ -283,7 +284,7 @@ class SerializerTest extends TestCase
         $strategy = new JsonStrategy();
         $serializer = new Serializer($strategy);
 
-        $this->assertSame($strategy, $serializer->getTransformer());
+        Assert::assertSame($strategy, $serializer->getTransformer());
     }
 
     public function testSerializationOfAnArrayOfScalars()
@@ -293,6 +294,6 @@ class SerializerTest extends TestCase
         $serializer = new Serializer(new JsonStrategy());
         $serialized = $serializer->serialize($scalar);
 
-        $this->assertEquals($scalar, $serializer->unserialize($serialized));
+        Assert::assertEquals($scalar, $serializer->unserialize($serialized));
     }
 }
