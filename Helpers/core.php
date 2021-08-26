@@ -86,7 +86,7 @@ function trigger_error__(string $message, string $level = E_USER_NOTICE)
  */
 function return_false__(): bool
 {
-    return false;
+    return (bool) false;
 }
 
 /**
@@ -96,7 +96,7 @@ function return_false__(): bool
  */
 function return_true__(): bool
 {
-    return true;
+    return (bool) true;
 }
 
 /**
@@ -269,11 +269,43 @@ function concat_ws(?string $separator = null, string $string1, string $string2):
 function is_null__($var): bool
 {
     if (null === $var) {
-        return true;
+        return (bool) true;
     }
 
-    return false;
+    return (bool) false;
 }
+
+/**
+ * Checks if a variable is true.
+ *
+ * @param mixed $var Variable to check.
+ * @return bool Returns `true` if true, `false` otherwise.
+ */
+function is_true__($var): bool
+{
+    if ((bool) true === $var) {
+        return (bool) true;
+    }
+
+    return (bool) false;
+}
+
+
+/**
+ * Checks if a variable is false.
+ *
+ * @param mixed $var Variable to check.
+ * @return bool Returns `true` if false, `false` otherwise.
+ */
+function is_false__($var): bool
+{
+    if ((bool) false === $var) {
+        return (bool) true;
+    }
+
+    return (bool) false;
+}
+
 
 /**
  * Truncates a string to the given length. It will optionally preserve
