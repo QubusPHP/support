@@ -4,7 +4,8 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Stolz
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -112,7 +113,7 @@ class Assets
      *
      * @var bool|string
      */
-    protected $pipeline = false;
+    protected bool|string $pipeline = false;
 
     /**
      * Directory for storing pipelined assets.
@@ -129,7 +130,7 @@ class Assets
      *
      * @var bool|int
      */
-    protected $pipelineGzip = false;
+    protected bool|int $pipelineGzip = false;
 
     /**
      * Closure used by the pipeline to fetch assets.
@@ -456,7 +457,7 @@ class Assets
      * You can take control of the tag rendering by
      * providing a closure that will receive an array of assets.
      *
-     * @param  array|Closure $attributes
+     * @param array|Closure $attributes
      */
     public function css($attributes = null): string
     {
@@ -500,7 +501,7 @@ class Assets
      * You can take control of the tag rendering by
      * providing a closure that will receive an array of assets.
      *
-     * @param  array|Closure $attributes
+     * @param array|Closure $attributes
      */
     public function js($attributes = null): string
     {

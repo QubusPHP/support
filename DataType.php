@@ -4,7 +4,7 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -38,7 +38,7 @@ class DataType implements DataObjectCollection
     }
 
     /**
-     * @return object
+     * @return object|null
      */
     public function get(string $key)
     {
@@ -50,7 +50,7 @@ class DataType implements DataObjectCollection
     }
 
     /**
-     * @return object
+     * @return object|null
      */
     public function __get(string $key)
     {
