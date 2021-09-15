@@ -4,7 +4,7 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -45,7 +45,7 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /** @var bool whether the container is read-only */
     protected bool $readOnly = false;
 
-    /** @var bool wether the container data has been modified */
+    /** @var bool whether the container data has been modified */
     protected bool $isModified = false;
 
     /**
@@ -75,7 +75,7 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Set the parent of this container, to support inheritance
      *
-     * @param   DataContainer  $parent  the parent container object
+     * @param DataContainer  $parent  the parent container object
      * @return  $this
      */
     public function setParent(?DataContainer $parent = null)
@@ -94,7 +94,7 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Enable the use of the parent object, if set
      *
-     * @return  $this
+     * @return $this
      */
     public function enableParent()
     {
@@ -108,7 +108,7 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Disable the use of the parent object
      *
-     * @return  $this
+     * @return $this
      */
     public function disableParent()
     {
@@ -120,9 +120,9 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Check whether or not this container has an active parent
      *
-     * @return  bool
+     * @return bool
      */
-    public function hasParent()
+    public function hasParent(): bool
     {
         return $this->parentEnabled;
     }
@@ -130,9 +130,9 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Retrieve the modified state of the container
      *
-     * @return  bool
+     * @return bool
      */
-    public function isModified()
+    public function isModified(): bool
     {
         return $this->isModified;
     }
@@ -141,8 +141,8 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
      * Replace the container's data.
      *
      * @param   array  $data  new data
-     * @return  $this
-     * @throws  RuntimeException
+     * @return $this
+     * @throws RuntimeException
      */
     public function setContents(array $data)
     {
@@ -160,7 +160,7 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Get the container's data
      *
-     * @return  array  container's data
+     * @return array container's data
      */
     public function getContents()
     {
@@ -172,9 +172,9 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Set wether the container is read-only.
+     * Set whether the container is read-only.
      *
-     * @param   bool  $readOnly  wether it's a read-only container
+     * @param bool $readOnly whether it's a read-only container
      * @return  $this
      */
     public function setReadOnly(bool $readOnly = true)
@@ -214,11 +214,11 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Check wether the container is read-only.
+     * Check whether the container is read-only.
      *
-     * @return  bool  $readOnly  wether it's a read-only container
+     * @return bool $readOnly  whether it's a read-only container
      */
-    public function isReadOnly()
+    public function isReadOnly(): bool
     {
         return $this->readOnly;
     }
@@ -234,10 +234,10 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Check if a key was set upon this bag's data
      *
-     * @param   string  $key
-     * @return  bool
+     * @param string $key
+     * @return bool
      */
-    public function has($key)
+    public function has($key): bool
     {
         $result = $this->dataType->array->keyExists($this->data, $key);
 
@@ -259,8 +259,8 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Get a key's value from this bag's data
      *
-     * @param   mixed   $default
-     * @return  mixed
+     * @param mixed   $default
+     * @return mixed
      */
     public function get(?string $key = null, $default = null)
     {
@@ -290,8 +290,8 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Set a config value
      *
-     * @param   string  $key
-     * @param   mixed   $value
+     * @param string  $key
+     * @param mixed   $value
      * @throws RuntimeException
      */
     public function set($key, $value)
@@ -316,8 +316,8 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Delete data from the container.
      *
-     * @param   string   $key  key to delete.
-     * @return  bool  delete success bool
+     * @param string   $key  key to delete.
+     * @return bool  delete success bool
      */
     public function delete(string $key)
     {
@@ -337,10 +337,10 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Allow usage of isset() on the param bag as an array
      *
-     * @param   string  $key
-     * @return  bool
+     * @param string  $key
+     * @return bool
      */
-    public function offsetExists($key)
+    public function offsetExists($key): bool
     {
         return $this->has($key);
     }
@@ -348,9 +348,9 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Allow fetching values as an array
      *
-     * @param   string  $key
-     * @return  mixed
-     * @throws  OutOfBoundsException
+     * @param string $key
+     * @return mixed
+     * @throws OutOfBoundsException
      */
     public function offsetGet($key)
     {
@@ -362,10 +362,11 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Disallow setting values like an array
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed $value
+     * @return void
      */
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value): void
     {
         $this->set($key, $value);
     }
@@ -373,12 +374,13 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Disallow unsetting values like an array
      *
-     * @param   string  $key
-     * @throws  RuntimeException
+     * @param string $key
+     * @return void
+     * @throws RuntimeException
      */
-    public function offsetUnset($key)
+    public function offsetUnset($key): void
     {
-        return $this->delete($key);
+        $this->delete($key);
     }
 
     /**
@@ -405,8 +407,8 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
      * Checks if a return value is a Closure without params, and if
      * so executes it before returning it.
      *
-     * @param   mixed  $val
-     * @return  mixed  closure result
+     * @param mixed  $val
+     * @return mixed  closure result
      */
     public function result($val)
     {

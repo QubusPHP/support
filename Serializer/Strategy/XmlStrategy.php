@@ -4,7 +4,8 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Nil Portugués Calderó
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -77,7 +78,7 @@ class XmlStrategy implements Strategy
      *
      * @param array            $data
      */
-    private function arrayToXml(array &$data, SimpleXMLElement $xmlData)
+    private function arrayToXml(array &$data, SimpleXMLElement $xmlData): void
     {
         foreach ($data as $key => $value) {
             if (is_array($value)) {
@@ -110,7 +111,7 @@ class XmlStrategy implements Strategy
     /**
      * @param array $array
      */
-    private function castToArray(array &$array)
+    private function castToArray(array &$array): void
     {
         foreach ($array as &$value) {
             if ($value instanceof SimpleXMLElement) {
@@ -126,7 +127,7 @@ class XmlStrategy implements Strategy
     /**
      * @param array $array
      */
-    private function recoverArrayNumericKeyValues(array &$array)
+    private function recoverArrayNumericKeyValues(array &$array): void
     {
         $newArray = [];
         foreach ($array as $key => &$value) {

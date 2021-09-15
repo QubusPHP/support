@@ -4,7 +4,8 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Nil Portugués Calderó
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
