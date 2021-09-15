@@ -567,7 +567,6 @@ class ArrayHelper
     public function insert(array &$original, $value, int $pos): bool
     {
         if (count($original) < abs($pos)) {
-            ;
             return false;
         }
 
