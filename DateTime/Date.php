@@ -4,7 +4,7 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -29,7 +29,7 @@ interface Date
      * @param string $format Format of the date. Default is `Y-m-d H:i:s`.
      * @return string
      */
-    public function format(string $format = 'Y-m-d H:i:s');
+    public function format(string $format = 'Y-m-d H:i:s'): string;
 
     /**
      * Returns the current time based on specified type.
@@ -46,5 +46,5 @@ interface Date
      * @param bool $gmt    Optional. Whether to use GMT timezone. Default false.
      * @return int|string Integer if $type is 'timestamp', string otherwise.
      */
-    public function current(string $type, bool $gmt = false);
+    public function current(string $type, bool $gmt = false): string|int;
 }

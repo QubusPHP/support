@@ -4,7 +4,8 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Nil Portugués Calderó
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -23,7 +24,7 @@ class JsonStrategy implements Strategy
 {
     /**
      * @param mixed $data
-     * @return string
+     * @return string|false
      */
     public function serialize($data)
     {
@@ -32,7 +33,7 @@ class JsonStrategy implements Strategy
 
     /**
      * @param $data
-     * @return array
+     * @return mixed
      */
     public function unserialize($data)
     {

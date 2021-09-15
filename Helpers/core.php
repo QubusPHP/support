@@ -4,7 +4,7 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -124,7 +124,7 @@ function return_zero__(): int
  *
  * @return array Empty array.
  */
-function return_empty_array__()
+function return_empty_array__(): array
 {
     return [];
 }
@@ -134,7 +134,7 @@ function return_empty_array__()
  *
  * @return string Empty string.
  */
-function return_empty_string__()
+function return_empty_string__(): string
 {
     return '';
 }
@@ -213,11 +213,11 @@ function remove_trailing_slash(string $string): string
 /**
  * Split a delimited string into an array.
  *
- * @param array|string $delimiters Delimeter(s) to search for.
  * @param array|string $string     String or array to be split.
+ * @param array|string $delimiters Delimeter(s) to search for.
  * @return array Return array.
  */
-function explode_array($delimiters, $string): array
+function explode_array(string|array $string, array|string $delimiters = [',']): array
 {
     if (! is_array($delimiters) && ! is_array($string)) {
         //if neither the delimiter nor the string are arrays
@@ -243,12 +243,12 @@ function explode_array($delimiters, $string): array
 /**
  * Concatenation with separator.
  *
+ * @param string $string1   Left string.
+ * @param string $string2   Right string.
  * @param string $separator Delimeter to use between strings. Default: comma.
- * @param string $string1 Left string.
- * @param string $string2 Right string.
  * @return string Concatenated string.
  */
-function concat_ws(?string $separator = null, string $string1, string $string2): string
+function concat_ws(string $string1, string $string2, ?string $separator = null): string
 {
     if (null === $separator) {
         $separator = ',';
@@ -342,9 +342,9 @@ function unicoder($string)
  * Strips out all duplicate values and compact the array.
  *
  * @param mixed $a An array that be compacted.
- * @return mixed
+ * @return array
  */
-function compact_unique_array($a)
+function compact_unique_array($a): array
 {
     $tmparr = array_unique($a);
     $i = 0;
@@ -360,7 +360,7 @@ function compact_unique_array($a)
  *
  * @param array $array Array of data.
  */
-function convert_array_to_object(array $array)
+function convert_array_to_object(array $array): object
 {
     foreach ($array as $key => $value) {
         if (is_array($value)) {
@@ -395,7 +395,7 @@ function php_like($pattern, $subject): bool
 /**
  * SQL Where operator in PHP.
  *
- * @param type $pattern
+ * @param string|array $pattern
  * @throws TypeException
  */
 function php_where(string $key, string $operator, $pattern): bool
@@ -458,7 +458,7 @@ function sort_element_callback(array $a, array $b)
  *
  * @param array  $array
  * @param mixed  $default
- * @return mixed
+ * @return array|null
  */
 function return_array(array $array, ?string $key, $default = null)
 {
@@ -556,7 +556,7 @@ function studly_case(string $string): string
  * @param array $noStrip
  * @return string
  */
-function camel_case(string $str, array $noStrip = [])
+function camel_case(string $str, array $noStrip = []): string
 {
     // non-alpha and non-numeric characters become spaces
     $str = preg_replace('/[^a-z0-9' . implode("", $noStrip) . ']+/i', ' ', $str);
@@ -589,7 +589,7 @@ function value($value)
  * @param string $encoding Encoding used. Default: utf-8.
  * @return string Filtered string with replaced "nice" characters.
  */
-function remove_accents(string $string, string $encoding = 'utf-8')
+function remove_accents(string $string, string $encoding = 'utf-8'): string
 {
     // converting accents in HTML entities
     $string = htmlentities($string, ENT_NOQUOTES, $encoding);
@@ -644,4 +644,80 @@ function call_qubus_func_array($callback, array $args)
     }
 
     return $callback(...$args);
+}
+
+/**
+ * Determine whether the current envrionment is Windows based.
+ *
+ * @return bool
+ */
+function windows_os(): bool
+{
+    return 'WIN' === strtoupper(substr(PHP_OS, 0, 3));
+}
+
+/**
+ * Print and die.
+ *
+ * @param object|array $x
+ * @param bool $pre Default true.
+ * @param bool $return Default false.
+ * @return void
+ */
+function pd($x, bool $pre = true, bool $return = false): void
+{
+    if ($pre) {
+        echo '<pre>';
+        print_r($x, $return);
+        echo '</pre>';
+    }
+
+    if (!$pre) {
+        print_r($x, $return);
+    }
+
+    die(1);
+}
+
+/**
+ * Single file writable atribute check.
+ * Thanks to legolas558.users.sf.net
+ */
+function win_is_writable(string $path): bool
+{
+    // will work in despite of Windows ACLs bug
+    // NOTE: use a trailing slash for folders!!!
+    // see http://bugs.php.net/bug.php?id=27609
+    // see http://bugs.php.net/bug.php?id=30931
+
+    if ($path[strlen($path) - 1] === '/') { // recursively return a temporary file path
+        return win_is_writable($path . uniqid(mt_rand()) . '.tmp');
+    } elseif (is_dir($path)) {
+        return win_is_writable($path . DIRECTORY_SEPARATOR . uniqid(mt_rand()) . '.tmp');
+    }
+    // check tmp file for read/write capabilities
+    $rm = file_exists($path);
+    $f = fopen($path, 'a');
+    if ($f === false) {
+        return false;
+    }
+    fclose($f);
+    if (! $rm) {
+        unlink($path);
+    }
+    return true;
+}
+
+/**
+ * Alternative to PHP's native is_writable function due to a Window's bug.
+ *
+ * @param string $path Path to check.
+ */
+function is_writable(string $path): bool
+{
+    if (windows_os()) {
+        return win_is_writable($path);
+    } else {
+        return is_writable($path);
+    }
 }

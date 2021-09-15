@@ -4,7 +4,7 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -157,7 +157,7 @@ final class QubusDate implements Date
      * @param string $format    Format of the date. Default is `Y-m-d H:i:s`.
      * @return string
      */
-    public function format(string $format = 'Y-m-d H:i:s')
+    public function format(string $format = 'Y-m-d H:i:s'): string
     {
         return $this->date->format($format);
     }
@@ -169,7 +169,7 @@ final class QubusDate implements Date
      * @param string $format    Format of the date. Default is `Y-m-d H:i:s`.
      * @return string Formatted date string.
      */
-    public function gmtdate(string $date = 'now', string $format = 'Y-m-d H:i:s')
+    public function gmtdate(string $date = 'now', string $format = 'Y-m-d H:i:s'): string
     {
         if ($date === 'now') {
             $string = (string) $this->date->now(new DateTimeZone('GMT'))->format($format);
@@ -206,7 +206,7 @@ final class QubusDate implements Date
      * @param bool $translate Whether the return date should be translated. Default true.
      * @return string|int|bool Formatted date string or Unix timestamp. False if $date is empty.
      */
-    public function db2Date(string $format, string $date, bool $translate = true)
+    public function db2Date(string $format, string $date, bool $translate = true): string|int|bool
     {
         if (empty($date)) {
             return false;
@@ -239,7 +239,7 @@ final class QubusDate implements Date
      * @param bool $gmt    Optional. Whether to use GMT timezone. Default false.
      * @return int|string Integer if $type is 'timestamp', string otherwise.
      */
-    public function current(string $type, bool $gmt = false)
+    public function current(string $type, bool $gmt = false): string|int
     {
         if ('timestamp' === $type || 'U' === $type) {
             return $gmt ? time() : time() + (int) ($this->locale()->offsetHours * (int) static::hourInSeconds());
@@ -260,7 +260,7 @@ final class QubusDate implements Date
      * @param int $timestamp Timestamp to convert.
      * @return string Localized human readable date.
      */
-    public function timestampToDate(string $format, int $timestamp)
+    public function timestampToDate(string $format, int $timestamp): string
     {
         return (string) $this->locale()->createFromTimestamp($timestamp)->format($format);
     }

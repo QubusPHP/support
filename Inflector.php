@@ -4,7 +4,7 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -165,7 +165,7 @@ class Inflector
      * @param   int     $number the number to ordinalize
      * @return  string  the ordinalized version of $number
      */
-    public static function ordinalize($number)
+    public static function ordinalize($number): string
     {
         if (! is_numeric($number)) {
             return $number;
@@ -196,9 +196,9 @@ class Inflector
      *
      * @param   string  $word   the word to pluralize
      * @param   int     $count  number of instances
-     * @return  string  the plural version of $word
+     * @return string the plural version of $word
      */
-    public static function pluralize($word, $count = 0)
+    public static function pluralize(string $word, int $count = 0): string
     {
         static::$init || static::initialize();
 
@@ -227,10 +227,10 @@ class Inflector
     /**
      * Gets the singular version of the given word
      *
-     * @param   string  $word  the word to singularize
-     * @return  string  the singular version of $word
+     * @param string $word the word to singularize
+     * @return string the singular version of $word
      */
-    public static function singularize($word)
+    public static function singularize(string $word): string
     {
         static::$init || static::initialize();
 
@@ -254,10 +254,10 @@ class Inflector
      * Takes a string that has words separated by underscores and turns it into
      * a CamelCased string.
      *
-     * @param   string  $underscoredWord  the underscored word
-     * @return  string  the CamelCased version of $underscoredWord
+     * @param string $underscoredWord  the underscored word
+     * @return string the CamelCased version of $underscoredWord
      */
-    public static function camelize($underscoredWord)
+    public static function camelize(string $underscoredWord): string
     {
         return preg_replace_callback(
             '/(^|_)(.)/',
@@ -271,10 +271,10 @@ class Inflector
     /**
      * Takes a CamelCased string and returns an underscore separated version.
      *
-     * @param   string  $camelCasedWord  the CamelCased word
-     * @return  string  an underscore separated version of $camelCasedWord
+     * @param string $camelCasedWord  the CamelCased word
+     * @return string an underscore separated version of $camelCasedWord
      */
-    public static function underscore($camelCasedWord)
+    public static function underscore(string $camelCasedWord): string
     {
         return strtolower(
             preg_replace(
@@ -294,11 +294,11 @@ class Inflector
      *
      * Only works with UTF-8.
      *
-     * @param   string  $str            String to translate
-     * @param   bool    $allowNonAscii  Whether to remove non ascii
-     * @return  string                  Translated string.
+     * @param  string $str           String to translate
+     * @param  bool   $allowNonAscii Whether to remove non ascii
+     * @return string Translated string.
      */
-    public static function ascii($str, $allowNonAscii = false)
+    public static function ascii(string $str, bool $allowNonAscii = false): string
     {
         // Translate unicode characters to their simpler counterparts
         $str = remove_accents($str);
@@ -319,8 +319,11 @@ class Inflector
      * @param string|array|null $onTheFlyOptions    Override options that can be passed to slugify method.
      * @return string The slugified text.
      */
-    public static function slugify($string, array $constructorOptions = [], $onTheFlyOptions = null)
-    {
+    public static function slugify(
+        string $string,
+        array $constructorOptions = [],
+        stirng|array|null $onTheFlyOptions = null
+    ): string {
         // Sanitize string.
         if (! is_array($string)) {
             $string = filter_var($string, FILTER_SANITIZE_STRING);
@@ -342,12 +345,12 @@ class Inflector
     /**
      * Turns an underscore or dash separated word and turns it into a human looking string.
      *
-     * @param   string  $str        the word
-     * @param   string  $sep        the separator (either _ or -)
-     * @param   bool    $lowercase  lowercase string and upper case first
-     * @return  string  the human version of given string
+     * @param  string  $str       the word
+     * @param  string  $sep       the separator (either _ or -)
+     * @param  bool    $lowercase lowercase string and upper case first
+     * @return string the human version of given string
      */
-    public static function humanize($str, $sep = '_', $lowercase = true)
+    public static function humanize(string $str, string $sep = '_', bool $lowercase = true): string
     {
         // Allow dash, otherwise default to underscore
         $sep = $sep !== '-' ? '_' : $sep;
@@ -362,10 +365,10 @@ class Inflector
     /**
      * Takes the class name out of a modulized string.
      *
-     * @param   string  $classNameInModule  the modulized class
-     * @return  string  the string without the class name
+     * @param  string $classNameInModule the modulized class
+     * @return string  the string without the class name
      */
-    public static function demodulize($classNameInModule)
+    public static function demodulize(string $classNameInModule): string
     {
         return preg_replace('/^.*::/', '', strval($classNameInModule));
     }
@@ -373,10 +376,10 @@ class Inflector
     /**
      * Takes the namespace off the given class name.
      *
-     * @param   string  $className  the class name
-     * @return  string  the string without the namespace
+     * @param  string $className the class name
+     * @return string the string without the namespace
      */
-    public static function denamespace($className)
+    public static function denamespace(string $className): string
     {
         $className = trim($className, '\\');
         if ($lastSeparator = strrpos($className, '\\')) {
@@ -388,10 +391,10 @@ class Inflector
     /**
      * Returns the namespace of the given class name.
      *
-     * @param   string  $className  the class name
-     * @return  string  the string without the namespace
+     * @param  string $className the class name
+     * @return string the string without the namespace
      */
-    public static function getNamespace($className)
+    public static function getNamespace(string $className): string
     {
         $className = trim($className, '\\');
         if ($lastSeparator = strrpos($className, '\\')) {
@@ -407,7 +410,7 @@ class Inflector
      * @param  string $className The table name.
      * @return string The table name.
      */
-    public static function tableize($className)
+    public static function tableize(string $className): string
     {
         $className = static::denamespace($className);
         return strtolower(static::pluralize(static::underscore($className)));
@@ -416,11 +419,11 @@ class Inflector
     /**
      * Takes an underscored classname and uppercases all letters after the underscores.
      *
-     * @param   string  $class  classname
-     * @param   string  $sep    separator
-     * @return  string
+     * @param  string $class classname
+     * @param  string $sep   separator
+     * @return string
      */
-    public static function wordsToUpper($class, $sep = '_')
+    public static function wordsToUpper(string $class, string $sep = '_'): string
     {
         return str_replace(' ', $sep, ucwords(str_replace($sep, ' ', $class)));
     }
@@ -428,11 +431,11 @@ class Inflector
     /**
      * Takes a table name and creates the class name.
      *
-     * @param   string  $name            the table name
-     * @param   bool    $forceSingular  whether to singularize the table name or not
-     * @return  string  the class name
+     * @param  string  $name          the table name
+     * @param  bool    $forceSingular whether to singularize the table name or not
+     * @return string the class name
      */
-    public static function classify($name, $forceSingular = true)
+    public static function classify(string $name, bool $forceSingular = true): string
     {
         $class = $forceSingular ? static::singularize($name) : $name;
         return static::wordsToUpper($class);
@@ -441,10 +444,10 @@ class Inflector
     /**
      * Checks if the given word has a plural version.
      *
-     * @param   string  $word  the word to check
-     * @return  bool    if the word is countable
+     * @param string $word the word to check
+     * @return bool if the word is countable
      */
-    public static function isCountable($word)
+    public static function isCountable(string $word): bool
     {
         static::$init || static::initialize();
 

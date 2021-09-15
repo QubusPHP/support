@@ -4,7 +4,7 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -35,7 +35,7 @@ class Container implements ContainerInterface, ArrayAccess, Countable, IteratorA
      *
      * @var array
      */
-    protected $data = [];
+    protected array $data = [];
 
     /**
      * @param array $items Pre-populate set with this key-value array
@@ -236,12 +236,10 @@ class Container implements ContainerInterface, ArrayAccess, Countable, IteratorA
     /**
      * Protect closure from being directly invoked.
      *
-     * @param  callable $callable A closure to keep from being invoked and evaluated.
+     * @param callable $callable A closure to keep from being invoked and evaluated.
      */
     public function protect(callable $callable): callable
     {
-        return function () use ($callable) {
-            return $callable;
-        };
+        return fn () => $callable;
     }
 }

@@ -4,7 +4,7 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -119,7 +119,7 @@ class ArrayHelper
      * @param array   $array  The array to insert it into
      * @param mixed   $key    The dot-notated key to set or array of keys
      * @param mixed   $value  The value
-     * @return  void
+     * @return void
      */
     public function set(array &$array, $key, $value = null)
     {
@@ -183,9 +183,9 @@ class ArrayHelper
      *
      * @param array   $array    The search array
      * @param mixed   $key      The dot-notated key or array of keys
-     * @return mixed
+     * @return bool
      */
-    public function keyExists($array, $key)
+    public function keyExists($array, $key): bool
     {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
@@ -334,7 +334,7 @@ class ArrayHelper
      * Checks if the given array is an assoc array.
      *
      * @param array  $arr  the array to check
-     * @return  bool   true if its an assoc array, false if not
+     * @return bool True if its an assoc array, false if not.
      */
     public function isAssoc($arr): bool
     {
@@ -359,7 +359,7 @@ class ArrayHelper
      * @param string  $glue    what to glue the keys together with
      * @param bool    $reset   whether to reset and start over on a new array
      * @param bool    $indexed whether to flatten only associative array's, or also indexed ones
-     * @return  array
+     * @return array
      */
     public function flatten(array $array, string $glue = ':', bool $reset = true, bool $indexed = true): array
     {
@@ -390,7 +390,7 @@ class ArrayHelper
      * @param array   $array  the array to flatten
      * @param string  $glue   what to glue the keys together with
      * @param bool    $reset  whether to reset and start over on a new array
-     * @return  array
+     * @return array
      */
     public function flattenAssoc(array $array, string $glue = ':', bool $reset = true): array
     {
@@ -402,7 +402,7 @@ class ArrayHelper
      *
      * @param array   $array  flattened array
      * @param string  $glue   glue used in flattening
-     * @return  array   the unflattened array
+     * @return array The unflattened array.
      */
     public function reverseFlatten(array $array, string $glue = ':'): array
     {
@@ -567,7 +567,6 @@ class ArrayHelper
     public function insert(array &$original, $value, int $pos): bool
     {
         if (count($original) < abs($pos)) {
-            new Error('Position larger than number of elements in array in which to insert.');
             return false;
         }
 
@@ -614,7 +613,6 @@ class ArrayHelper
         $pos = array_search($key, array_keys($original));
 
         if ($pos === false) {
-            new Error('Unknown key before which to insert the new value into the array.');
             return false;
         }
 
@@ -638,7 +636,6 @@ class ArrayHelper
         $pos = array_search($key, array_keys($original));
 
         if ($pos === false) {
-            new Error('Unknown key after which to insert the new value into the array.');
             return false;
         }
 
@@ -660,7 +657,6 @@ class ArrayHelper
         $key = array_search($search, $original);
 
         if ($key === false) {
-            new Error('Unknown value after which to insert the new value into the array.');
             return false;
         }
 
@@ -682,7 +678,6 @@ class ArrayHelper
         $key = array_search($search, $original);
 
         if ($key === false) {
-            new Error('Unknown value before which to insert the new value into the array.');
             return false;
         }
 
@@ -907,7 +902,7 @@ class ArrayHelper
      * @param string|array $key   The key or array of keys and values
      * @param mixed        $value The value to prepend
      */
-    public function prepend(array &$arr, $key, $value = null)
+    public function prepend(array &$arr, $key, $value = null): string|array
     {
         $arr = (is_array($key) ? $key : [$key => $value]) + $arr;
     }
@@ -961,7 +956,7 @@ class ArrayHelper
      * @param bool   $recursive Whether to get keys recursive.
      * @param string $delimiter The delimiter, when $recursive is true.
      * @param bool   $strict    If true, do a strict key comparison.
-     * @return mixed
+     * @return string|bool|null
      * @throws TypeException
      */
     public function search(
@@ -971,7 +966,7 @@ class ArrayHelper
         bool $recursive = true,
         string $delimiter = '.',
         bool $strict = false
-    ) {
+    ): string|bool|null {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
@@ -1070,9 +1065,9 @@ class ArrayHelper
      * @param string $key      Key of the current entry to use as reference.
      * @param bool   $getValue If true, return the previous value instead of the previous key.
      * @param bool   $strict   If true, do a strict key comparison.
-     * @return mixed The value in the array, null if there is no previous value, or false if the key doesn't exist.
+     * @return string|bool|null The value in the array, null if there is no previous value, or false if the key doesn't exist.
      */
-    public function previousByKey($array, $key, bool $getValue = false, bool $strict = false)
+    public function previousByKey($array, $key, bool $getValue = false, bool $strict = false): string|bool|null
     {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
@@ -1101,9 +1096,9 @@ class ArrayHelper
      * @param string $key      Key of the current entry to use as reference.
      * @param bool   $getValue If true, return the next value instead of the next key.
      * @param bool   $strict   If true, do a strict key comparison.
-     * @return mixed The value in the array, null if there is no next value, or false if the key doesn't exist.
+     * @return string|bool|null The value in the array, null if there is no next value, or false if the key doesn't exist.
      */
-    public function nextByKey($array, string $key, bool $getValue = false, bool $strict = false)
+    public function nextByKey($array, string $key, bool $getValue = false, bool $strict = false): string|bool|null
     {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
@@ -1135,9 +1130,9 @@ class ArrayHelper
      * @param string $value    Value of the current entry to use as reference.
      * @param bool   $getValue If true, return the previous value instead of the previous key.
      * @param bool   $strict   If true, do a strict key comparison.
-     * @return mixed The value in the array, null if there is no previous value, or false if the key doesn't exist.
+     * @return string|bool|null The value in the array, null if there is no previous value, or false if the key doesn't exist.
      */
-    public function previousByValue($array, $value, bool $getValue = true, bool $strict = false)
+    public function previousByValue($array, $value, bool $getValue = true, bool $strict = false): string|bool|null
     {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
@@ -1169,9 +1164,9 @@ class ArrayHelper
      * @param string $value    Value of the current entry to use as reference.
      * @param bool   $getValue If true, return the next value instead of the next key.
      * @param bool   $strict   If true, do a strict key comparison.
-     * @return mixed The value in the array, null if there is no next value, or false if the key doesn't exist
+     * @return string|bool|null The value in the array, null if there is no next value, or false if the key doesn't exist
      */
-    public function nextByValue($array, $value, bool $getValue = true, bool $strict = false)
+    public function nextByValue($array, $value, bool $getValue = true, bool $strict = false): string|bool|null
     {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
