@@ -243,18 +243,32 @@ function explode_array(string|array $string, array|string $delimiters = [',']): 
 /**
  * Concatenation with separator.
  *
- * @param string $string1   Left string.
- * @param string $string2   Right string.
- * @param string $separator Delimeter to use between strings. Default: comma.
+ * @param string $separator  Delimeter to use between strings. Default: comma.
+ * @param string $string1    Left string.
+ * @param string $string2    Right string.
+ * @param string ...$strings List of strings.
  * @return string Concatenated string.
  */
-function concat_ws(string $string1, string $string2, ?string $separator = null): string
+function concat_ws(string $separator = ',', string $string1, string $string2, ...$strings): string
 {
-    if (null === $separator) {
-        $separator = ',';
+    $string = $string1 . $separator . $string2;
+
+    if (func_num_args() > 3) {
+        $stringList = '';
+        $argList = array_slice(func_get_args(), 3);
+        $argCount = count($argList);
+        for ($i = 0; $i < $argCount; $i++) {
+            if (null === $argList[$i]) {
+                continue;
+            }
+            $stringList .= $separator . $argList[$i];
+        }
+        return $string . $stringList;
     }
-    return $string1 . $separator . $string2;
+
+    return $string;
 }
+
 
 /**
  * Checks if a variable is null.
