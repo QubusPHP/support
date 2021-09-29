@@ -64,9 +64,9 @@ use const ENT_NOQUOTES;
  * end user to track down the issue.
  *
  * @param string $message Custom message to print.
- * @param string $level Predefined PHP error constant.
+ * @param int $level Predefined PHP error constant.
  */
-function trigger_error__(string $message, string $level = E_USER_NOTICE)
+function trigger_error__(string $message, int $level = E_USER_NOTICE)
 {
     $debug = debug_backtrace();
     $caller = next($debug);
@@ -531,11 +531,27 @@ function array_accessible($value): bool
 }
 
 /**
- * Check array key exists.
+ * Checks if the given key or index exists in the array.
  *
- * @param array  $array
+ * @param array $array An array with keys to check.
+ * @param string $key Value to check.
+ * @return bool
  */
 function array_exists(array $array, string $key): bool
+{
+    trigger_deprecation(__FUNCTION__, '1.0', '2.0', 'array_key_exists__');
+
+    return array_key_exists__($key, $array);
+}
+
+/**
+ * Checks if the given key or index exists in the array.
+ *
+ * @param string $key Value to check.
+ * @param array $array An array with keys to check.
+ * @return bool
+ */
+function array_key_exists__(string $key, array $array): bool
 {
     if ($array instanceof ArrayAccess) {
         return $array->offsetExists($key);
@@ -734,4 +750,54 @@ function is_writable(string $path): bool
     } else {
         return is_writable($path);
     }
+}
+
+/**
+ * Used to trigger code deprecation warnings.
+ *
+ * @param string $functionName Name of function that is deprecated.
+ * @param string $deprecatedVersion Version for which code becomes deprecated.
+ * @param string $removedVersion Version for when deprecated code will be removed.
+ * @param string|null $replacement Replacement of deprecated code if any.
+ * @return bool
+ */
+function trigger_deprecation(
+    string $functionName,
+    string $deprecatedVersion,
+    string $removedVersion,
+    ?string $replacement = null
+): bool {
+    if (!defined('STAL_ENVIRONMENT')) {
+        define('STAL_ENVIRONMENT', 'production');
+    }
+
+    if (STAL_ENVIRONMENT === 'development') {
+        if (!is_null__($replacement)) {
+            trigger_error__(
+                sprintf(
+                    '%1$s() is <strong>deprecated</strong> since version %2$s and will be removed in version %3$s. 
+                    Use %4$s() instead. <br />',
+                    $functionName,
+                    $deprecatedVersion,
+                    $removedVersion,
+                    $replacement
+                ),
+                E_USER_DEPRECATED
+            );
+        } else {
+            trigger_error__(
+                sprintf(
+                    '%1$s() is <strong>deprecated</strong> since version %2$s and will be removed in version %3$s. 
+                    No alternative is available.<br />',
+                    $functionName,
+                    $deprecatedVersion,
+                    $removedVersion
+                ),
+                E_USER_DEPRECATED
+            );
+        }
+        return true;
+    }
+    
+    return false;
 }
