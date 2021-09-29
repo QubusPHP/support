@@ -484,12 +484,12 @@ function return_array(array $array, ?string $key, $default = null)
         return $array;
     }
 
-    if (array_exists($array, $key)) {
+    if (array_key_exists__($key, $array)) {
         return $array[$key];
     }
 
     foreach (explode('.', $key) as $segment) {
-        if (array_accessible($array) && array_exists($array, $segment)) {
+        if (array_accessible($array) && array_key_exists__($segment, $array)) {
             $array = $array[$segment];
         } else {
             return value($default);
@@ -539,7 +539,7 @@ function array_accessible($value): bool
  */
 function array_exists(array $array, string $key): bool
 {
-    trigger_deprecation(__FUNCTION__, '1.0', '2.0', 'array_key_exists__');
+    trigger_deprecation(__FUNCTION__, '1.0', '2.0', __NAMESPACE__ . '\\' . 'array_key_exists__');
 
     return array_key_exists__($key, $array);
 }
