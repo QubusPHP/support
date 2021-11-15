@@ -26,7 +26,7 @@ class FlatArrayTransformer extends ArrayTransformer
      */
     public function serialize($value)
     {
-        return $this->flatten(parent::serialize($value));
+        return $this->flatten([parent::serialize($value)]);
     }
 
     /**

@@ -218,23 +218,20 @@ class Assets
     public function config(array $config): Assets
     {
         // Set regex options
-        foreach (
-            [
+        foreach ([
                 'asset_regex',
                 'css_regex',
                 'js_regex',
                 'no_minification_regex',
-            ] as $option
-        ) {
+            ] as $option) {
             $propertyOption = camel_case($option);
-            if (isset($config[$option]) && (@preg_match($config[$option], null) !== false)) {
+            if (isset($config[$option]) && (@preg_match($config[$option], '') !== false)) {
                 $this->$propertyOption = $config[$option];
             }
         }
 
         // Set common options
-        foreach (
-            [
+        foreach ([
                 'public_dir',
                 'css_dir',
                 'js_dir',
@@ -242,8 +239,7 @@ class Assets
                 'pipeline',
                 'pipeline_dir',
                 'pipeline_gzip',
-            ] as $option
-        ) {
+            ] as $option) {
             $propertyOption = camel_case($option);
 
             if (isset($config[$option])) {
@@ -252,14 +248,12 @@ class Assets
         }
 
         // Set pipeline options
-        foreach (
-            [
+        foreach ([
                 'fetch_command',
                 'notify_command',
                 'css_minifier',
                 'js_minifier',
-            ] as $option
-        ) {
+            ] as $option) {
             $propertyOption = camel_case($option);
 
             if (isset($config[$option]) && $config[$option] instanceof Closure) {
@@ -352,11 +346,11 @@ class Assets
             return $this;
         }
 
-        if (! $this->isRemoteLink($asset)) {
+        if (!$this->isRemoteLink($asset)) {
             $asset = $this->buildLocalLink($asset, $this->cssDir);
         }
 
-        if (! in_array($asset, $this->css)) {
+        if (!in_array($asset, $this->css)) {
             $this->css[] = $asset;
         }
 
@@ -381,11 +375,11 @@ class Assets
             return $this;
         }
 
-        if (! $this->isRemoteLink($asset)) {
+        if (!$this->isRemoteLink($asset)) {
             $asset = $this->buildLocalLink($asset, $this->cssDir);
         }
 
-        if (! in_array($asset, $this->css)) {
+        if (!in_array($asset, $this->css)) {
             array_unshift($this->css, $asset);
         }
 
@@ -410,11 +404,11 @@ class Assets
             return $this;
         }
 
-        if (! $this->isRemoteLink($asset)) {
+        if (!$this->isRemoteLink($asset)) {
             $asset = $this->buildLocalLink($asset, $this->jsDir);
         }
 
-        if (! in_array($asset, $this->js)) {
+        if (!in_array($asset, $this->js)) {
             $this->js[] = $asset;
         }
 
@@ -439,11 +433,11 @@ class Assets
             return $this;
         }
 
-        if (! $this->isRemoteLink($asset)) {
+        if (!$this->isRemoteLink($asset)) {
             $asset = $this->buildLocalLink($asset, $this->jsDir);
         }
 
-        if (! in_array($asset, $this->js)) {
+        if (!in_array($asset, $this->js)) {
             array_unshift($this->js, $asset);
         }
 
@@ -461,7 +455,7 @@ class Assets
      */
     public function css($attributes = null): string
     {
-        if (! $this->css) {
+        if (!$this->css) {
             return '';
         }
 
@@ -475,11 +469,11 @@ class Assets
         $attributes = (array) $attributes;
         unset($attributes['href']);
 
-        if (! array_key_exists('type', $attributes)) {
+        if (!array_key_exists('type', $attributes)) {
             $attributes['type'] = 'text/css';
         }
 
-        if (! array_key_exists('rel', $attributes)) {
+        if (!array_key_exists('rel', $attributes)) {
             $attributes['rel'] = 'stylesheet';
         }
 
@@ -505,7 +499,7 @@ class Assets
      */
     public function js($attributes = null): string
     {
-        if (! $this->js) {
+        if (!$this->js) {
             return '';
         }
 
@@ -519,7 +513,7 @@ class Assets
         $attributes = (array) $attributes;
         unset($attributes['src']);
 
-        if (! array_key_exists('type', $attributes)) {
+        if (!array_key_exists('type', $attributes)) {
             $attributes['type'] = 'text/javascript';
         }
 
@@ -611,8 +605,8 @@ class Assets
     {
         // Create destination dir if it doesn't exist.
         $pipelineDir = $this->publicDir . DIRECTORY_SEPARATOR
-        . $subdirectory . DIRECTORY_SEPARATOR . $this->pipelineDir;
-        if (! is_dir($pipelineDir)) {
+            . $subdirectory . DIRECTORY_SEPARATOR . $this->pipelineDir;
+        if (!is_dir($pipelineDir)) {
             mkdir($pipelineDir, 0755, true);
         }
 
@@ -656,7 +650,7 @@ class Assets
         $salt = $this->pipeline;
 
         // Pipeline disabled. Do not salt hash
-        if (! $salt) {
+        if (!$salt) {
             return md5(implode($assets));
         }
 
@@ -699,8 +693,8 @@ class Assets
                 // Add current protocol to agnostic links
                 if (substr($link, 0, 2) === '//') {
                     $protocol = isset($_SERVER['HTTPS']) &&
-                    ! empty($_SERVER['HTTPS']) &&
-                    $_SERVER['HTTPS'] !== 'off' ? 'https:' : 'http:';
+                        !empty($_SERVER['HTTPS']) &&
+                        $_SERVER['HTTPS'] !== 'off' ? 'https:' : 'http:';
                     $link     = $protocol . $link;
                 }
             } else {
@@ -712,8 +706,8 @@ class Assets
 
             // Fetch link content
             $content = $this->fetchCommand instanceof Closure
-            ? $this->fetchCommand->__invoke($link)
-            : file_get_contents($link);
+                ? $this->fetchCommand->__invoke($link)
+                : file_get_contents($link);
 
             // Minify
             $buffer .= preg_match($this->noMinificationRegex, $originalLink) ? $content : $minifier->__invoke($content);
@@ -834,7 +828,7 @@ class Assets
         $files = $this->rglob($absolutePath, $pattern, $this->publicDir);
 
         // No luck? Nothing to do
-        if (! $files) {
+        if (!$files) {
             return $this;
         }
 

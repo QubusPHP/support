@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Qubus\Support;
 
+use Qubus\Exception\Exception;
 use Qubus\Support\Traits\StaticProxy;
 
 use function array_pop;
@@ -108,7 +109,7 @@ class StringHelper
             // Handle special characters.
             preg_match_all('/&[a-z]+;/i', strip_tags($string), $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
             // fix preg_match_all broken multibyte support
-            if (strlen($string !== mb_strlen($string))) {
+            if (strlen($string) !== mb_strlen($string)) {
                 $correction = 0;
                 foreach ($matches as $index => $match) {
                     $matches[$index][0][1] -= $correction;
@@ -126,7 +127,7 @@ class StringHelper
             // Handle all the html tags.
             preg_match_all('/<[^>]+>([^<]*)/', $string, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
             // fix preg_match_all broken multibyte support
-            if (strlen($string !== mb_strlen($string))) {
+            if (strlen($string) !== mb_strlen($string)) {
                 $correction = 0;
                 foreach ($matches as $index => $match) {
                     $matches[$index][0][1] -= $correction;
@@ -142,7 +143,7 @@ class StringHelper
 
                 $tag = $this->substr(strtok($match[0][0], " \t\n\r\0\x0B>"), 1);
                 if ($tag[0] !== '/') {
-                    if (! in_array($tag, $selfClosingTags)) {
+                    if (!in_array($tag, $selfClosingTags)) {
                         $tags[] = $tag;
                     }
                 } elseif (end($tags) === $this->substr($tag, 1)) {
@@ -208,10 +209,12 @@ class StringHelper
      */
     public function random(string $type = 'alnum', int $length = 16): string
     {
+        $randString = (string) mt_rand();
+
         switch ($type) {
             case 'basic':
                 return mt_rand();
-            break;
+                break;
 
             default:
             case 'alnum':
@@ -252,23 +255,23 @@ class StringHelper
                     $str .= substr($pool, mt_rand(0, strlen($pool) - 1), 1);
                 }
                 return $str;
-            break;
+                break;
 
             case 'unique':
-                return md5(uniqid(mt_rand()));
-            break;
+                return md5(uniqid($randString));
+                break;
 
             case 'sha1':
-                return sha1(uniqid(mt_rand(), true));
-            break;
+                return sha1(uniqid($randString, true));
+                break;
 
             case 'sha256':
-                return hash('sha256', uniqid(mt_rand(), true));
-            break;
+                return hash('sha256', uniqid($randString, true));
+                break;
 
             case 'sha512':
-                return hash('sha512', uniqid(mt_rand(), true));
-            break;
+                return hash('sha512', uniqid($randString, true));
+                break;
 
             case 'uuid':
                 $pool = ['8', '9', 'a', 'b'];
@@ -281,7 +284,7 @@ class StringHelper
                     $this->random('hexdec', 3),
                     $this->random('hexdec', 12)
                 );
-            break;
+                break;
         }
     }
 
@@ -347,7 +350,7 @@ class StringHelper
      */
     public function isXml(string $string): bool
     {
-        if (! defined('LIBXML_COMPACT')) {
+        if (!defined('LIBXML_COMPACT')) {
             throw new Exception('libxml is required to use StringHelper::isXml()');
         }
 
@@ -367,7 +370,7 @@ class StringHelper
     public function isSerialized(string $string): bool
     {
         $array = unserialize($string);
-        return ! ($array === false && $string !== 'b:0;');
+        return !($array === false && $string !== 'b:0;');
     }
 
     /**
@@ -392,8 +395,8 @@ class StringHelper
     public function strlen(string $str, string|null $encoding = 'UTF-8')
     {
         return $encoding
-        ? mb_strlen($str, $encoding)
-        : strlen($str);
+            ? mb_strlen($str, $encoding)
+            : strlen($str);
     }
 
     /**
@@ -410,8 +413,8 @@ class StringHelper
     public function strpos(string $haystack, $needle, int $offset = 0, string|null $encoding = 'UTF-8')
     {
         return $encoding
-        ? mb_strpos($haystack, $needle, $offset, $encoding)
-        : strpos($haystack, $needle, $offset);
+            ? mb_strpos($haystack, $needle, $offset, $encoding)
+            : strpos($haystack, $needle, $offset);
     }
 
     /**
@@ -562,7 +565,7 @@ class StringHelper
     public function lcfirst(string $str): string
     {
         return mb_strtolower(mb_substr($str, 0, 1, 'UTF-8'), 'UTF-8')
-        . mb_substr($str, 1, mb_strlen($str, 'UTF-8'), 'UTF-8');
+            . mb_substr($str, 1, mb_strlen($str, 'UTF-8'), 'UTF-8');
     }
 
     /**
@@ -574,7 +577,7 @@ class StringHelper
     public function ucfirst(string $str): string
     {
         return mb_strtoupper(mb_substr($str, 0, 1, 'UTF-8'), 'UTF-8')
-        . mb_substr($str, 1, mb_strlen($str, 'UTF-8'), 'UTF-8');
+            . mb_substr($str, 1, mb_strlen($str, 'UTF-8'), 'UTF-8');
     }
 
     /**
