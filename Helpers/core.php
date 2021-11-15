@@ -73,7 +73,7 @@ function trigger_error__(string $message, int $level = E_USER_NOTICE)
     echo '<div class="alerts alerts-error center">';
     trigger_error(
         $message . ' used <strong>' . $caller['function'] . '()</strong> called from <strong>'
-        . $caller['file'] . '</strong> on line <strong>' . $caller['line'] . '</strong>' . "\n<br />error handler",
+            . $caller['file'] . '</strong> on line <strong>' . $caller['line'] . '</strong>' . "\n<br />error handler",
         $level
     );
     echo '</div>';
@@ -219,10 +219,10 @@ function remove_trailing_slash(string $string): string
  */
 function explode_array(string|array $string, array|string $delimiters = [',']): array
 {
-    if (! is_array($delimiters) && ! is_array($string)) {
+    if (!is_array($delimiters) && !is_array($string)) {
         //if neither the delimiter nor the string are arrays
         return explode($delimiters, $string);
-    } elseif (! is_array($delimiters) && is_array($string)) {
+    } elseif (!is_array($delimiters) && is_array($string)) {
         //if the delimiter is not an array but the string is
         foreach ($string as $item) {
             foreach (explode($delimiters, $item) as $subItem) {
@@ -230,7 +230,7 @@ function explode_array(string|array $string, array|string $delimiters = [',']): 
             }
         }
         return $items;
-    } elseif (is_array($delimiters) && ! is_array($string)) {
+    } elseif (is_array($delimiters) && !is_array($string)) {
         //if the delimiter is an array but the string is not
         $stringArray[] = $string;
         foreach ($delimiters as $delimiter) {
@@ -434,13 +434,13 @@ function php_where(string $key, string $operator, $pattern): bool
             $filter = in_array($key, (array) $pattern);
             break;
         case 'not in':
-            $filter = ! in_array($key, (array) $pattern);
+            $filter = !in_array($key, (array) $pattern);
             break;
         case 'match':
             $filter = (bool) preg_match($pattern, $key);
             break;
         case 'between':
-            if (! is_array($pattern) || count($pattern) < 2) {
+            if (!is_array($pattern) || count($pattern) < 2) {
                 throw new TypeException("Query 'between' needs exactly 2 items in array.");
             }
             $filter = $key >= $pattern[0] && $key <= $pattern[1];
@@ -476,7 +476,7 @@ function sort_element_callback(array $a, array $b)
  */
 function return_array(array $array, ?string $key, $default = null)
 {
-    if (! array_accessible($array)) {
+    if (!array_accessible($array)) {
         return value($default);
     }
 
@@ -720,10 +720,12 @@ function win_is_writable(string $path): bool
     // see http://bugs.php.net/bug.php?id=27609
     // see http://bugs.php.net/bug.php?id=30931
 
+    $randString = (string) mt_rand();
+
     if ($path[strlen($path) - 1] === '/') { // recursively return a temporary file path
-        return win_is_writable($path . uniqid(mt_rand()) . '.tmp');
+        return win_is_writable($path . uniqid($randString) . '.tmp');
     } elseif (is_dir($path)) {
-        return win_is_writable($path . DIRECTORY_SEPARATOR . uniqid(mt_rand()) . '.tmp');
+        return win_is_writable($path . DIRECTORY_SEPARATOR . uniqid($randString) . '.tmp');
     }
     // check tmp file for read/write capabilities
     $rm = file_exists($path);
@@ -732,7 +734,7 @@ function win_is_writable(string $path): bool
         return false;
     }
     fclose($f);
-    if (! $rm) {
+    if (!$rm) {
         unlink($path);
     }
     return true;
@@ -798,6 +800,6 @@ function trigger_deprecation(
         }
         return true;
     }
-    
+
     return false;
 }
