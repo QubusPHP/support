@@ -24,7 +24,9 @@ use function array_values;
 use function explode;
 use function gettype;
 use function is_array;
+use function is_int;
 use function is_numeric;
+use function is_string;
 use function simplexml_load_string;
 use function str_replace;
 use function strpos;
@@ -57,10 +59,15 @@ class XmlStrategy implements Strategy
      * @param array $input
      * @return array
      */
-    private function replaceKeys(array &$replacements, array $input)
+    private function replaceKeys(array $replacements, array $input)
     {
         $return = [];
         foreach ($input as $key => $value) {
+            if (is_string($key) || is_int($key)) {
+                $key = (string) $key;
+            } else {
+                $key = (array) $key;
+            }
             $key = str_replace(array_keys($replacements), array_values($replacements), $key);
 
             if (is_array($value)) {
