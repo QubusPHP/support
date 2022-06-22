@@ -769,11 +769,11 @@ function trigger_deprecation(
     string $removedVersion,
     ?string $replacement = null
 ): bool {
-    if (!defined('STAL_ENVIRONMENT')) {
-        define('STAL_ENVIRONMENT', 'production');
+    if (!defined('QUBUS_ENVIRONMENT')) {
+        define('QUBUS_ENVIRONMENT', 'production');
     }
 
-    if (STAL_ENVIRONMENT === 'development') {
+    if (QUBUS_ENVIRONMENT === 'development') {
         if (!is_null__($replacement)) {
             trigger_error__(
                 sprintf(
