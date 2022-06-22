@@ -21,7 +21,7 @@ trait SortCallbackAware
      *
      * @param array $a First array.
      * @param array $b Second Array.
-     * @return int Comparision
+     * @return int Comparison
      */
     protected function afsort(array $a, array $b)
     {
