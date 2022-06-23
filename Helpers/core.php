@@ -21,41 +21,57 @@ use Qubus\Support\DataType;
 
 use function array_key_exists;
 use function array_merge;
+use function array_slice;
 use function array_unique;
 use function array_values;
 use function count;
 use function ctype_lower;
 use function debug_backtrace;
+use function define;
+use function defined;
 use function explode;
+use function fclose;
 use function file_exists;
+use function fopen;
+use function func_get_args;
+use function func_num_args;
 use function htmlentities;
 use function implode;
 use function in_array;
 use function is_array;
 use function is_bool;
+use function is_dir;
 use function is_object;
 use function is_string;
 use function lcfirst;
 use function ltrim;
+use function mt_rand;
 use function next;
 use function ord;
 use function preg_match;
 use function preg_quote;
 use function preg_replace;
+use function print_r;
 use function rtrim;
 use function sprintf;
 use function str_replace;
 use function str_split;
+use function strlen;
 use function strpos;
-use function strrpos;
 use function strtolower;
+use function strtoupper;
 use function substr;
 use function trigger_error;
 use function trim;
 use function ucwords;
+use function uniqid;
+use function unlink;
 
+use const DIRECTORY_SEPARATOR;
+use const E_USER_DEPRECATED;
 use const E_USER_NOTICE;
 use const ENT_NOQUOTES;
+use const PHP_OS;
 
 /**
  * Wrapper function for the core PHP function: trigger_error.
@@ -73,7 +89,7 @@ function trigger_error__(string $message, int $level = E_USER_NOTICE)
     echo '<div class="alerts alerts-error center">';
     trigger_error(
         $message . ' used <strong>' . $caller['function'] . '()</strong> called from <strong>'
-        . $caller['file'] . '</strong> on line <strong>' . $caller['line'] . '</strong>' . "\n<br />error handler",
+            . $caller['file'] . '</strong> on line <strong>' . $caller['line'] . '</strong>' . "\n<br />error handler",
         $level
     );
     echo '</div>';
@@ -243,13 +259,13 @@ function explode_array(string|array $string, array|string $delimiters = [',']): 
 /**
  * Concatenation with separator.
  *
- * @param string $separator  Delimeter to use between strings. Default: comma.
  * @param string $string1    Left string.
  * @param string $string2    Right string.
+ * @param string $separator  Delimeter to use between strings. Default: comma.
  * @param string ...$strings List of strings.
  * @return string Concatenated string.
  */
-function concat_ws(string $separator = ',', string $string1, string $string2, ...$strings): string
+function concat_ws(string $string1, string $string2, string $separator = ',', ...$strings): string
 {
     $string = $string1 . $separator . $string2;
 
@@ -268,7 +284,6 @@ function concat_ws(string $separator = ',', string $string1, string $string2, ..
 
     return $string;
 }
-
 
 /**
  * Checks if a variable is null.
@@ -304,7 +319,6 @@ function is_true__($var): bool
     return (bool) false;
 }
 
-
 /**
  * Checks if a variable is false.
  *
@@ -319,7 +333,6 @@ function is_false__($var): bool
 
     return (bool) false;
 }
-
 
 /**
  * Truncates a string to the given length. It will optionally preserve
@@ -535,7 +548,6 @@ function array_accessible($value): bool
  *
  * @param array $array An array with keys to check.
  * @param string $key Value to check.
- * @return bool
  */
 function array_exists(array $array, string $key): bool
 {
@@ -549,7 +561,6 @@ function array_exists(array $array, string $key): bool
  *
  * @param string $key Value to check.
  * @param array $array An array with keys to check.
- * @return bool
  */
 function array_key_exists__(string $key, array $array): bool
 {
@@ -584,7 +595,6 @@ function studly_case(string $string): string
  * Convert a value to camel caps case.
  *
  * @param array $noStrip
- * @return string
  */
 function camel_case(string $str, array $noStrip = []): string
 {
@@ -678,8 +688,6 @@ function call_qubus_func_array($callback, array $args)
 
 /**
  * Determine whether the current envrionment is Windows based.
- *
- * @return bool
  */
 function windows_os(): bool
 {
@@ -692,7 +700,6 @@ function windows_os(): bool
  * @param object|array $x
  * @param bool $pre Default true.
  * @param bool $return Default false.
- * @return void
  */
 function pd($x, bool $pre = true, bool $return = false): void
 {
@@ -702,7 +709,7 @@ function pd($x, bool $pre = true, bool $return = false): void
         echo '</pre>';
     }
 
-    if (!$pre) {
+    if (! $pre) {
         print_r($x, $return);
     }
 
@@ -720,10 +727,12 @@ function win_is_writable(string $path): bool
     // see http://bugs.php.net/bug.php?id=27609
     // see http://bugs.php.net/bug.php?id=30931
 
+    $randString = (string) mt_rand();
+
     if ($path[strlen($path) - 1] === '/') { // recursively return a temporary file path
-        return win_is_writable($path . uniqid(mt_rand()) . '.tmp');
+        return win_is_writable($path . uniqid($randString) . '.tmp');
     } elseif (is_dir($path)) {
-        return win_is_writable($path . DIRECTORY_SEPARATOR . uniqid(mt_rand()) . '.tmp');
+        return win_is_writable($path . DIRECTORY_SEPARATOR . uniqid($randString) . '.tmp');
     }
     // check tmp file for read/write capabilities
     $rm = file_exists($path);
@@ -759,7 +768,6 @@ function is_writable(string $path): bool
  * @param string $deprecatedVersion Version for which code becomes deprecated.
  * @param string $removedVersion Version for when deprecated code will be removed.
  * @param string|null $replacement Replacement of deprecated code if any.
- * @return bool
  */
 function trigger_deprecation(
     string $functionName,
@@ -767,12 +775,12 @@ function trigger_deprecation(
     string $removedVersion,
     ?string $replacement = null
 ): bool {
-    if (!defined('STAL_ENVIRONMENT')) {
-        define('STAL_ENVIRONMENT', 'production');
+    if (! defined('QUBUS_ENVIRONMENT')) {
+        define('QUBUS_ENVIRONMENT', 'production');
     }
 
-    if (STAL_ENVIRONMENT === 'development') {
-        if (!is_null__($replacement)) {
+    if (QUBUS_ENVIRONMENT === 'development') {
+        if (! is_null__($replacement)) {
             trigger_error__(
                 sprintf(
                     '%1$s() is <strong>deprecated</strong> since version %2$s and will be removed in version %3$s. 
@@ -798,6 +806,6 @@ function trigger_deprecation(
         }
         return true;
     }
-    
+
     return false;
 }

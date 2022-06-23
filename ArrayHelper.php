@@ -16,10 +16,10 @@ namespace Qubus\Support;
 
 use ArrayAccess;
 use BadMethodCallException;
-use Error;
+use Closure;
 use Iterator;
 use Qubus\Exception\Data\TypeException;
-use Qubus\Support\Traits\StaticProxy;
+use Qubus\Support\Traits\StaticProxyAware;
 
 use function abs;
 use function array_combine;
@@ -59,7 +59,7 @@ use const SORT_REGULAR;
 
 class ArrayHelper
 {
-    use StaticProxy;
+    use StaticProxyAware;
 
     /**
      * Gets a dot-notated key from an array, with a default value if it does
@@ -164,14 +164,12 @@ class ArrayHelper
 
         if (! $index) {
             foreach ($array as $i => $a) {
-                $return[] = is_object($a) && ! $a instanceof ArrayAccess ? $a->{$key} :
-                ($getDeep ? $this->get($a, $key) : $a[$key]);
+                $return[] = is_object($a) && ! $a instanceof ArrayAccess ? $a->{$key} : ($getDeep ? $this->get($a, $key) : $a[$key]);
             }
         } else {
             foreach ($array as $i => $a) {
                 $index !== true && $i = is_object($a) && ! $a instanceof ArrayAccess ? $a->{$index} : $a[$index];
-                $return[$i] = is_object($a) && ! $a instanceof ArrayAccess ? $a->{$key} :
-                ($getDeep ? $this->get($a, $key) : $a[$key]);
+                $return[$i] = is_object($a) && ! $a instanceof ArrayAccess ? $a->{$key} : ($getDeep ? $this->get($a, $key) : $a[$key]);
             }
         }
 
@@ -183,7 +181,6 @@ class ArrayHelper
      *
      * @param array   $array    The search array
      * @param mixed   $key      The dot-notated key or array of keys
-     * @return bool
      */
     public function keyExists($array, $key): bool
     {
@@ -905,6 +902,8 @@ class ArrayHelper
     public function prepend(array &$arr, $key, $value = null): string|array
     {
         $arr = (is_array($key) ? $key : [$key => $value]) + $arr;
+
+        return $arr;
     }
 
     /**
@@ -956,7 +955,6 @@ class ArrayHelper
      * @param bool   $recursive Whether to get keys recursive.
      * @param string $delimiter The delimiter, when $recursive is true.
      * @param bool   $strict    If true, do a strict key comparison.
-     * @return string|bool|null
      * @throws TypeException
      */
     public function search(

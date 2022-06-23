@@ -33,7 +33,7 @@ class XmlTransformer extends ArrayTransformer
         $array = parent::serialize($value);
 
         $xmlData = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><data></data>');
-        $this->arrayToXml($array, $xmlData);
+        $this->arrayToXml((array) $array, $xmlData);
         $xml = $xmlData->asXML();
 
         $xmlDoc = new DOMDocument();
@@ -47,9 +47,9 @@ class XmlTransformer extends ArrayTransformer
     /**
      * Converts an array to XML using SimpleXMLElement.
      *
-     * @param array            $data
+     * @param array $data
      */
-    private function arrayToXml(array &$data, SimpleXMLElement $xmlData)
+    private function arrayToXml(array $data, SimpleXMLElement $xmlData)
     {
         foreach ($data as $key => $value) {
             if (is_array($value)) {

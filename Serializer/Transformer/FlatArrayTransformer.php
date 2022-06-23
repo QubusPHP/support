@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 namespace Qubus\Support\Serializer\Transformer;
 
-use function array_merge;
 use function is_array;
 
 class FlatArrayTransformer extends ArrayTransformer
@@ -26,7 +25,8 @@ class FlatArrayTransformer extends ArrayTransformer
      */
     public function serialize($value)
     {
-        return $this->flatten(parent::serialize($value));
+        $array = [parent::serialize($value)];
+        return $this->flatten($array);
     }
 
     /**
@@ -39,7 +39,7 @@ class FlatArrayTransformer extends ArrayTransformer
         $result = [];
         foreach ($array as $key => $value) {
             if (is_array($value)) {
-                $result = array_merge($result, $this->flatten($value, $prefix . $key . '.'));
+                $result += $this->flatten($value, $prefix . $key . '.');
             } else {
                 $result[$prefix . $key] = $value;
             }

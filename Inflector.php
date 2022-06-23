@@ -322,7 +322,7 @@ class Inflector
     public static function slugify(
         string $string,
         array $constructorOptions = [],
-        stirng|array|null $onTheFlyOptions = null
+        string|array|null $onTheFlyOptions = null
     ): string {
         // Sanitize string.
         if (! is_array($string)) {
@@ -421,7 +421,6 @@ class Inflector
      *
      * @param  string $class classname
      * @param  string $sep   separator
-     * @return string
      */
     public static function wordsToUpper(string $class, string $sep = '_'): string
     {

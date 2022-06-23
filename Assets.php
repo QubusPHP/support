@@ -110,8 +110,6 @@ class Assets
      * Enable assets pipeline (concatenation and minification).
      * Use a string that evaluates to `true` to provide the salt of the pipeline hash.
      * Use 'auto' to automatically calculated the salt from your assets last modification time.
-     *
-     * @var bool|string
      */
     protected bool|string $pipeline = false;
 
@@ -127,8 +125,6 @@ class Assets
      * Useful only if your webserver supports Gzip HTTP_ACCEPT_ENCODING.
      * Set to true to use the default compression level.
      * Set an integer between 0 (no compression) and 9 (maximum compression) to choose compression level.
-     *
-     * @var bool|int
      */
     protected bool|int $pipelineGzip = false;
 
@@ -227,7 +223,7 @@ class Assets
             ] as $option
         ) {
             $propertyOption = camel_case($option);
-            if (isset($config[$option]) && (@preg_match($config[$option], null) !== false)) {
+            if (isset($config[$option]) && (@preg_match($config[$option], '') !== false)) {
                 $this->$propertyOption = $config[$option];
             }
         }

@@ -14,7 +14,8 @@ declare(strict_types=1);
 
 namespace Qubus\Support;
 
-use Qubus\Support\Traits\StaticProxy;
+use Qubus\Exception\Exception;
+use Qubus\Support\Traits\StaticProxyAware;
 
 use function array_pop;
 use function array_rand;
@@ -68,7 +69,7 @@ use const PREG_SET_ORDER;
 
 class StringHelper
 {
-    use StaticProxy;
+    use StaticProxyAware;
 
     /**
      * Truncates a string to the given length. It will optionally preserve
@@ -108,7 +109,7 @@ class StringHelper
             // Handle special characters.
             preg_match_all('/&[a-z]+;/i', strip_tags($string), $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
             // fix preg_match_all broken multibyte support
-            if (strlen($string !== mb_strlen($string))) {
+            if (strlen($string) !== mb_strlen($string)) {
                 $correction = 0;
                 foreach ($matches as $index => $match) {
                     $matches[$index][0][1] -= $correction;
@@ -126,7 +127,7 @@ class StringHelper
             // Handle all the html tags.
             preg_match_all('/<[^>]+>([^<]*)/', $string, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
             // fix preg_match_all broken multibyte support
-            if (strlen($string !== mb_strlen($string))) {
+            if (strlen($string) !== mb_strlen($string)) {
                 $correction = 0;
                 foreach ($matches as $index => $match) {
                     $matches[$index][0][1] -= $correction;
@@ -164,7 +165,6 @@ class StringHelper
      * @param string  $str       String to increment.
      * @param int     $first     Number that is used to mean first.
      * @param string  $separator Separtor between the name and the number.
-     * @return string
      */
     public function increment(string $str, int $first = 1, string $separator = '_'): string
     {
@@ -208,6 +208,8 @@ class StringHelper
      */
     public function random(string $type = 'alnum', int $length = 16): string
     {
+        $randString = (string) mt_rand();
+
         switch ($type) {
             case 'basic':
                 return mt_rand();
@@ -255,19 +257,19 @@ class StringHelper
             break;
 
             case 'unique':
-                return md5(uniqid(mt_rand()));
+                return md5(uniqid($randString));
             break;
 
             case 'sha1':
-                return sha1(uniqid(mt_rand(), true));
+                return sha1(uniqid($randString, true));
             break;
 
             case 'sha256':
-                return hash('sha256', uniqid(mt_rand(), true));
+                return hash('sha256', uniqid($randString, true));
             break;
 
             case 'sha512':
-                return hash('sha512', uniqid(mt_rand(), true));
+                return hash('sha512', uniqid($randString, true));
             break;
 
             case 'uuid':
@@ -308,7 +310,6 @@ class StringHelper
      *
      * @param string $string String to parse.
      * @param array  $array  Params to str_replace.
-     * @return string
      */
     public function tr(string $string, array $array = []): string
     {
@@ -342,7 +343,6 @@ class StringHelper
      * Check if a string is a valid XML.
      *
      * @param string $string String to check.
-     * @return bool
      * @throws Exception
      */
     public function isXml(string $string): bool
@@ -557,7 +557,6 @@ class StringHelper
      * Does not strtoupper first.
      *
      * @param string $str String to lowercase first letter.
-     * @return string
      */
     public function lcfirst(string $str): string
     {
@@ -569,7 +568,6 @@ class StringHelper
      * Does not strtolower first.
      *
      * @param string $str String to uppercase first letter.
-     * @return string
      */
     public function ucfirst(string $str): string
     {

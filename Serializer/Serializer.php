@@ -30,7 +30,6 @@ use function array_merge;
 use function array_unique;
 use function class_exists;
 use function floatval;
-use function get_class;
 use function get_object_vars;
 use function gettype;
 use function intval;
@@ -168,7 +167,7 @@ class Serializer implements Serializeable
     private function isInstanceOf($value, $classFqn)
     {
         return is_object($value)
-        && (strtolower(get_class($value)) === strtolower($classFqn) || is_subclass_of($value, $classFqn, true));
+        && (strtolower($value::class) === strtolower($classFqn) || is_subclass_of($value, $classFqn, true));
     }
 
     /**
@@ -572,8 +571,8 @@ class Serializer implements Serializeable
                 } elseif (false === strpos($data, '"')) {
                     return false;
                 }
-            // or else fall through
-            // no break
+                // or else fall through
+                // no break
             case 'a':
             case 'O':
                 return (bool) preg_match("/^{$token}:[0-9]+:/s", $data);

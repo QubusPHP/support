@@ -65,7 +65,7 @@ class Container implements ContainerInterface, ArrayAccess, Countable, IteratorA
      */
     public function get($key)
     {
-        if (! is_string($id) || empty($id)) {
+        if (! is_string($key) || empty($key)) {
             throw new Exception('The key must be a non-empty string.');
         }
 
@@ -114,9 +114,8 @@ class Container implements ContainerInterface, ArrayAccess, Countable, IteratorA
      * Does this set contain a key?
      *
      * @param  string  $key The data key
-     * @return bool
      */
-    public function has($key)
+    public function has($key): bool
     {
         return array_key_exists($key, $this->data);
     }

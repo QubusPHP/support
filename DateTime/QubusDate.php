@@ -86,8 +86,6 @@ final class QubusDate implements Date
 
     /**
      * Returns minute in seconds.
-     *
-     * @return int
      */
     public static function minuteInSeconds(): int
     {
@@ -96,8 +94,6 @@ final class QubusDate implements Date
 
     /**
      * Returns hour in seconds.
-     *
-     * @return int
      */
     public static function hourInSeconds(): int
     {
@@ -106,8 +102,6 @@ final class QubusDate implements Date
 
     /**
      * Returns day in seconds.
-     *
-     * @return int
      */
     public static function dayInSeconds(): int
     {
@@ -116,8 +110,6 @@ final class QubusDate implements Date
 
     /**
      * Returns week in seconds.
-     *
-     * @return int
      */
     public static function weekInSeconds(): int
     {
@@ -126,8 +118,6 @@ final class QubusDate implements Date
 
     /**
      * Returns month in seconds.
-     *
-     * @return int
      */
     public static function monthInSeconds(): int
     {
@@ -136,8 +126,6 @@ final class QubusDate implements Date
 
     /**
      * Returns year in seconds.
-     *
-     * @return int
      */
     public static function yearInSeconds(): int
     {
@@ -155,7 +143,6 @@ final class QubusDate implements Date
      *      $this->format('Y-m-d H:i:s', $datetime);
      *
      * @param string $format    Format of the date. Default is `Y-m-d H:i:s`.
-     * @return string
      */
     public function format(string $format = 'Y-m-d H:i:s'): string
     {

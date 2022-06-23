@@ -17,7 +17,7 @@ namespace Qubus\Support\Traits;
 use ReflectionClass;
 use RuntimeException;
 
-trait StaticProxy
+trait StaticProxyAware
 {
     /**
      * The stored singleton instance.

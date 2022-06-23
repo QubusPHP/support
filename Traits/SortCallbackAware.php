@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 namespace Qubus\Support\Traits;
 
-trait SortCallback
+trait SortCallbackAware
 {
     /**
      * Protected callback function for the usort function.
      *
      * @param array $a First array.
      * @param array $b Second Array.
-     * @return int Comparision
+     * @return int Comparison
      */
     protected function afsort(array $a, array $b)
     {

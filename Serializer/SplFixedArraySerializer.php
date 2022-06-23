@@ -19,7 +19,6 @@ use ReflectionClass;
 use SplFixedArray;
 
 use function count;
-use function get_class;
 
 class SplFixedArraySerializer
 {
@@ -29,7 +28,7 @@ class SplFixedArraySerializer
     public static function serialize(Serializer $serializer, SplFixedArray $splFixedArray)
     {
         $toArray = [
-            Serializer::CLASS_IDENTIFIER_KEY => get_class($splFixedArray),
+            Serializer::CLASS_IDENTIFIER_KEY => $splFixedArray::class,
             Serializer::CLASS_PARENT_KEY     => 'SplFixedArray',
             Serializer::SCALAR_VALUE         => [],
         ];
