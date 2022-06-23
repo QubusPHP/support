@@ -119,8 +119,6 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
 
     /**
      * Check whether or not this container has an active parent
-     *
-     * @return bool
      */
     public function hasParent(): bool
     {
@@ -129,8 +127,6 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
 
     /**
      * Retrieve the modified state of the container
-     *
-     * @return bool
      */
     public function isModified(): bool
     {
@@ -235,7 +231,6 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
      * Check if a key was set upon this bag's data
      *
      * @param string $key
-     * @return bool
      */
     public function has($key): bool
     {
@@ -338,7 +333,6 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
      * Allow usage of isset() on the param bag as an array
      *
      * @param string  $key
-     * @return bool
      */
     public function offsetExists($key): bool
     {
@@ -364,7 +358,6 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
      *
      * @param string $key
      * @param mixed $value
-     * @return void
      */
     public function offsetSet($key, $value): void
     {
@@ -375,7 +368,6 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
      * Disallow unsetting values like an array
      *
      * @param string $key
-     * @return void
      * @throws RuntimeException
      */
     public function offsetUnset($key): void

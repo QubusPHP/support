@@ -72,7 +72,7 @@ class ArrayHelper
      */
     public function get($array, $key = null, ?string $default = null)
     {
-        if (!is_array($array) && !$array instanceof ArrayAccess) {
+        if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
 
@@ -102,7 +102,7 @@ class ArrayHelper
 
         foreach (explode('.', $key) as $keyPart) {
             if (($array instanceof ArrayAccess && isset($array[$keyPart])) === false) {
-                if (!is_array($array) || !array_key_exists($keyPart, $array)) {
+                if (! is_array($array) || ! array_key_exists($keyPart, $array)) {
                     return $this->value($default);
                 }
             }
@@ -138,7 +138,7 @@ class ArrayHelper
             while (count($keys) > 1) {
                 $key = array_shift($keys);
 
-                if (!isset($array[$key]) || !is_array($array[$key])) {
+                if (! isset($array[$key]) || ! is_array($array[$key])) {
                     $array[$key] = [];
                 }
 
@@ -162,14 +162,14 @@ class ArrayHelper
         $return = [];
         $getDeep = strpos($key, '.') !== false;
 
-        if (!$index) {
+        if (! $index) {
             foreach ($array as $i => $a) {
-                $return[] = is_object($a) && !$a instanceof ArrayAccess ? $a->{$key} : ($getDeep ? $this->get($a, $key) : $a[$key]);
+                $return[] = is_object($a) && ! $a instanceof ArrayAccess ? $a->{$key} : ($getDeep ? $this->get($a, $key) : $a[$key]);
             }
         } else {
             foreach ($array as $i => $a) {
-                $index !== true && $i = is_object($a) && !$a instanceof ArrayAccess ? $a->{$index} : $a[$index];
-                $return[$i] = is_object($a) && !$a instanceof ArrayAccess ? $a->{$key} : ($getDeep ? $this->get($a, $key) : $a[$key]);
+                $index !== true && $i = is_object($a) && ! $a instanceof ArrayAccess ? $a->{$index} : $a[$index];
+                $return[$i] = is_object($a) && ! $a instanceof ArrayAccess ? $a->{$key} : ($getDeep ? $this->get($a, $key) : $a[$key]);
             }
         }
 
@@ -181,17 +181,16 @@ class ArrayHelper
      *
      * @param array   $array    The search array
      * @param mixed   $key      The dot-notated key or array of keys
-     * @return bool
      */
     public function keyExists($array, $key): bool
     {
-        if (!is_array($array) && !$array instanceof ArrayAccess) {
+        if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
 
         is_object($key) && $key = (string) $key;
 
-        if (!is_string($key)) {
+        if (! is_string($key)) {
             return false;
         }
 
@@ -201,7 +200,7 @@ class ArrayHelper
 
         foreach (explode('.', $key) as $keyPart) {
             if (($array instanceof ArrayAccess && isset($array[$keyPart])) === false) {
-                if (!is_array($array) || !array_key_exists($keyPart, $array)) {
+                if (! is_array($array) || ! array_key_exists($keyPart, $array)) {
                     return false;
                 }
             }
@@ -235,13 +234,13 @@ class ArrayHelper
 
         $keyParts = explode('.', $key);
 
-        if (!is_array($array) || !array_key_exists($keyParts[0], $array)) {
+        if (! is_array($array) || ! array_key_exists($keyParts[0], $array)) {
             return false;
         }
 
         $thisKey = array_shift($keyParts);
 
-        if (!empty($keyParts)) {
+        if (! empty($keyParts)) {
             $key = implode('.', $keyParts);
             return $this->delete($array[$thisKey], $key);
         } else {
@@ -262,7 +261,7 @@ class ArrayHelper
      */
     public function assocToKeyVal($assoc, string $keyField, string $valField): array
     {
-        if (!is_array($assoc) && !$assoc instanceof Iterator) {
+        if (! is_array($assoc) && ! $assoc instanceof Iterator) {
             throw new TypeException('The first parameter must be an array.');
         }
 
@@ -287,7 +286,7 @@ class ArrayHelper
      */
     public function keyValToAssoc($array, string $keyField, string $valField): array
     {
-        if (!is_array($array) && !$array instanceof Iterator) {
+        if (! is_array($array) && ! $array instanceof Iterator) {
             throw new TypeException('The first parameter must be an array.');
         }
 
@@ -336,13 +335,13 @@ class ArrayHelper
      */
     public function isAssoc($arr): bool
     {
-        if (!is_array($arr)) {
+        if (! is_array($arr)) {
             throw new TypeException('The parameter must be an array.');
         }
 
         $counter = 0;
         foreach ($arr as $key => $unused) {
-            if (!is_int($key) || $key !== $counter++) {
+            if (! is_int($key) || $key !== $counter++) {
                 return true;
             }
         }
@@ -413,7 +412,7 @@ class ArrayHelper
                 while (count($keys) > 1) {
                     $key = array_shift($keys);
                     $key = is_numeric($key) ? (int) $key : $key;
-                    if (!isset($temp[$key]) || !is_array($temp[$key])) {
+                    if (! isset($temp[$key]) || ! is_array($temp[$key])) {
                         $temp[$key] = [];
                     }
                     $temp = &$temp[$key];
@@ -465,8 +464,8 @@ class ArrayHelper
         foreach ($array as &$value) {
             if (is_array($value)) {
                 $value = $callback === null
-                    ? $this->filterRecursive($value)
-                    : $this->filterRecursive($value, $callback);
+                ? $this->filterRecursive($value)
+                : $this->filterRecursive($value, $callback);
             }
         }
 
@@ -698,7 +697,7 @@ class ArrayHelper
         string $order = 'asc',
         int $sortFlags = SORT_REGULAR
     ): array {
-        if (!is_array($array)) {
+        if (! is_array($array)) {
             throw new TypeException('$this->sort() - $array must be an array.');
         }
 
@@ -721,7 +720,7 @@ class ArrayHelper
                 break;
             default:
                 throw new TypeException('$this->sort() - $order must be asc or desc.');
-                break;
+            break;
         }
 
         $c = [];
@@ -775,7 +774,7 @@ class ArrayHelper
     public function average(array $array)
     {
         // No arguments passed, lets not divide by 0
-        if (!($count = count($array)) > 0) {
+        if (! ($count = count($array)) > 0) {
             return 0;
         }
 
@@ -796,7 +795,7 @@ class ArrayHelper
             $replace = [$replace => $newKey];
         }
 
-        if (!is_array($source) || !is_array($replace)) {
+        if (! is_array($source) || ! is_array($replace)) {
             throw new TypeException(
                 '$this->replaceKey() - $source must an array. $replace must be an array or string.'
             );
@@ -832,12 +831,12 @@ class ArrayHelper
         $array  = func_get_arg(0);
         $arrays = array_slice(func_get_args(), 1);
 
-        if (!is_array($array)) {
+        if (! is_array($array)) {
             throw new TypeException('$this->merge() - all arguments must be arrays.');
         }
 
         foreach ($arrays as $arr) {
-            if (!is_array($arr)) {
+            if (! is_array($arr)) {
                 throw new TypeException('$this->merge() - all arguments must be arrays.');
             }
 
@@ -870,12 +869,12 @@ class ArrayHelper
         $array  = func_get_arg(0);
         $arrays = array_slice(func_get_args(), 1);
 
-        if (!is_array($array)) {
+        if (! is_array($array)) {
             throw new TypeException('$this->mergeAssoc() - all arguments must be arrays.');
         }
 
         foreach ($arrays as $arr) {
-            if (!is_array($arr)) {
+            if (! is_array($arr)) {
                 throw new TypeException('$this->mergeAssoc() - all arguments must be arrays.');
             }
 
@@ -917,7 +916,7 @@ class ArrayHelper
     public function inArrayRecursive($needle, array $haystack, bool $strict = false): bool
     {
         foreach ($haystack as $value) {
-            if (!$strict && $needle === $value) {
+            if (! $strict && $needle === $value) {
                 return true;
             } elseif ($needle === $value) {
                 return true;
@@ -956,7 +955,6 @@ class ArrayHelper
      * @param bool   $recursive Whether to get keys recursive.
      * @param string $delimiter The delimiter, when $recursive is true.
      * @param bool   $strict    If true, do a strict key comparison.
-     * @return string|bool|null
      * @throws TypeException
      */
     public function search(
@@ -967,15 +965,15 @@ class ArrayHelper
         string $delimiter = '.',
         bool $strict = false
     ): string|bool|null {
-        if (!is_array($array) && !$array instanceof ArrayAccess) {
+        if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
 
-        if (null !== $default && !is_int($default) && !is_string($default)) {
+        if (null !== $default && ! is_int($default) && ! is_string($default)) {
             throw new TypeException('Expects parameter 3 ($default) to be a string or integer or null.');
         }
 
-        if (!is_string($delimiter)) {
+        if (! is_string($delimiter)) {
             throw new TypeException('Expects parameter 5 ($delimiter) to be a string.');
         }
 
@@ -1033,7 +1031,7 @@ class ArrayHelper
      */
     public function sum($array, string $key)
     {
-        if (!is_array($array) && !$array instanceof ArrayAccess) {
+        if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
 
@@ -1069,7 +1067,7 @@ class ArrayHelper
      */
     public function previousByKey($array, $key, bool $getValue = false, bool $strict = false): string|bool|null
     {
-        if (!is_array($array) && !$array instanceof ArrayAccess) {
+        if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
 
@@ -1080,7 +1078,7 @@ class ArrayHelper
         if (($index = array_search($key, $keys, $strict)) === false) {
             // key does not exist
             return false;
-        } elseif (!isset($keys[$index - 1])) { // check if we have a previous key
+        } elseif (! isset($keys[$index - 1])) { // check if we have a previous key
             // there is none
             return null;
         }
@@ -1100,7 +1098,7 @@ class ArrayHelper
      */
     public function nextByKey($array, string $key, bool $getValue = false, bool $strict = false): string|bool|null
     {
-        if (!is_array($array) && !$array instanceof ArrayAccess) {
+        if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
 
@@ -1114,7 +1112,7 @@ class ArrayHelper
         }
 
         // check if we have a previous key
-        if (!isset($keys[$index + 1])) {
+        if (! isset($keys[$index + 1])) {
             // there is none
             return null;
         }
@@ -1134,7 +1132,7 @@ class ArrayHelper
      */
     public function previousByValue($array, $value, bool $getValue = true, bool $strict = false): string|bool|null
     {
-        if (!is_array($array) && !$array instanceof ArrayAccess) {
+        if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
 
@@ -1149,7 +1147,7 @@ class ArrayHelper
         $index = array_search($key, $keys);
 
         // if there is no previous one, bail out
-        if (!isset($keys[$index - 1])) {
+        if (! isset($keys[$index - 1])) {
             return null;
         }
 
@@ -1168,7 +1166,7 @@ class ArrayHelper
      */
     public function nextByValue($array, $value, bool $getValue = true, bool $strict = false): string|bool|null
     {
-        if (!is_array($array) && !$array instanceof ArrayAccess) {
+        if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
 
@@ -1183,7 +1181,7 @@ class ArrayHelper
         $index = array_search($key, $keys);
 
         // if there is no next one, bail out
-        if (!isset($keys[$index + 1])) {
+        if (! isset($keys[$index + 1])) {
             return null;
         }
 

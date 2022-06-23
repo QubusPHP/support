@@ -143,7 +143,7 @@ class StringHelper
 
                 $tag = $this->substr(strtok($match[0][0], " \t\n\r\0\x0B>"), 1);
                 if ($tag[0] !== '/') {
-                    if (!in_array($tag, $selfClosingTags)) {
+                    if (! in_array($tag, $selfClosingTags)) {
                         $tags[] = $tag;
                     }
                 } elseif (end($tags) === $this->substr($tag, 1)) {
@@ -165,7 +165,6 @@ class StringHelper
      * @param string  $str       String to increment.
      * @param int     $first     Number that is used to mean first.
      * @param string  $separator Separtor between the name and the number.
-     * @return string
      */
     public function increment(string $str, int $first = 1, string $separator = '_'): string
     {
@@ -214,7 +213,7 @@ class StringHelper
         switch ($type) {
             case 'basic':
                 return mt_rand();
-                break;
+            break;
 
             default:
             case 'alnum':
@@ -255,23 +254,23 @@ class StringHelper
                     $str .= substr($pool, mt_rand(0, strlen($pool) - 1), 1);
                 }
                 return $str;
-                break;
+            break;
 
             case 'unique':
                 return md5(uniqid($randString));
-                break;
+            break;
 
             case 'sha1':
                 return sha1(uniqid($randString, true));
-                break;
+            break;
 
             case 'sha256':
                 return hash('sha256', uniqid($randString, true));
-                break;
+            break;
 
             case 'sha512':
                 return hash('sha512', uniqid($randString, true));
-                break;
+            break;
 
             case 'uuid':
                 $pool = ['8', '9', 'a', 'b'];
@@ -284,7 +283,7 @@ class StringHelper
                     $this->random('hexdec', 3),
                     $this->random('hexdec', 12)
                 );
-                break;
+            break;
         }
     }
 
@@ -311,7 +310,6 @@ class StringHelper
      *
      * @param string $string String to parse.
      * @param array  $array  Params to str_replace.
-     * @return string
      */
     public function tr(string $string, array $array = []): string
     {
@@ -345,12 +343,11 @@ class StringHelper
      * Check if a string is a valid XML.
      *
      * @param string $string String to check.
-     * @return bool
      * @throws Exception
      */
     public function isXml(string $string): bool
     {
-        if (!defined('LIBXML_COMPACT')) {
+        if (! defined('LIBXML_COMPACT')) {
             throw new Exception('libxml is required to use StringHelper::isXml()');
         }
 
@@ -370,7 +367,7 @@ class StringHelper
     public function isSerialized(string $string): bool
     {
         $array = unserialize($string);
-        return !($array === false && $string !== 'b:0;');
+        return ! ($array === false && $string !== 'b:0;');
     }
 
     /**
@@ -395,8 +392,8 @@ class StringHelper
     public function strlen(string $str, string|null $encoding = 'UTF-8')
     {
         return $encoding
-            ? mb_strlen($str, $encoding)
-            : strlen($str);
+        ? mb_strlen($str, $encoding)
+        : strlen($str);
     }
 
     /**
@@ -413,8 +410,8 @@ class StringHelper
     public function strpos(string $haystack, $needle, int $offset = 0, string|null $encoding = 'UTF-8')
     {
         return $encoding
-            ? mb_strpos($haystack, $needle, $offset, $encoding)
-            : strpos($haystack, $needle, $offset);
+        ? mb_strpos($haystack, $needle, $offset, $encoding)
+        : strpos($haystack, $needle, $offset);
     }
 
     /**
@@ -560,24 +557,22 @@ class StringHelper
      * Does not strtoupper first.
      *
      * @param string $str String to lowercase first letter.
-     * @return string
      */
     public function lcfirst(string $str): string
     {
         return mb_strtolower(mb_substr($str, 0, 1, 'UTF-8'), 'UTF-8')
-            . mb_substr($str, 1, mb_strlen($str, 'UTF-8'), 'UTF-8');
+        . mb_substr($str, 1, mb_strlen($str, 'UTF-8'), 'UTF-8');
     }
 
     /**
      * Does not strtolower first.
      *
      * @param string $str String to uppercase first letter.
-     * @return string
      */
     public function ucfirst(string $str): string
     {
         return mb_strtoupper(mb_substr($str, 0, 1, 'UTF-8'), 'UTF-8')
-            . mb_substr($str, 1, mb_strlen($str, 'UTF-8'), 'UTF-8');
+        . mb_substr($str, 1, mb_strlen($str, 'UTF-8'), 'UTF-8');
     }
 
     /**

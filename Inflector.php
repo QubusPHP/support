@@ -167,7 +167,7 @@ class Inflector
      */
     public static function ordinalize($number): string
     {
-        if (!is_numeric($number)) {
+        if (! is_numeric($number)) {
             return $number;
         }
 
@@ -177,16 +177,16 @@ class Inflector
             switch ($number % 10) {
                 case 1:
                     return $number . 'st';
-                    break;
+                break;
                 case 2:
                     return $number . 'nd';
-                    break;
+                break;
                 case 3:
                     return $number . 'rd';
-                    break;
+                break;
                 default:
                     return $number . 'th';
-                    break;
+                break;
             }
         }
     }
@@ -210,7 +210,7 @@ class Inflector
             return $result;
         }
 
-        if (!static::isCountable($result)) {
+        if (! static::isCountable($result)) {
             return $result;
         }
 
@@ -236,7 +236,7 @@ class Inflector
 
         $result = strval($word);
 
-        if (!static::isCountable($result)) {
+        if (! static::isCountable($result)) {
             return $result;
         }
 
@@ -303,7 +303,7 @@ class Inflector
         // Translate unicode characters to their simpler counterparts
         $str = remove_accents($str);
 
-        if (!$allowNonAscii) {
+        if (! $allowNonAscii) {
             return preg_replace('/[^\x09\x0A\x0D\x20-\x7E]/', '', $str);
         }
 
@@ -325,7 +325,7 @@ class Inflector
         string|array|null $onTheFlyOptions = null
     ): string {
         // Sanitize string.
-        if (!is_array($string)) {
+        if (! is_array($string)) {
             $string = filter_var($string, FILTER_SANITIZE_STRING);
         }
 
@@ -421,7 +421,6 @@ class Inflector
      *
      * @param  string $class classname
      * @param  string $sep   separator
-     * @return string
      */
     public static function wordsToUpper(string $class, string $sep = '_'): string
     {
@@ -451,6 +450,6 @@ class Inflector
     {
         static::$init || static::initialize();
 
-        return !in_array(strtolower(strval($word)), static::$uncountableWords);
+        return ! in_array(strtolower(strval($word)), static::$uncountableWords);
     }
 }
