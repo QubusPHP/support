@@ -32,28 +32,28 @@ final class QubusDate implements Date
      *
      * @var string|int
      */
-    protected $time;
+    public readonly string|int $time;
 
     /**
      * TimeZone
      *
      * @var string|DateTimeZone
      */
-    protected $timezone;
+    public readonly string|DateTimeZone $timezone;
 
     /**
      * Locale
      *
-     * @var string
+     * @var string|null
      */
-    protected $locale;
+    public readonly ?string $locale;
 
     /**
      * Date object.
      *
      * @var mixed
      */
-    protected $date;
+    public readonly mixed $date;
 
     /**
      * Returns new Datetime object.
@@ -61,12 +61,23 @@ final class QubusDate implements Date
      * @param string|int $time
      * @param string|DateTimeZone $timezone
      */
-    public function __construct($time = null, $timezone = null, ?string $locale = null)
-    {
+    private function __construct(
+        string|int $time,
+        string|DateTimeZone $timezone = null,
+        ?string $locale = null
+    ) {
         $this->time     = $time;
-        $this->timezone = $timezone;
+        $this->timezone = $timezone ?? new QubusDateTimeZone('UTC');
         $this->locale   = $locale ?? 'en';
         $this->date     = new Carbon($this->time, $this->timezone);
+    }
+
+    public static function fromString(
+        string|int $time,
+        string|DateTimeZone $timezone = null,
+        ?string $locale = null
+    ): self {
+        return new self($time, $timezone, $locale);
     }
 
     public function getDate()
