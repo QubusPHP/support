@@ -178,9 +178,9 @@ function load_file(string $file, bool $once = true, $showErrors = true)
 {
     if (file_exists("'$file'")) {
         if ($once) {
-            return require_once "'$file'";
+            require_once("'$file'");
         } else {
-            return require "'$file'";
+            require("'$file'");
         }
     } elseif (is_bool($showErrors) && $showErrors) {
         trigger_error__(
@@ -687,7 +687,7 @@ function call_qubus_func_array($callback, array $args)
 }
 
 /**
- * Determine whether the current envrionment is Windows based.
+ * Determine whether the current environment is Windows based.
  */
 function windows_os(): bool
 {
