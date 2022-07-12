@@ -32,7 +32,7 @@ use function uniqid;
 
 class DataContainer implements ArrayAccess, IteratorAggregate, Countable
 {
-    protected DataObjectCollection $dataType;
+    public readonly DataObjectCollection $dataType;
     /** @var DataContainer parent container, for inheritance */
     protected $parent;
 
