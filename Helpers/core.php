@@ -344,7 +344,7 @@ function is_false__($var): bool
  * @param bool    $isHtml        Whether the string has HTML.
  * @return string The truncated string.
  */
-function truncate_string($string, $limit, $continuation = '...', $isHtml = false): string
+function truncate_string(string $string, int $limit, string $continuation = '...', bool $isHtml = false): string
 {
     return (new DataType())->string->truncate($string, $limit, $continuation, $isHtml);
 }
@@ -355,7 +355,7 @@ function truncate_string($string, $limit, $continuation = '...', $isHtml = false
  * @param string $string
  * @return mixed
  */
-function unicoder($string)
+function unicoder(string $string)
 {
     $p = str_split(trim($string));
     $newString = '';
@@ -368,10 +368,10 @@ function unicoder($string)
 /**
  * Strips out all duplicate values and compact the array.
  *
- * @param mixed $a An array that be compacted.
+ * @param array $a An array that be compacted.
  * @return array
  */
-function compact_unique_array($a): array
+function compact_unique_array(array $a): array
 {
     $tmparr = array_unique($a);
     $i = 0;
@@ -413,7 +413,7 @@ function convert_array_to_object(array $array): object
  * @param string $pattern
  * @param string $subject
  */
-function php_like($pattern, $subject): bool
+function php_like(string $pattern, string $subject): bool
 {
     $match = str_replace('%', '.*', preg_quote($pattern, '/'));
     return (bool) preg_match("/^{$match}$/i", $subject);
@@ -562,7 +562,7 @@ function array_exists(array $array, string $key): bool
  * @param string $key Value to check.
  * @param array $array An array with keys to check.
  */
-function array_key_exists__(string $key, array $array): bool
+function array_key_exists__(string $key, array|ArrayAccess $array): bool
 {
     if ($array instanceof ArrayAccess) {
         return $array->offsetExists($key);
@@ -808,4 +808,18 @@ function trigger_deprecation(
     }
 
     return false;
+}
+
+/**
+ * Call the given callable with the given value then return the value.
+ * 
+ * @param mixed    $value
+ * @param callable $callable
+ * @return mixed
+ */
+function tap(mixed $value, callable $callback): mixed
+{
+    $callback($value);
+
+    return $value;
 }
