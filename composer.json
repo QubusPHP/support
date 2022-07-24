@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": ">=8.1",
         "ext-mbstring": "*",
         "cocur/slugify": "^4.0",
         "mrclay/minify": "^3.0",
