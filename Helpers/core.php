@@ -809,17 +809,3 @@ function trigger_deprecation(
 
     return false;
 }
-
-/**
- * Call the given callable with the given value then return the value.
- * 
- * @param mixed    $value
- * @param callable $callable
- * @return mixed
- */
-function tap(mixed $value, callable $callback): mixed
-{
-    $callback($value);
-
-    return $value;
-}
