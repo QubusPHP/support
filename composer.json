@@ -25,6 +25,7 @@
         "psr/container": "^2",
         "psr/log": "^3",
         "qubus/exception": "^2.0",
+        "qubus/inheritance": "^2.0",
         "symfony/var-dumper": "^5.3"
     },
     "require-dev": {

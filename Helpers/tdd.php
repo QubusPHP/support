@@ -39,6 +39,8 @@ use const STDOUT;
  */
 function it($m, $p)
 {
+    global $e;
+
     $d = debug_backtrace(0)[0];
     is_callable($p) && $p = $p();
     $GLOBALS['e'];
@@ -48,6 +50,8 @@ function it($m, $p)
 }
 
 register_shutdown_function(function () {
+    global $e;
+    
     $GLOBALS['e'];
     $e && die(1);
 });
