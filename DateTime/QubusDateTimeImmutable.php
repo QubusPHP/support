@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Qubus\Support\DateTime;
 
 use Carbon\CarbonImmutable;
+use DateTimeInterface;
 
 /**
  * @see https://carbon.nesbot.com/docs/
@@ -506,6 +507,6 @@ use Carbon\CarbonImmutable;
  * @method        static CarbonImmutable       __set_state(array $array)                                                            https://php.net/manual/en/datetime.set-state.php
  */
 
-class QubusDateTimeImmutable extends CarbonImmutable
+final class QubusDateTimeImmutable extends CarbonImmutable implements DateTimeInterface
 {
 }
