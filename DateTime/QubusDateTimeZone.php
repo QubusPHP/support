@@ -16,6 +16,6 @@ namespace Qubus\Support\DateTime;
 
 use Carbon\CarbonTimeZone;
 
-class QubusDateTimeZone extends CarbonTimeZone
+final class QubusDateTimeZone extends CarbonTimeZone
 {
 }
