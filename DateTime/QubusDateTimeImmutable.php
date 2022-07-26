@@ -506,6 +506,6 @@ use Carbon\CarbonImmutable;
  * @method        static CarbonImmutable       __set_state(array $array)                                                            https://php.net/manual/en/datetime.set-state.php
  */
 
-class QubusDateTimeImmutable extends CarbonImmutable
+final class QubusDateTimeImmutable extends CarbonImmutable
 {
 }
