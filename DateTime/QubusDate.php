@@ -15,7 +15,9 @@ declare(strict_types=1);
 namespace Qubus\Support\DateTime;
 
 use Carbon\Carbon;
+use DateTimeInterface;
 use DateTimeZone;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 use function count;
 use function date;
@@ -25,48 +27,31 @@ use function str_replace;
 use function strtotime;
 use function time;
 
-final class QubusDate implements Date
+class QubusDate implements Date
 {
     /**
-     * Time/DateTime
-     *
-     * @var string|int
-     */
-    public readonly string|int $time;
-
-    /**
      * TimeZone
-     *
-     * @var string|DateTimeZone
      */
     public readonly string|DateTimeZone $timezone;
 
     /**
      * Locale
-     *
-     * @var string|null
      */
     public readonly ?string $locale;
 
     /**
      * Date object.
-     *
-     * @var mixed
      */
     public readonly mixed $date;
 
     /**
      * Returns new Datetime object.
-     *
-     * @param string|int $time
-     * @param string|DateTimeZone $timezone
      */
     private function __construct(
-        string|int $time,
-        string|DateTimeZone $timezone = null,
+        public readonly string|int $time,
+        string|DateTimeZone|null $timezone = null,
         ?string $locale = null
     ) {
-        $this->time     = $time;
         $this->timezone = $timezone ?? new QubusDateTimeZone('UTC');
         $this->locale   = $locale ?? 'en';
         $this->date     = new Carbon($this->time, $this->timezone);
@@ -74,23 +59,21 @@ final class QubusDate implements Date
 
     public static function fromString(
         string|int $time,
-        string|DateTimeZone $timezone = null,
+        string|DateTimeZone|null $timezone = null,
         ?string $locale = null
     ): self {
         return new self($time, $timezone, $locale);
     }
 
-    public function getDate()
+    public function getDate(): mixed
     {
         return $this->date;
     }
 
     /**
      * Sets the timezone.
-     *
-     * @param string|DateTimeZone $timezone
      */
-    public function setTimezone($timezone)
+    public function setTimezone(string|DateTimeZone $timezone): DateTimeInterface
     {
         return $this->date->setTimezone($timezone);
     }
@@ -181,9 +164,9 @@ final class QubusDate implements Date
     /**
      * Returns the date in localized format.
      *
-     * @return object Returns current localized datetime.
+     * @return LocaleAwareInterface Returns current localized datetime.
      */
-    public function locale()
+    public function locale(): LocaleAwareInterface
     {
         $timestamp = $this->date;
         $timestamp->setLocale($this->locale);
@@ -209,10 +192,10 @@ final class QubusDate implements Date
         if (empty($date)) {
             return false;
         }
-        if ('G' == $format) {
+        if ('G' === $format) {
             return strtotime($date . ' +0000');
         }
-        if ('U' == $format) {
+        if ('U' === $format) {
             return strtotime($date);
         }
         if ($translate) {
@@ -265,10 +248,8 @@ final class QubusDate implements Date
 
     /**
      * Prints elapsed time based on datetime.
-     *
-     * @returns Elapsed time.
      */
-    public function timeAgo($original)
+    public function timeAgo(int $original): string
     {
         // array of time period chunks
         $chunks = [
@@ -290,12 +271,12 @@ final class QubusDate implements Date
             $name    = $chunks[$i][1];
 
             // finding the biggest chunk (if the chunk fits, break)
-            if (($count = floor($since / $seconds)) != 0) {
+            if (($count = floor($since / $seconds)) !== 0) {
                 break;
             }
         }
 
-        $print = $count == 1 ? '1 ' . $name : "$count {$name}s";
+        $print = $count === 1 ? '1 ' . $name : "$count {$name}s";
 
         if ($i + 1 < $j) {
             // now getting the second item
@@ -303,8 +284,8 @@ final class QubusDate implements Date
             $name2    = $chunks[$i + 1][1];
 
             // add second item if its greater than 0
-            if (($count2 = floor(($since - ($seconds * $count)) / $seconds2)) != 0) {
-                $print .= $count2 == 1 ? ', 1 ' . $name2 : " $count2 {$name2}s";
+            if (($count2 = floor(($since - ($seconds * $count)) / $seconds2)) !== 0) {
+                $print .= $count2 === 1 ? ', 1 ' . $name2 : " $count2 {$name2}s";
             }
         }
         return $print;
