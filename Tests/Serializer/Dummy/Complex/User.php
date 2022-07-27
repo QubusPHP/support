@@ -15,19 +15,15 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Support\Serializer\Dummy\Complex;
 
+use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
 use Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\UserId;
 
 class User implements JsonSerializable
 {
-    /**
-     * @var UserId
-     */
-    private $userId;
-    /**
-     * @var
-     */
-    private $name;
+    private UserId $userId;
+
+    private string $name;
 
     /**
      * @param UserId $id
@@ -48,14 +44,18 @@ class User implements JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function jsonSerialize()
+    #[ArrayShape([
+        'userId' => "mixed|\Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\UserId",
+        'name' => "string"
+    ])]
+    public function jsonSerialize(): mixed
     {
         return
         [

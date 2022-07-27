@@ -37,13 +37,12 @@ use const STDOUT;
  * @param string $m Message.
  * @param mixed $p Callable.
  */
-function it($m, $p)
+function it(string $m, mixed $p): void
 {
     global $e;
 
     $d = debug_backtrace(0)[0];
     is_callable($p) && $p = $p();
-    $GLOBALS['e'];
     $e = $e || ! $p;
     $o = "\e[3" . ($p ? "2m✔" : "1m✘") . "\e[36m It $m";
     fwrite($p ? STDOUT : STDERR, $p ? "$o\n" : "$o \e[1;37;41mFAIL: {$d['file']} #" . $d['line'] . "\e[0m\n");
@@ -51,8 +50,7 @@ function it($m, $p)
 
 register_shutdown_function(function () {
     global $e;
-    
-    $GLOBALS['e'];
+
     $e && die(1);
 });
 
@@ -66,7 +64,7 @@ register_shutdown_function(function () {
  *
  * @param array $ps Array of callables.
  */
-function all(array $ps)
+function all(array $ps): bool
 {
     return array_reduce($ps, function ($a, $p) {
         return $a && $p;
@@ -82,9 +80,10 @@ function all(array $ps)
  *      }));
  *
  * @param string $exp Exception to check for.
- * @return boolean
+ * @param Closure $cb
+ * @return bool
  */
-function throws($exp, Closure $cb)
+function throws($exp, Closure $cb): bool
 {
     try {
         $cb();
@@ -108,9 +107,10 @@ function throws($exp, Closure $cb)
  *          $sut->test();
  *      }));
  *
- * @return boolean
+ * @param Closure $cb
+ * @return bool
  */
-function withMock(Closure $cb)
+function withMock(Closure $cb): bool
 {
     $cb();
     try {

@@ -132,10 +132,10 @@ class Assets
      * Closure used by the pipeline to fetch assets.
      *
      * Useful when file_get_contents() function is not available in your PHP
-     * instalation or when you want to apply any kind of preprocessing to
+     * installation or when you want to apply any kind of preprocessing to
      * your assets before they get pipelined.
      *
-     * The closure will receive as the only parameter a string with the path/URL of the asset and
+     * The closure will receive as the only parameter a string with the path/URL of the asset, and
      * it should return the content of the asset file as a string.
      */
     protected Closure $fetchCommand;
@@ -151,7 +151,7 @@ class Assets
      * - String containing the relative URL of the file.
      * - String containing the absolute path (filesystem) of the file.
      * - Array containing the assets included in the file.
-     * - Boolean indicating whether or not a gziped version of the file was also created.
+     * - Boolean indicating whether a gzipped version of the file was also created.
      */
     protected Closure $notifyCommand;
 
@@ -284,9 +284,10 @@ class Assets
      * It automatically detects the asset type (JavaScript, CSS or collection).
      * You may add more than one asset passing an array as argument.
      *
-     * @param  mixed   $asset
+     * @param mixed $asset
+     * @return Assets
      */
-    public function add($asset): Assets
+    public function add(mixed $asset): Assets
     {
         // More than one asset
         if (is_array($asset)) {
@@ -311,8 +312,9 @@ class Assets
      * You may prepend more than one asset passing an array as argument.
      *
      * @param mixed $asset
+     * @return Assets
      */
-    public function prepend($asset): Assets
+    public function prepend(mixed $asset): Assets
     {
         // More than one asset
         if (is_array($asset)) {
@@ -336,9 +338,10 @@ class Assets
      * It checks for duplicates.
      * You may add more than one asset passing an array as argument.
      *
-     * @param  mixed   $asset
+     * @param mixed $asset
+     * @return Assets
      */
-    public function addCss($asset): Assets
+    public function addCss(mixed $asset): Assets
     {
         if (is_array($asset)) {
             foreach ($asset as $a) {
@@ -365,9 +368,10 @@ class Assets
      * It checks for duplicates.
      * You may prepend more than one asset passing an array as argument.
      *
-     * @param  mixed   $asset
+     * @param mixed $asset
+     * @return Assets
      */
-    public function prependCss($asset): Assets
+    public function prependCss(mixed $asset): Assets
     {
         if (is_array($asset)) {
             foreach (array_reverse($asset) as $a) {
@@ -394,9 +398,10 @@ class Assets
      * It checks for duplicates.
      * You may add more than one asset passing an array as argument.
      *
-     * @param  mixed   $asset
+     * @param mixed $asset
+     * @return Assets
      */
-    public function addJs($asset): Assets
+    public function addJs(mixed $asset): Assets
     {
         if (is_array($asset)) {
             foreach ($asset as $a) {
@@ -423,9 +428,10 @@ class Assets
      * It checks for duplicates.
      * You may prepend more than one asset passing an array as argument.
      *
-     * @param  mixed   $asset
+     * @param mixed $asset
+     * @return Assets
      */
-    public function prependJs($asset): Assets
+    public function prependJs(mixed $asset): Assets
     {
         if (is_array($asset)) {
             foreach (array_reverse($asset) as $a) {
@@ -453,9 +459,9 @@ class Assets
      * You can take control of the tag rendering by
      * providing a closure that will receive an array of assets.
      *
-     * @param array|Closure $attributes
+     * @param array|Closure|null $attributes
      */
-    public function css($attributes = null): string
+    public function css(array|Closure $attributes = null): string
     {
         if (! $this->css) {
             return '';
@@ -497,9 +503,9 @@ class Assets
      * You can take control of the tag rendering by
      * providing a closure that will receive an array of assets.
      *
-     * @param array|Closure $attributes
+     * @param array|Closure|null $attributes
      */
-    public function js($attributes = null): string
+    public function js(array|Closure $attributes = null): string
     {
         if (! $this->js) {
             return '';
@@ -533,7 +539,9 @@ class Assets
     /**
      * Add/replace collection.
      *
-     * @param  array   $assets
+     * @param string $collectionName
+     * @param array $assets
+     * @return Assets
      */
     public function registerCollection(string $collectionName, array $assets): Assets
     {
@@ -547,7 +555,7 @@ class Assets
      *
      * @return Assets
      */
-    public function reset()
+    public function reset(): Assets
     {
         return $this->resetCss()->resetJs();
     }
@@ -573,7 +581,7 @@ class Assets
     }
 
     /**
-     * Minifiy and concatenate CSS files.
+     * Minify and concatenate CSS files.
      */
     protected function cssPipeline(): string
     {
@@ -586,7 +594,7 @@ class Assets
     }
 
     /**
-     * Minifiy and concatenate JavaScript files.
+     * Minify and concatenate JavaScript files.
      */
     protected function jsPipeline(): string
     {
@@ -599,9 +607,13 @@ class Assets
     }
 
     /**
-     * Minifiy and concatenate files.
+     * Minify and concatenate files.
      *
      * @param array $assets
+     * @param string $extension
+     * @param string $subdirectory
+     * @param Closure $minifier
+     * @return string
      */
     protected function pipeline(array $assets, string $extension, string $subdirectory, Closure $minifier): string
     {
@@ -622,13 +634,13 @@ class Assets
             return $relativePath;
         }
 
-        // Download, concatenate and minifiy files
+        // Download, concatenate and minify files
         $buffer = $this->packLinks($assets, $minifier);
 
         // Write minified file
         file_put_contents($absolutePath, $buffer);
 
-        // Write gziped file
+        // Write gzipped file
         if ($gzipAvailable = function_exists('gzencode') && $this->pipelineGzip !== false) {
             $level = $this->pipelineGzip === true ? -1 : intval($this->pipelineGzip);
             file_put_contents("$absolutePath.gz", gzencode($buffer, $level));
@@ -645,7 +657,8 @@ class Assets
     /**
      * Calculate the pipeline hash.
      *
-     * @param  array  $assets
+     * @param array $assets
+     * @return string
      */
     protected function calculatePipelineHash(array $assets): string
     {
@@ -680,9 +693,11 @@ class Assets
     }
 
     /**
-     * Download, concatenate and minifiy the content of several links.
+     * Download, concatenate and minify the content of several links.
      *
-     * @param  array   $links
+     * @param array $links
+     * @param Closure $minifier
+     * @return string
      */
     protected function packLinks(array $links, Closure $minifier): string
     {
@@ -724,7 +739,7 @@ class Assets
     /**
      * Build link to local asset.
      *
-     * Detects packages links.
+     * Detect packages links.
      *
      * @return string the link
      */
@@ -742,7 +757,8 @@ class Assets
     /**
      * Build an HTML attribute string from an array.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     * @return string
      */
     public function buildTagAttributes(array $attributes): string
     {
@@ -766,9 +782,10 @@ class Assets
     /**
      * Determine whether an asset is normal or from a package.
      *
+     * @param string $asset
      * @return bool|array
      */
-    protected function assetIsFromPackage(string $asset)
+    protected function assetIsFromPackage(string $asset): bool|array
     {
         if (preg_match('{^([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+):(.*)$}', $asset, $matches)) {
             return array_slice($matches, 1, 3);
@@ -780,7 +797,7 @@ class Assets
     /**
      * Determine whether a link is local or remote.
      *
-     * Undestands both "http://" and "https://" as well as protocol agnostic links "//"
+     * Understands both "http://" and "https://" as well as protocol agnostic links "//"
      */
     protected function isRemoteLink(string $link): bool
     {
@@ -810,8 +827,9 @@ class Assets
     /**
      * Add all assets matching $pattern within $directory.
      *
-     * @param  string $directory Relative to $this->publicDir
-     * @param  string $pattern (regex)
+     * @param string $directory Relative to $this->publicDir
+     * @param string|null $pattern (regex)
+     * @return Assets
      */
     public function addDir(string $directory, ?string $pattern = null): Assets
     {
@@ -821,7 +839,7 @@ class Assets
             return $this;
         }
 
-        // By default match all assets
+        // By default, match all assets
         if ($pattern === null) {
             $pattern = $this->assetRegex;
         }
@@ -861,7 +879,7 @@ class Assets
      * @param  string $directory Relative to $this->publicDir
      * @return Assets
      */
-    public function addDirCss(string $directory)
+    public function addDirCss(string $directory): static
     {
         return $this->addDir($directory, $this->cssRegex);
     }
@@ -872,7 +890,7 @@ class Assets
      * @param  string $directory Relative to $this->publicDir
      * @return Assets
      */
-    public function addDirJs(string $directory)
+    public function addDirJs(string $directory): static
     {
         return $this->addDir($directory, $this->jsRegex);
     }
@@ -880,8 +898,9 @@ class Assets
     /**
      * Recursively get files matching $pattern within $directory.
      *
-     * @param  string $pattern (regex)
-     * @param  string $ltrim Will be trimed from the left of the file path
+     * @param string $directory
+     * @param string $pattern (regex)
+     * @param string|null $ltrim Will be trimmed from the left of the file path
      * @return array
      */
     protected function rglob(string $directory, string $pattern, ?string $ltrim = null): array
