@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Qubus\Support;
 
+use Closure;
 use Qubus\Exception\Exception;
 use Qubus\Support\Traits\StaticProxyAware;
 
@@ -160,11 +161,11 @@ class StringHelper
     }
 
     /**
-     * Add's _1 to a string or increment the ending number to allow _2, _3, etc
+     * Adds _1 to a string or increment the ending number to allow _2, _3, etc
      *
      * @param string  $str       String to increment.
      * @param int     $first     Number that is used to mean first.
-     * @param string  $separator Separtor between the name and the number.
+     * @param string  $separator Separator between the name and the number.
      */
     public function increment(string $str, int $first = 1, string $separator = '_'): string
     {
@@ -202,11 +203,11 @@ class StringHelper
     /**
      * Creates a random string of characters
      *
-     * @param string  $type   The type of string.
-     * @param int     $length The number of characters.
-     * @return string The random string.
+     * @param string $type The type of string.
+     * @param int $length The number of characters.
+     * @return string|int|false The random string.
      */
-    public function random(string $type = 'alnum', int $length = 16): string
+    public function random(string $type = 'alnum', int $length = 16): string|int|false
     {
         $randString = (string) mt_rand();
 
@@ -294,7 +295,7 @@ class StringHelper
      *
      * @return Closure
      */
-    public function alternator()
+    public function alternator(): Closure
     {
         // the args are the values to alternate
         $args = func_get_args();
@@ -311,7 +312,7 @@ class StringHelper
      * @param string $string String to parse.
      * @param array  $array  Params to str_replace.
      */
-    public function tr(string $string, array $array = []): string
+    public function tr(mixed $string, array $array = []): mixed
     {
         if (is_string($string)) {
             $trArr = [];
@@ -385,11 +386,11 @@ class StringHelper
     /**
      * Find the position of the first occurrence of a substring in a string.
      *
-     * @param string $str           The string being measured for length.
+     * @param string $str The string being measured for length.
      * @param string|null $encoding Defaults to the setting in the config, which defaults to UTF-8.
-     * @return int The length of the string on success, and 0 if the string is empty.
+     * @return int|false The length of the string on success, and 0 if the string is empty.
      */
-    public function strlen(string $str, string|null $encoding = 'UTF-8')
+    public function strlen(string $str, string|null $encoding = 'UTF-8'): int|false
     {
         return $encoding
         ? mb_strlen($str, $encoding)
@@ -400,14 +401,15 @@ class StringHelper
      * Find position of first occurrence of string in a string.
      *
      * @param string $haystack The string being checked.
-     * @param mixed  $needle   The string to find in haystack.
-     * @param int    $offset   The search offset.
-     * @return mixed           Returns the position of where the needle exists relative to the beginning
-     *                         of the haystack string (independent of offset). Also note that string
-     *                         positions start at 0, and not 1.
-     *                         Returns false if the needle was not found.
+     * @param mixed $needle The string to find in haystack.
+     * @param int $offset The search offset.
+     * @param string|null $encoding
+     * @return false|int Returns the position of where the needle exists relative to the beginning
+*                        of the haystack string (independent of offset). Also note that string
+*                        positions start at 0, and not 1.
+*                        Returns false if the needle was not found.
      */
-    public function strpos(string $haystack, $needle, int $offset = 0, string|null $encoding = 'UTF-8')
+    public function strpos(string $haystack, mixed $needle, int $offset = 0, string|null $encoding = 'UTF-8'): false|int
     {
         return $encoding
         ? mb_strpos($haystack, $needle, $offset, $encoding)
@@ -418,12 +420,12 @@ class StringHelper
      * Find position of last occurrence of a string in a string.
      *
      * @param string $haystack The string being checked.
-     * @param mixed  $needle   The string to find in haystack.
-     * @param int    $offset   The search offset.
-     * @return mixed           Returns the numeric position of the last occurrence of needle in the
+     * @param mixed $needle The string to find in haystack.
+     * @param int $offset The search offset.
+     * @return false|int Returns the numeric position of the last occurrence of needle in the
      *                         haystack string. If needle is not found, it returns false.
      */
-    public function strrpos(string $haystack, $needle, int $offset = 0)
+    public function strrpos(string $haystack, mixed $needle, int $offset = 0): false|int
     {
         return mb_strrpos($haystack, $needle, $offset, 'UTF-8');
     }
@@ -431,15 +433,15 @@ class StringHelper
     /**
      * Get part of string.
      *
-     * @param string $str    The string to extract the substring from.
-     * @param int    $start  If start is non-negative, the returned string will start at the start'th
+     * @param string $str The string to extract the substring from.
+     * @param int $start If start is non-negative, the returned string will start at the start'th
      *                       position in str, counting from zero. If start is negative, the returned
      *                       string will start at the start'th character from the end of str.
-     * @param int    $length Maximum number of characters to use from str. If omitted or NULL is passed,
+     * @param int|null $length Maximum number of characters to use from str. If omitted or NULL is passed,
      *                       extract all characters to the end of the string.
      * @return mixed Returns the extracted part of string; or false on failure, or an empty string.
      */
-    public function substr(string $str, int $start, int|null $length = null)
+    public function substr(string $str, int $start, int|null $length = null): mixed
     {
         // substr functions don't parse null correctly if the string is multibyte.
         if (null === $length) {
@@ -453,7 +455,7 @@ class StringHelper
      * Make a string lowercase.
      *
      * @param string $str The string to convert to lowercase.
-     * @return string The lowercased string.
+     * @return string The lowercase string.
      */
     public function strtolower(string $str): string
     {
@@ -464,7 +466,7 @@ class StringHelper
      * Make a string uppercase.
      *
      * @param string $str The string to convert to uppercase.
-     * @return string The uppercased string.
+     * @return string The uppercase string.
      */
     public function strtoupper(string $str): string
     {
@@ -477,12 +479,12 @@ class StringHelper
      * @param string $haystack The string from which to get the position of the last occurrence of needle.
      * @param string $needle   The string to find in haystack.
      * @param int    $offset   The search offset.
-     * @return mixed Returns the position of where the needle exists relative to the beginning
+     * @return false|int Returns the position of where the needle exists relative to the beginning
      *               of the haystack string (independent of offset). Also note that string
      *               positions start at 0, and not 1.
      *               Returns false if the needle was not found.
      */
-    public function stripos(string $haystack, string $needle, int $offset = 0)
+    public function stripos(string $haystack, string $needle, int $offset = 0): bool|int
     {
         return mb_stripos($haystack, $needle, $offset, 'UTF-8');
     }
@@ -493,10 +495,10 @@ class StringHelper
      * @param string $haystack The string from which to get the position of the last occurrence of needle.
      * @param string $needle   The string to find in haystack.
      * @param int    $offset   The search offset.
-     * @return mixed Returns the numeric position of the last occurrence of needle in the
+     * @return int|bool Returns the numeric position of the last occurrence of needle in the
      *               haystack string. If needle is not found, it returns false.
      */
-    public function strripos(string $haystack, string $needle, int $offset = 0)
+    public function strripos(string $haystack, string $needle, int $offset = 0): int|bool
     {
         return mb_strripos($haystack, $needle, $offset, 'UTF-8');
     }
@@ -504,12 +506,12 @@ class StringHelper
     /**
      * Finds first occurrence of a string within another.
      *
-     * @param string $haystack     The string from which to get the position of the last occurrence of needle.
-     * @param string $needle       The string to find in haystack.
-     * @param int    $beforeNeedle Determines which portion of haystack this function returns.
-     * @return mixed The portion of haystack, or false if needle is not found.
+     * @param string $haystack The string from which to get the position of the last occurrence of needle.
+     * @param string $needle The string to find in haystack.
+     * @param bool $beforeNeedle Determines which portion of haystack this function returns.
+     * @return string|bool The portion of haystack, or false if needle is not found.
      */
-    public function strstr(string $haystack, string $needle, bool $beforeNeedle = false)
+    public function strstr(string $haystack, string $needle, bool $beforeNeedle = false): string|bool
     {
         return mb_strstr($haystack, $needle, $beforeNeedle, 'UTF-8');
     }
@@ -517,12 +519,12 @@ class StringHelper
     /**
      * Finds first occurrence of a string within another, case-insensitive.
      *
-     * @param string $haystack     The string from which to get the position of the last occurrence of needle.
-     * @param string $needle       The string to find in haystack.
-     * @param int    $beforeNeedle Determines which portion of haystack this function returns.
-     * @return mixed The portion of haystack, or false if needle is not found.
+     * @param string $haystack The string from which to get the position of the last occurrence of needle.
+     * @param string $needle The string to find in haystack.
+     * @param bool $beforeNeedle Determines which portion of haystack this function returns.
+     * @return string|bool The portion of haystack, or false if needle is not found.
      */
-    public function stristr(string $haystack, string $needle, bool $beforeNeedle = false)
+    public function stristr(string $haystack, string $needle, bool $beforeNeedle = false): string|bool
     {
         return mb_stristr($haystack, $needle, $beforeNeedle, 'UTF-8');
     }
@@ -531,11 +533,11 @@ class StringHelper
      * Finds the last occurrence of a character in a string within another.
      *
      * @param string $haystack The string from which to get the last occurrence of needle.
-     * @param string $needle   The string to find in haystack.
-     * @param int    $part     Determines which portion of haystack this function returns.
-     * @return mixed           The portion of haystack, or false if needle is not found.
+     * @param string $needle The string to find in haystack.
+     * @param bool $beforeNeedle
+     * @return false|string           The portion of haystack, or false if needle is not found.
      */
-    public function strrchr(string $haystack, string $needle, bool $beforeNeedle = false)
+    public function strrchr(string $haystack, string $needle, bool $beforeNeedle = false): bool|string
     {
         return mb_strrchr($haystack, $needle, $beforeNeedle, 'UTF-8');
     }
@@ -546,9 +548,9 @@ class StringHelper
      * @param string $haystack The string from which to get the position of the last occurrence of needle.
      * @param string $needle   The string to find in haystack.
      * @param int    $offset   The search offset.
-     * @return int The number of occurences found.
+     * @return int The number of occurrences found.
      */
-    public function substrCount(string $haystack, string $needle, int $offset = 0)
+    public function substrCount(string $haystack, string $needle, int $offset = 0): int
     {
         return mb_substr_count($haystack, $needle, $offset, 'UTF-8');
     }
@@ -584,7 +586,7 @@ class StringHelper
      * @param string $str String to uppercase.
      * @return string
      */
-    public function ucwords(string $str)
+    public function ucwords(string $str): string
     {
         return mb_convert_case($str, MB_CASE_TITLE, 'UTF-8');
     }

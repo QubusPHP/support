@@ -16,6 +16,10 @@ namespace Qubus\Support;
 
 class DataType implements DataObjectCollection
 {
+    public ?object $string;
+
+    public ?object $array;
+
     /**
      * list of instances
      *
@@ -30,17 +34,19 @@ class DataType implements DataObjectCollection
     }
 
     /**
+     * @param string $key
      * @param object $value
      */
-    public function add(string $key, $value): void
+    public function add(string $key, object $value): void
     {
         $this->instances[$key] = $value;
     }
 
     /**
+     * @param string $key
      * @return object|null
      */
-    public function get(string $key)
+    public function get(string $key): ?object
     {
         if (isset($this->instances[$key])) {
             return $this->instances[$key];

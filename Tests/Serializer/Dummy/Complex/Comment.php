@@ -15,24 +15,19 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Support\Serializer\Dummy\Complex;
 
+use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
 use Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\CommentId;
-use Qubus\Tests\Support\Serializer\Dummy\Complex\User;
 
 class Comment implements JsonSerializable
 {
-    /**
-     * @var
-     */
-    private $commentId;
-    /**
-     * @var array
-     */
-    private $dates;
-    /**
-     * @var string
-     */
-    private $comment;
+    private CommentId $commentId;
+
+    private array $dates;
+
+    private string $comment;
+
+    private User $user;
 
     /**
      * @param CommentId $id
@@ -51,7 +46,7 @@ class Comment implements JsonSerializable
     /**
      * @return mixed
      */
-    public function getCommentId()
+    public function getCommentId(): mixed
     {
         return $this->commentId;
     }
@@ -59,7 +54,7 @@ class Comment implements JsonSerializable
     /**
      * @return mixed
      */
-    public function getComment()
+    public function getComment(): mixed
     {
         return $this->comment;
     }
@@ -67,12 +62,16 @@ class Comment implements JsonSerializable
     /**
      * @return User
      */
-    public function getUser()
+    public function getUser(): \Qubus\Tests\Support\Serializer\Dummy\Complex\User
     {
         return $this->user;
     }
 
-    public function jsonSerialize()
+    #[ArrayShape([
+        'commentId' => "mixed|\Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\CommentId",
+        'comment' => "mixed|string"
+    ])]
+    public function jsonSerialize(): mixed
     {
         return
         [

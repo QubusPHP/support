@@ -16,13 +16,10 @@ namespace Qubus\Support;
 
 interface DataObjectCollection
 {
-    /**
-     * @param object $value
-     */
-    public function add(string $key, $value): void;
+    public function add(string $key, object $value): void;
 
     /**
      * @return object|null Returns the object or null if object does not exist.
      */
-    public function get(string $key);
+    public function get(string $key): ?object;
 }
