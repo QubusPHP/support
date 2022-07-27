@@ -326,7 +326,7 @@ class Inflector
     ): string {
         // Sanitize string.
         if (! is_array($string)) {
-            $string = filter_var($string, FILTER_SANITIZE_STRING);
+            $string = htmlspecialchars($string);
         }
 
         // Remove tags

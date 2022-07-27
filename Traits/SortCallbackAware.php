@@ -23,7 +23,7 @@ trait SortCallbackAware
      * @param array $b Second Array.
      * @return int Comparison
      */
-    protected function afsort(array $a, array $b)
+    protected function afsort(array $a, array $b): int
     {
         if (isset($a['priority']) && isset($b['priority'])) {
             $priority1 = (int) $a['priority'];

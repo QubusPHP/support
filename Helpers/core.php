@@ -16,6 +16,7 @@ namespace Qubus\Support\Helpers;
 
 use ArrayAccess;
 use Closure;
+use JetBrains\PhpStorm\NoReturn;
 use Qubus\Exception\Data\TypeException;
 use Qubus\Support\DataType;
 
@@ -82,7 +83,7 @@ use const PHP_OS;
  * @param string $message Custom message to print.
  * @param int $level Predefined PHP error constant.
  */
-function trigger_error__(string $message, int $level = E_USER_NOTICE)
+function trigger_error__(string $message, int $level = E_USER_NOTICE): void
 {
     $debug = debug_backtrace();
     $caller = next($debug);
@@ -102,7 +103,7 @@ function trigger_error__(string $message, int $level = E_USER_NOTICE)
  */
 function return_false__(): bool
 {
-    return (bool) false;
+    return false;
 }
 
 /**
@@ -112,7 +113,7 @@ function return_false__(): bool
  */
 function return_true__(): bool
 {
-    return (bool) true;
+    return true;
 }
 
 /**
@@ -172,15 +173,14 @@ function return_void__(): void
  * @param bool|Closure $showErrors If true error will be processed,
  *                                 if Closure - only Closure will be called.
  *                                 Default true.
- * @return mixed
  */
-function load_file(string $file, bool $once = true, $showErrors = true)
+function load_file(string $file, bool $once = true, $showErrors = true): mixed
 {
     if (file_exists("'$file'")) {
         if ($once) {
-            require_once("'$file'");
+            require_once "'$file'";
         } else {
-            require("'$file'");
+            require "'$file'";
         }
     } elseif (is_bool($showErrors) && $showErrors) {
         trigger_error__(
@@ -295,13 +295,13 @@ function concat_ws(string $string1, string $string2, string $separator = ',', ..
  * @param mixed $var Variable to check.
  * @return bool Returns `true` if null, `false` otherwise.
  */
-function is_null__($var): bool
+function is_null__(mixed $var): bool
 {
     if (null === $var) {
-        return (bool) true;
+        return true;
     }
 
-    return (bool) false;
+    return false;
 }
 
 /**
@@ -310,13 +310,13 @@ function is_null__($var): bool
  * @param mixed $var Variable to check.
  * @return bool Returns `true` if true, `false` otherwise.
  */
-function is_true__($var): bool
+function is_true__(mixed $var): bool
 {
-    if ((bool) true === $var) {
-        return (bool) true;
+    if (true === $var) {
+        return true;
     }
 
-    return (bool) false;
+    return false;
 }
 
 /**
@@ -325,13 +325,13 @@ function is_true__($var): bool
  * @param mixed $var Variable to check.
  * @return bool Returns `true` if false, `false` otherwise.
  */
-function is_false__($var): bool
+function is_false__(mixed $var): bool
 {
-    if ((bool) false === $var) {
-        return (bool) true;
+    if (false === $var) {
+        return true;
     }
 
-    return (bool) false;
+    return false;
 }
 
 /**
@@ -355,7 +355,7 @@ function truncate_string(string $string, int $limit, string $continuation = '...
  * @param string $string
  * @return mixed
  */
-function unicoder(string $string)
+function unicoder(string $string): mixed
 {
     $p = str_split(trim($string));
     $newString = '';
@@ -409,9 +409,6 @@ function convert_array_to_object(array $array): object
  *      php_like('lu%', 'Lucy'); //true
  *      php_like('%lu', 'Lucy'); //false
  *      php_like('cy%', 'Lucy'); //false
- *
- * @param string $pattern
- * @param string $subject
  */
 function php_like(string $pattern, string $subject): bool
 {
@@ -470,10 +467,10 @@ function php_where(string $key, string $operator, $pattern): bool
  * @param array $b Second item for comparison.
  * @return int Return 0, -1, or 1 based on two string comparison.
  */
-function sort_element_callback(array $a, array $b)
+function sort_element_callback(array $a, array $b): int
 {
-    $aname = is_array($a) && isset($a['Name']) ? $a['Name'] : 0;
-    $bname = is_array($b) && isset($b['Name']) ? $b['Name'] : 0;
+    $aname = $a['Name'] ?? 0;
+    $bname = $b['Name'] ?? 0;
     if ($aname === $bname) {
         return 0;
     }
@@ -483,11 +480,12 @@ function sort_element_callback(array $a, array $b)
 /**
  * Return array specific item.
  *
- * @param array  $array
- * @param mixed  $default
+ * @param array $array
+ * @param string|null $key
+ * @param mixed|null $default
  * @return array|null
  */
-function return_array(array $array, ?string $key, $default = null)
+function return_array(array $array, ?string $key, mixed $default = null): ?array
 {
     if (! array_accessible($array)) {
         return value($default);
@@ -515,7 +513,8 @@ function return_array(array $array, ?string $key, $default = null)
 /**
  * Flatten a multi-dimensional associative array with dots.
  *
- * @param  array   $array
+ * @param array $array
+ * @param string $prepend
  * @return array
  */
 function array_dot(array $array, string $prepend = ''): array
@@ -534,11 +533,12 @@ function array_dot(array $array, string $prepend = ''): array
 }
 
 /**
- * Check input is array accessable.
+ * Check input is array accessible.
  *
  * @param mixed $value
+ * @return bool
  */
-function array_accessible($value): bool
+function array_accessible(mixed $value): bool
 {
     return is_array($value) || $value instanceof ArrayAccess;
 }
@@ -560,7 +560,8 @@ function array_exists(array $array, string $key): bool
  * Checks if the given key or index exists in the array.
  *
  * @param string $key Value to check.
- * @param array $array An array with keys to check.
+ * @param array|ArrayAccess $array $array An array with keys to check.
+ * @return bool
  */
 function array_key_exists__(string $key, array|ArrayAccess $array): bool
 {
@@ -594,7 +595,9 @@ function studly_case(string $string): string
 /**
  * Convert a value to camel caps case.
  *
+ * @param string $str
  * @param array $noStrip
+ * @return string
  */
 function camel_case(string $str, array $noStrip = []): string
 {
@@ -604,9 +607,7 @@ function camel_case(string $str, array $noStrip = []): string
     // uppercase the first character of each word
     $str = ucwords($str);
     $str = str_replace(" ", "", $str);
-    $str = lcfirst($str);
-
-    return $str;
+    return lcfirst($str);
 }
 
 /**
@@ -615,7 +616,7 @@ function camel_case(string $str, array $noStrip = []): string
  * @param  mixed  $value
  * @return mixed
  */
-function value($value)
+function value(mixed $value): mixed
 {
     return $value instanceof Closure ? $value() : $value;
 }
@@ -643,13 +644,11 @@ function remove_accents(string $string, string $encoding = 'utf-8'): string
     );
 
     // replacing ligatures
-    // Exemple "œ" => "oe", "Æ" => "AE"
+    // Example "œ" => "oe", "Æ" => "AE"
     $string = preg_replace('#&([A-za-z]{2})(?:lig);#', '\1', $string);
 
     // removing the remaining bits
-    $string = preg_replace('#&[^;]+;#', '', $string);
-
-    return $string;
+    return preg_replace('#&[^;]+;#', '', $string);
 }
 
 /**
@@ -660,7 +659,7 @@ function remove_accents(string $string, string $encoding = 'utf-8'): string
 function call_qubus_func_array($callback, array $args)
 {
     // deal with "class::method" syntax
-    if (is_string($callback) && strpos($callback, '::') !== false) {
+    if (is_string($callback) && str_contains($callback, '::') !== false) {
         $callback = explode('::', $callback);
     }
 
@@ -697,11 +696,12 @@ function windows_os(): bool
 /**
  * Print and die.
  *
- * @param object|array $x
+ * @param mixed $x
  * @param bool $pre Default true.
  * @param bool $return Default false.
  */
-function pd($x, bool $pre = true, bool $return = false): void
+#[NoReturn]
+function pd(mixed $x, bool $pre = true, bool $return = false): void
 {
     if ($pre) {
         echo '<pre>';
@@ -717,7 +717,7 @@ function pd($x, bool $pre = true, bool $return = false): void
 }
 
 /**
- * Single file writable atribute check.
+ * Single file writable attribute check.
  * Thanks to legolas558.users.sf.net
  */
 function win_is_writable(string $path): bool

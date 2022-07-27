@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Qubus\Support\Traits;
 
 use ReflectionClass;
+use ReflectionException;
 use RuntimeException;
 
 trait StaticProxyAware
@@ -30,8 +31,9 @@ trait StaticProxyAware
      * Creates the original or retrieves the stored singleton instance.
      *
      * @return self
+     * @throws ReflectionException
      */
-    public static function getInstance()
+    public static function getInstance(): static
     {
         if (! static::$instance) {
             static::$instance = (new ReflectionClass(static::class))
@@ -44,7 +46,7 @@ trait StaticProxyAware
     /**
      * Reset the Container instance.
      */
-    public static function resetInstance()
+    public static function resetInstance(): void
     {
         if (self::$instance) {
             self::$instance = null;

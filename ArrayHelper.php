@@ -65,12 +65,13 @@ class ArrayHelper
      * Gets a dot-notated key from an array, with a default value if it does
      * not exist.
      *
-     * @param array  $array   The search array.
-     * @param mixed  $key     The dot-notated key or array of keys.
-     * @param string $default The default value
+     * @param array|ArrayAccess $array $array The search array.
+     * @param mixed|null $key The dot-notated key or array of keys.
+     * @param string|null $default The default value
      * @return mixed
+     * @throws TypeException
      */
-    public function get($array, $key = null, ?string $default = null)
+    public function get(array|ArrayAccess $array, mixed $key = null, ?string $default = null): mixed
     {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
@@ -118,10 +119,10 @@ class ArrayHelper
      *
      * @param array   $array  The array to insert it into
      * @param mixed   $key    The dot-notated key to set or array of keys
-     * @param mixed   $value  The value
+     * @param mixed|null $value  The value
      * @return void
      */
-    public function set(array &$array, $key, $value = null)
+    public function set(array &$array, mixed $key, mixed $value = null): void
     {
         if ($key === null) {
             $array = $value;
@@ -152,15 +153,16 @@ class ArrayHelper
     /**
      * Pluck an array of values from an array.
      *
-     * @param array           $array Collection of arrays to pluck from.
-     * @param string          $key   Key of the value to pluck.
-     * @param string|int|bool $index Optional return array index key, true for original index.
+     * @param array $array Collection of arrays to pluck from.
+     * @param string $key Key of the value to pluck.
+     * @param bool|int|string|null $index Optional return array index key, true for original index.
      * @return array Array of plucked values.
+     * @throws TypeException
      */
-    public function pluck(array $array, string $key, $index = null)
+    public function pluck(array $array, string $key, bool|int|string $index = null): array
     {
         $return = [];
-        $getDeep = strpos($key, '.') !== false;
+        $getDeep = str_contains($key, '.') !== false;
 
         if (! $index) {
             foreach ($array as $i => $a) {
@@ -179,10 +181,12 @@ class ArrayHelper
     /**
      * Array_key_exists with a dot-notated key from an array.
      *
-     * @param array   $array    The search array
-     * @param mixed   $key      The dot-notated key or array of keys
+     * @param array|ArrayAccess $array $array The search array
+     * @param mixed $key The dot-notated key or array of keys
+     * @return bool
+     * @throws TypeException
      */
-    public function keyExists($array, $key): bool
+    public function keyExists(array|ArrayAccess $array, mixed $key): bool
     {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
@@ -215,10 +219,10 @@ class ArrayHelper
      * Unsets dot-notated k?string ey from an array
      *
      * @param array   $array    The search array
-     * @param mixed   $key      The dot-notated key or array of keys
+     * @param mixed|null $key      The dot-notated key or array of keys
      * @return mixed
      */
-    public function delete(array &$array, $key = null)
+    public function delete(array &$array, mixed $key = null): mixed
     {
         if ($key === null) {
             return false;
@@ -234,7 +238,7 @@ class ArrayHelper
 
         $keyParts = explode('.', $key);
 
-        if (! is_array($array) || ! array_key_exists($keyParts[0], $array)) {
+        if (! array_key_exists($keyParts[0], $array)) {
             return false;
         }
 
@@ -251,15 +255,15 @@ class ArrayHelper
     }
 
     /**
-     * Converts a multi-dimensional associative array into an array of key => values with the provided field names.
+     * Converts a multidimensional associative array into an array of key => values with the provided field names.
      *
-     * @param array  $assoc    The array to convert.
+     * @param array|Iterator $assoc The array to convert.
      * @param string $keyField The field name of the key field.
      * @param string $valField The field name of the value field.
      * @return array
      * @throws TypeException
      */
-    public function assocToKeyVal($assoc, string $keyField, string $valField): array
+    public function assocToKeyVal(array|Iterator $assoc, string $keyField, string $valField): array
     {
         if (! is_array($assoc) && ! $assoc instanceof Iterator) {
             throw new TypeException('The first parameter must be an array.');
@@ -276,15 +280,15 @@ class ArrayHelper
     }
 
     /**
-     * Converts an array of key => values into a multi-dimensional associative array with the provided field names
+     * Converts an array of key => values into a multidimensional associative array with the provided field names
      *
-     * @param array   $array      the array to convert
-     * @param string  $keyField  the field name of the key field
-     * @param string  $valField  the field name of the value field
+     * @param array|Iterator $array $array      the array to convert
+     * @param string $keyField the field name of the key field
+     * @param string $valField the field name of the value field
      * @return  array
-     * @throws  TypeException
+     * @throws TypeException
      */
-    public function keyValToAssoc($array, string $keyField, string $valField): array
+    public function keyValToAssoc(array|Iterator $array, string $keyField, string $valField): array
     {
         if (! is_array($array) && ! $array instanceof Iterator) {
             throw new TypeException('The first parameter must be an array.');
@@ -313,7 +317,7 @@ class ArrayHelper
      * @return  array|null  the new array or null
      * @throws BadMethodCallException
      */
-    public function toAssoc(array $arr)
+    public function toAssoc(array $arr): ?array
     {
         if (($count = count($arr)) % 2 > 0) {
             throw new BadMethodCallException('Number of values in toAssoc must be even.');
@@ -330,15 +334,11 @@ class ArrayHelper
     /**
      * Checks if the given array is an assoc array.
      *
-     * @param array  $arr  the array to check
-     * @return bool True if its an assoc array, false if not.
+     * @param array $arr the array to check
+     * @return bool True if it's an assoc array, false if not.
      */
-    public function isAssoc($arr): bool
+    public function isAssoc(array $arr): bool
     {
-        if (! is_array($arr)) {
-            throw new TypeException('The parameter must be an array.');
-        }
-
         $counter = 0;
         foreach ($arr as $key => $unused) {
             if (! is_int($key) || $key !== $counter++) {
@@ -455,8 +455,8 @@ class ArrayHelper
     /**
      * Recursive version of PHP's array_filter().
      *
-     * @param array    $array    The array to filter.
-     * @param callback $callback The callback that determines whether or not a value is filtered.
+     * @param array $array The array to filter.
+     * @param callable|null $callback $callback The callback that determines whether a value is filtered.
      * @return array
      */
     public function filterRecursive(array $array, ?callable $callback = null): array
@@ -555,13 +555,13 @@ class ArrayHelper
      *
      * WARNING: original array is edited by reference, only bool success is returned.
      *
-     * @param array       $original The original array (by reference).
-     * @param array|mixed $value    The value(s) to insert, if you want to insert an array
-     *                              it needs to be in an array itself.
-     * @param int         $pos      The numeric position at which to insert, negative to count from the end backwards.
-     * @return bool False when array shorter then $pos, otherwise true
+     * @param array $original The original array (by reference).
+     * @param mixed $value    The value(s) to insert, if you want to insert an array
+     *                        it needs to be in an array itself.
+     * @param int   $pos      The numeric position at which to insert, negative to count from the end backwards.
+     * @return bool False when array shorter than $pos, otherwise true
      */
-    public function insert(array &$original, $value, int $pos): bool
+    public function insert(array &$original, mixed $value, int $pos): bool
     {
         if (count($original) < abs($pos)) {
             return false;
@@ -576,13 +576,13 @@ class ArrayHelper
      * Insert value(s) into an array, mostly an array_splice alias
      * WARNING: original array is edited by reference, only bool success is returned
      *
-     * @param array       $original The original array (by reference)
-     * @param array|mixed $values   The value(s) to insert, if you want to insert an array
-     *                              it needs to be in an array itself.
-     * @param int         $pos      The numeric position at which to insert, negative to count from the end backwards.
-     * @return bool false when array shorter then $pos, otherwise true
+     * @param array $original The original array (by reference)
+     * @param mixed $values   The value(s) to insert, if you want to insert an array
+     *                        it needs to be in an array itself.
+     * @param int   $pos      The numeric position at which to insert, negative to count from the end backwards.
+     * @return bool false when array shorter than $pos, otherwise true
      */
-    public function insertAssoc(array &$original, $values, int $pos): bool
+    public function insertAssoc(array &$original, mixed $values, int $pos): bool
     {
         if (count($original) < abs($pos)) {
             return false;
@@ -598,14 +598,14 @@ class ArrayHelper
      *
      * WARNING: original array is edited by reference, only bool success is returned.
      *
-     * @param array       $original The original array (by reference).
-     * @param array|mixed $value    The value(s) to insert, if you want to insert an array
-     *                              it needs to be in an array itself.
-     * @param string|int  $key      The key before which to insert.
-     * @param bool        $isAssoc  Whether the input is an associative array.
+     * @param array      $original The original array (by reference).
+     * @param mixed      $value    The value(s) to insert, if you want to insert an array
+     *                             it needs to be in an array itself.
+     * @param int|string $key      The key before which to insert.
+     * @param bool       $isAssoc  Whether the input is an associative array.
      * @return bool False when key isn't found in the array, otherwise true.
      */
-    public function insertBeforeKey(array &$original, $value, $key, bool $isAssoc = false): bool
+    public function insertBeforeKey(array &$original, mixed $value, int|string $key, bool $isAssoc = false): bool
     {
         $pos = array_search($key, array_keys($original));
 
@@ -621,14 +621,14 @@ class ArrayHelper
      *
      * WARNING: original array is edited by reference, only bool success is returned.
      *
-     * @param array       $original The original array (by reference).
-     * @param array|mixed $value    The value(s) to insert, if you want to insert an array
-     *                              it needs to be in an array itself.
-     * @param string|int  $key      The key after which to insert.
-     * @param bool        $isAssoc  Whether the input is an associative array.
+     * @param array      $original The original array (by reference).
+     * @param mixed      $value    The value(s) to insert, if you want to insert an array
+     *                             it needs to be in an array itself.
+     * @param int|string $key      The key after which to insert.
+     * @param bool       $isAssoc  Whether the input is an associative array.
      * @return bool False when key isn't found in the array, otherwise true.
      */
-    public function insertAfterKey(array &$original, $value, $key, bool $isAssoc = false): bool
+    public function insertAfterKey(array &$original, mixed $value, int|string $key, bool $isAssoc = false): bool
     {
         $pos = array_search($key, array_keys($original));
 
@@ -642,14 +642,14 @@ class ArrayHelper
     /**
      * Insert value(s) into an array after a specific value (first found in array).
      *
-     * @param array       $original The original array (by reference).
-     * @param array|mixed $value    The value(s) to insert, if you want to insert an array
-     *                              it needs to be in an array itself.
-     * @param string|int  $search   The value after which to insert.
-     * @param bool        $isAssoc  Whether the input is an associative array.
+     * @param array      $original The original array (by reference).
+     * @param mixed      $value    The value(s) to insert, if you want to insert an array
+     *                             it needs to be in an array itself.
+     * @param int|string $search   The value after which to insert.
+     * @param bool       $isAssoc  Whether the input is an associative array.
      * @return bool False when value isn't found in the array, otherwise true.
      */
-    public function insertAfterValue(array &$original, $value, $search, bool $isAssoc = false): bool
+    public function insertAfterValue(array &$original, mixed $value, int|string $search, bool $isAssoc = false): bool
     {
         $key = array_search($search, $original);
 
@@ -663,14 +663,14 @@ class ArrayHelper
     /**
      * Insert value(s) into an array before a specific value (first found in array)
      *
-     * @param array       $original The original array (by reference).
-     * @param array|mixed $value    The value(s) to insert, if you want to insert an array.
-     *                              it needs to be in an array itself.
-     * @param string|int  $search   The value after which to insert.
-     * @param bool        $isAssoc  Whether the input is an associative array.
+     * @param array      $original The original array (by reference).
+     * @param mixed      $value    The value(s) to insert, if you want to insert an array.
+     *                             it needs to be in an array itself.
+     * @param int|string $search   The value after which to insert.
+     * @param bool       $isAssoc  Whether the input is an associative array.
      * @return bool False when value isn't found in the array, otherwise true.
      */
-    public function insertBeforeValue(array &$original, $value, $search, bool $isAssoc = false): bool
+    public function insertBeforeValue(array &$original, mixed $value, int|string $search, bool $isAssoc = false): bool
     {
         $key = array_search($search, $original);
 
@@ -684,7 +684,7 @@ class ArrayHelper
     /**
      * Sorts a multi-dimensional array by it's values.
      *
-     * @param array  $array     The array to fetch from.
+     * @param array $array     The array to fetch from.
      * @param string $key       The key to sort by.
      * @param string $order     The order (asc or desc).
      * @param int    $sortFlags The php sort type flag.
@@ -692,15 +692,11 @@ class ArrayHelper
      * @throws TypeException
      */
     public function sort(
-        $array,
+        array $array,
         string $key,
         string $order = 'asc',
         int $sortFlags = SORT_REGULAR
     ): array {
-        if (! is_array($array)) {
-            throw new TypeException('$this->sort() - $array must be an array.');
-        }
-
         if (empty($array)) {
             return $array;
         }
@@ -735,10 +731,11 @@ class ArrayHelper
     /**
      * Sorts an array on multiple values, with deep sorting support.
      *
-     * @param array $array      Collection of arrays/objects to sort.
-     * @param array $conditions Worting conditions.
-     * @param bool  $ignoreCase Whether to sort case insensitive.
+     * @param array $array Collection of arrays/objects to sort.
+     * @param array $conditions Sorting conditions.
+     * @param bool $ignoreCase Whether to sort case-insensitive.
      * @return array
+     * @throws TypeException
      */
     public function multisort(array $array, array $conditions, bool $ignoreCase = false): array
     {
@@ -769,9 +766,9 @@ class ArrayHelper
      * Find the average of an array.
      *
      * @param array $array The array containing the values.
-     * @return number The average value.
+     * @return float|int The average value.
      */
-    public function average(array $array)
+    public function average(array $array): float|int
     {
         // No arguments passed, lets not divide by 0
         if (! ($count = count($array)) > 0) {
@@ -784,21 +781,15 @@ class ArrayHelper
     /**
      * Replaces key names in an array by names in the $replace parameter.
      *
-     * @param array        $source  The array containing the key/value combinations
+     * @param array $source The array containing the key/value combinations
      * @param array|string $replace Key to replace or array containing the replacement keys
-     * @param string       $newKey  The replacement key
+     * @param string|null $newKey The replacement key
      * @return array The array with the new keys.
      */
-    public function replaceKey($source, $replace, ?string $newKey = null): array
+    public function replaceKey(array $source, array|string $replace, ?string $newKey = null): array
     {
         if (is_string($replace)) {
             $replace = [$replace => $newKey];
-        }
-
-        if (! is_array($source) || ! is_array($replace)) {
-            throw new TypeException(
-                '$this->replaceKey() - $source must an array. $replace must be an array or string.'
-            );
         }
 
         $result = [];
@@ -896,10 +887,10 @@ class ArrayHelper
      * Will overwrite if the value exists.
      *
      * @param array        $arr   The array to prepend to
-     * @param string|array $key   The key or array of keys and values
-     * @param mixed        $value The value to prepend
+     * @param array|string $key   The key or array of keys and values
+     * @param mixed|null $value The value to prepend
      */
-    public function prepend(array &$arr, $key, $value = null): string|array
+    public function prepend(array &$arr, array|string $key, mixed $value = null): string|array
     {
         $arr = (is_array($key) ? $key : [$key => $value]) + $arr;
 
@@ -913,7 +904,7 @@ class ArrayHelper
      * @param array $haystack Array to search in.
      * @return bool Whether the needle is found in the haystack.
      */
-    public function inArrayRecursive($needle, array $haystack, bool $strict = false): bool
+    public function inArrayRecursive(mixed $needle, array $haystack, bool $strict = false): bool
     {
         foreach ($haystack as $value) {
             if (! $strict && $needle === $value) {
@@ -949,17 +940,18 @@ class ArrayHelper
      * method will return a delimiter-notated key using the
      * $delimiter parameter.
      *
-     * @param array  $array     The search array.
-     * @param mixed  $value     The searched value.
-     * @param string $default   The default value.
-     * @param bool   $recursive Whether to get keys recursive.
+     * @param array|ArrayAccess $array $array     The search array.
+     * @param mixed $value The searched value.
+     * @param string|null $default The default value.
+     * @param bool $recursive Whether to get keys recursive.
      * @param string $delimiter The delimiter, when $recursive is true.
-     * @param bool   $strict    If true, do a strict key comparison.
+     * @param bool $strict If true, do a strict key comparison.
+     * @return string|bool|null
      * @throws TypeException
      */
     public function search(
-        $array,
-        $value,
+        array|ArrayAccess $array,
+        mixed $value,
         ?string $default = null,
         bool $recursive = true,
         string $delimiter = '.',
@@ -999,7 +991,7 @@ class ArrayHelper
     /**
      * Returns only unique values in an array. It does not sort. First value is used.
      *
-     * @param array $arr The array to dedup.
+     * @param array $arr The array to dedupe.
      * @return array array With only de-duped values.
      */
     public function unique(array $arr): array
@@ -1025,11 +1017,12 @@ class ArrayHelper
     /**
      * Calculate the sum of an array.
      *
-     * @param array  $array The array containing the values.
-     * @param string $key   Key of the value to pluck.
-     * @return number The sum value
+     * @param array|ArrayAccess $array $array The array containing the values.
+     * @param string $key Key of the value to pluck.
+     * @return float|int The sum value
+     * @throws TypeException
      */
-    public function sum($array, string $key)
+    public function sum(array|ArrayAccess $array, string $key): float|int
     {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
@@ -1059,13 +1052,14 @@ class ArrayHelper
     /**
      * Get the previous value or key from an array using the current array key.
      *
-     * @param array  $array    The array containing the values.
-     * @param string $key      Key of the current entry to use as reference.
-     * @param bool   $getValue If true, return the previous value instead of the previous key.
-     * @param bool   $strict   If true, do a strict key comparison.
+     * @param array|ArrayAccess $array $array    The array containing the values.
+     * @param string $key Key of the current entry to use as reference.
+     * @param bool $getValue If true, return the previous value instead of the previous key.
+     * @param bool $strict If true, do a strict key comparison.
      * @return string|bool|null The value in the array, null if there is no previous value, or false if the key doesn't exist.
+     * @throws TypeException
      */
-    public function previousByKey($array, $key, bool $getValue = false, bool $strict = false): string|bool|null
+    public function previousByKey(array|ArrayAccess $array, string $key, bool $getValue = false, bool $strict = false): string|bool|null
     {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
@@ -1090,13 +1084,14 @@ class ArrayHelper
     /**
      * Get the next value or key from an array using the current array key.
      *
-     * @param array  $array    The array containing the values.
-     * @param string $key      Key of the current entry to use as reference.
-     * @param bool   $getValue If true, return the next value instead of the next key.
-     * @param bool   $strict   If true, do a strict key comparison.
+     * @param array|ArrayAccess $array $array The array containing the values.
+     * @param string $key Key of the current entry to use as reference.
+     * @param bool $getValue If true, return the next value instead of the next key.
+     * @param bool $strict If true, do a strict key comparison.
      * @return string|bool|null The value in the array, null if there is no next value, or false if the key doesn't exist.
+     * @throws TypeException
      */
-    public function nextByKey($array, string $key, bool $getValue = false, bool $strict = false): string|bool|null
+    public function nextByKey(array|ArrayAccess $array, string $key, bool $getValue = false, bool $strict = false): string|bool|null
     {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
@@ -1124,13 +1119,14 @@ class ArrayHelper
     /**
      * Get the previous value or key from an array using the current array value
      *
-     * @param array  $array    The array containing the values.
-     * @param string $value    Value of the current entry to use as reference.
-     * @param bool   $getValue If true, return the previous value instead of the previous key.
-     * @param bool   $strict   If true, do a strict key comparison.
+     * @param array|ArrayAccess $array $array    The array containing the values.
+     * @param string $value Value of the current entry to use as reference.
+     * @param bool $getValue If true, return the previous value instead of the previous key.
+     * @param bool $strict If true, do a strict key comparison.
      * @return string|bool|null The value in the array, null if there is no previous value, or false if the key doesn't exist.
+     * @throws TypeException
      */
-    public function previousByValue($array, $value, bool $getValue = true, bool $strict = false): string|bool|null
+    public function previousByValue(array|ArrayAccess $array, string $value, bool $getValue = true, bool $strict = false): string|bool|null
     {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
@@ -1158,13 +1154,14 @@ class ArrayHelper
     /**
      * Get the next value or key from an array using the current array value.
      *
-     * @param array  $array    The array containing the values.
-     * @param string $value    Value of the current entry to use as reference.
-     * @param bool   $getValue If true, return the next value instead of the next key.
-     * @param bool   $strict   If true, do a strict key comparison.
+     * @param array|ArrayAccess $array $array    The array containing the values.
+     * @param string $value Value of the current entry to use as reference.
+     * @param bool $getValue If true, return the next value instead of the next key.
+     * @param bool $strict If true, do a strict key comparison.
      * @return string|bool|null The value in the array, null if there is no next value, or false if the key doesn't exist
+     * @throws TypeException
      */
-    public function nextByValue($array, $value, bool $getValue = true, bool $strict = false): string|bool|null
+    public function nextByValue(array|ArrayAccess $array, string $value, bool $getValue = true, bool $strict = false): string|bool|null
     {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
@@ -1194,12 +1191,13 @@ class ArrayHelper
      *
      * Returns $default for missing keys, as with $this->get().
      *
-     * @param array $array   The array containing the values.
-     * @param array $keys    List of keys (or indices) to return.
-     * @param mixed $default Value of missing keys; default null.
+     * @param array $array The array containing the values.
+     * @param array $keys List of keys (or indices) to return.
+     * @param mixed|null $default Value of missing keys; default null.
      * @return array An array containing the same set of keys provided.
+     * @throws TypeException
      */
-    public function subset(array $array, array $keys, $default = null): array
+    public function subset(array $array, array $keys, mixed $default = null): array
     {
         $result = [];
 
@@ -1218,7 +1216,7 @@ class ArrayHelper
      * @param mixed $var The value to get.
      * @return mixed
      */
-    public function value($var)
+    public function value(mixed $var): mixed
     {
         return $var instanceof Closure ? $var() : $var;
     }
