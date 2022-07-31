@@ -18,6 +18,7 @@ use ArrayAccess;
 use Closure;
 use JetBrains\PhpStorm\NoReturn;
 use Qubus\Exception\Data\TypeException;
+use Qubus\Support\ClassInfo;
 use Qubus\Support\DataType;
 
 use function array_key_exists;
@@ -808,4 +809,33 @@ function trigger_deprecation(
     }
 
     return false;
+}
+
+/**
+ * Convert class name to a delimited string.
+ * 
+ * @since 2.1.7
+ * 
+ * @param object|string $className 
+ * @param callable|string|null $callback 
+ * @param string $delimiter 
+ * @return string 
+ */
+function classname_to_delimited_string(
+    object|string $className,
+    callable|string|null $callback = 'strtolower',
+    string $delimiter = '-'
+): string {
+    // Remove namespace from class if present.
+    $explode = explode('\\', $className);
+    $classNameWithoutNamespace = end($explode);
+    // Split the class name into parts and remove any empty array values.
+    $parts = preg_split('/(?=[A-Z])/', $classNameWithoutNamespace, -1, PREG_SPLIT_NO_EMPTY);
+    // Convert each array value to lowercase.
+    $array = array_map($callback, $parts);
+    // Convert the array into a string with spaces in between them.
+    $implode = implode(' ', $array);
+
+    // Replace the spaces with the delimiter and give back the delimited string.
+    return str_replace(' ', $delimiter, $implode);
 }
