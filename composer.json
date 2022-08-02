@@ -26,6 +26,7 @@
         "cocur/slugify": "^4.1",
         "mrclay/minify": "^3.0",
         "nesbot/carbon": "^2.60",
+        "pestphp/pest": "^1.21",
         "psr/container": "^2",
         "psr/log": "^3",
         "qubus/exception": "^2.0",
