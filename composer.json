@@ -45,8 +45,7 @@
             "Qubus\\Support\\": ""
         },
         "files": [
-            "Helpers/core.php",
-            "Helpers/tdd.php"
+            "Helpers/core.php"
         ]
     },
     "autoload-dev": {
