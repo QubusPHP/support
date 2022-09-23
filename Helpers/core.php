@@ -16,12 +16,11 @@ namespace Qubus\Support\Helpers;
 
 use ArrayAccess;
 use Closure;
-use JetBrains\PhpStorm\NoReturn;
 use Qubus\Exception\Data\TypeException;
-use Qubus\Support\ClassInfo;
 use Qubus\Support\DataType;
 
 use function array_key_exists;
+use function array_map;
 use function array_merge;
 use function array_slice;
 use function array_unique;
@@ -31,6 +30,7 @@ use function ctype_lower;
 use function debug_backtrace;
 use function define;
 use function defined;
+use function end;
 use function explode;
 use function fclose;
 use function file_exists;
@@ -53,13 +53,14 @@ use function ord;
 use function preg_match;
 use function preg_quote;
 use function preg_replace;
+use function preg_split;
 use function print_r;
 use function rtrim;
 use function sprintf;
+use function str_contains;
 use function str_replace;
 use function str_split;
 use function strlen;
-use function strpos;
 use function strtolower;
 use function strtoupper;
 use function substr;
@@ -74,6 +75,7 @@ use const E_USER_DEPRECATED;
 use const E_USER_NOTICE;
 use const ENT_NOQUOTES;
 use const PHP_OS;
+use const PREG_SPLIT_NO_EMPTY;
 
 /**
  * Wrapper function for the core PHP function: trigger_error.
@@ -175,13 +177,13 @@ function return_void__(): void
  *                                 if Closure - only Closure will be called.
  *                                 Default true.
  */
-function load_file(string $file, bool $once = true, $showErrors = true): mixed
+function load_file(string $file, bool $once = true, bool|Closure $showErrors = true): mixed
 {
     if (file_exists("'$file'")) {
         if ($once) {
-            require_once "'$file'";
+            return require_once "'$file'";
         } else {
-            require "'$file'";
+            return require "'$file'";
         }
     } elseif (is_bool($showErrors) && $showErrors) {
         trigger_error__(
@@ -231,7 +233,7 @@ function remove_trailing_slash(string $string): string
  * Split a delimited string into an array.
  *
  * @param array|string $string     String or array to be split.
- * @param array|string $delimiters Delimeter(s) to search for.
+ * @param array|string $delimiters Delimiter(s) to search for.
  * @return array Return array.
  */
 function explode_array(string|array $string, array|string $delimiters = [',']): array
@@ -262,7 +264,7 @@ function explode_array(string|array $string, array|string $delimiters = [',']): 
  *
  * @param string $string1    Left string.
  * @param string $string2    Right string.
- * @param string $separator  Delimeter to use between strings. Default: comma.
+ * @param string $separator  Delimiter to use between strings. Default: comma.
  * @param string ...$strings List of strings.
  * @return string Concatenated string.
  */
@@ -352,11 +354,8 @@ function truncate_string(string $string, int $limit, string $continuation = '...
 
 /**
  * Converts a string into unicode values.
- *
- * @param string $string
- * @return mixed
  */
-function unicoder(string $string): mixed
+function unicoder(string $string): string
 {
     $p = str_split(trim($string));
     $newString = '';
@@ -535,9 +534,6 @@ function array_dot(array $array, string $prepend = ''): array
 
 /**
  * Check input is array accessible.
- *
- * @param mixed $value
- * @return bool
  */
 function array_accessible(mixed $value): bool
 {
@@ -552,7 +548,12 @@ function array_accessible(mixed $value): bool
  */
 function array_exists(array $array, string $key): bool
 {
-    trigger_deprecation(__FUNCTION__, '1.0', '2.0', __NAMESPACE__ . '\\' . 'array_key_exists__');
+    trigger_deprecation(
+        functionName: __FUNCTION__,
+        deprecatedVersion: '1.0',
+        removedVersion: '2.0',
+        replacement: __NAMESPACE__ . '\\' . 'array_key_exists__'
+    );
 
     return array_key_exists__($key, $array);
 }
@@ -562,7 +563,6 @@ function array_exists(array $array, string $key): bool
  *
  * @param string $key Value to check.
  * @param array|ArrayAccess $array $array An array with keys to check.
- * @return bool
  */
 function array_key_exists__(string $key, array|ArrayAccess $array): bool
 {
@@ -596,9 +596,7 @@ function studly_case(string $string): string
 /**
  * Convert a value to camel caps case.
  *
- * @param string $str
  * @param array $noStrip
- * @return string
  */
 function camel_case(string $str, array $noStrip = []): string
 {
@@ -613,9 +611,6 @@ function camel_case(string $str, array $noStrip = []): string
 
 /**
  * Return the default value of the given value.
- *
- * @param  mixed  $value
- * @return mixed
  */
 function value(mixed $value): mixed
 {
@@ -697,12 +692,10 @@ function windows_os(): bool
 /**
  * Print and die.
  *
- * @param mixed $x
  * @param bool $pre Default true.
  * @param bool $return Default false.
  */
-#[NoReturn]
-function pd(mixed $x, bool $pre = true, bool $return = false): void
+function pd(mixed $x, bool $pre = true, bool $return = false): never
 {
     if ($pre) {
         echo '<pre>';
@@ -813,13 +806,8 @@ function trigger_deprecation(
 
 /**
  * Convert class name to a delimited string.
- * 
+ *
  * @since 2.1.7
- * 
- * @param object|string $className 
- * @param callable|string|null $callback 
- * @param string $delimiter 
- * @return string 
  */
 function classname_to_delimited_string(
     object|string $className,
