@@ -756,7 +756,7 @@ function is_writable(string $path): bool
     if (windows_os()) {
         return win_is_writable(path: $path);
     } else {
-        return is_writable(path: $path);
+        return \is_writable(filename: $path);
     }
 }
 
