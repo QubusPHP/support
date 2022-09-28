@@ -17,6 +17,8 @@ namespace Qubus\Support\Helpers;
 use ArrayAccess;
 use Closure;
 use Qubus\Exception\Data\TypeException;
+use Qubus\Support\Collection\ArrayCollection;
+use Qubus\Support\Collection\Collection;
 use Qubus\Support\DataType;
 
 use function array_key_exists;
@@ -595,9 +597,7 @@ function studly_case(string $string): string
 /**
  * Convert a value to camel caps case.
  *
- * @param string $str
  * @param array $noStrip
- * @return string
  */
 function camel_case(string $str, array $noStrip = []): string
 {
@@ -836,4 +836,16 @@ function classname_to_delimited_string(
 
     // Replace the spaces with the delimiter and give back the delimited string.
     return str_replace(search: ' ', replace: $delimiter, subject: $implode);
+}
+
+/**
+ * Create a new collection instance from an array of items.
+ *
+ * @since 2.2.2
+ * @param array $items
+ * @return Collection
+ */
+function collect(array $items = []): Collection
+{
+    return new ArrayCollection($items);
 }
