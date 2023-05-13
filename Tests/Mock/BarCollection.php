@@ -15,14 +15,7 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Support\Mock;
 
-use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\TestCase;
-use Qubus\Support\Assets;
 use Qubus\Support\Collection\Collection;
-use ReflectionClass;
-
-use function array_pop;
-use function uniqid;
 
 class BarCollection extends Collection
 {
