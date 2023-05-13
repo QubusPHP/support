@@ -6,14 +6,9 @@ namespace Qubus\Tests\Support;
 
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
-use Qubus\Exception\Data\TypeException;
 use Qubus\Support\Collection\Arrayable;
 use Qubus\Support\Collection\ArrayCollection;
 use Qubus\Support\Collection\Collectionable;
-use Qubus\Support\Container\ObjectStorageMap;
-use Qubus\Support\DataType;
-
 use Qubus\Tests\Support\Mock\Bar;
 use Qubus\Tests\Support\Mock\BarCollection;
 
