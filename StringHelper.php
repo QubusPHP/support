@@ -16,7 +16,7 @@ namespace Qubus\Support;
 
 use Closure;
 use Qubus\Exception\Exception;
-use Qubus\Support\Traits\StaticProxyAware;
+use Qubus\Inheritance\StaticProxyAware;
 
 use function array_pop;
 use function array_rand;
