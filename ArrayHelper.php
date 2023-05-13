@@ -19,7 +19,7 @@ use BadMethodCallException;
 use Closure;
 use Iterator;
 use Qubus\Exception\Data\TypeException;
-use Qubus\Support\Traits\StaticProxyAware;
+use Qubus\Inheritance\StaticProxyAware;
 
 use function abs;
 use function array_combine;
