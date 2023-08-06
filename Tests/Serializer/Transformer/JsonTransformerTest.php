@@ -19,6 +19,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use DateTime;
 use Qubus\Exception\Data\TypeException;
+use ReflectionException;
 use stdClass;
 use Qubus\Support\Serializer\DeepCopySerializer;
 use Qubus\Support\Serializer\Transformer\JsonTransformer;
@@ -31,6 +32,9 @@ use Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\CommentId;
 
 class JsonTransformerTest extends TestCase
 {
+    /**
+     * @throws ReflectionException
+     */
     public function testSerializationObjectWithArrayOfOneAttribute()
     {
         $object = new stdClass();
@@ -49,6 +53,9 @@ STRING;
         Assert::assertEquals($expected, $serializer->serialize($object));
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testSerializationObjectWithObjectOfOneAttribute()
     {
         $internal = new stdClass();
@@ -70,6 +77,9 @@ STRING;
         Assert::assertEquals($expected, $serializer->serialize($object));
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testSerialization()
     {
         $object = $this->getObject();
@@ -107,7 +117,7 @@ STRING;
     /**
      * @return Post
      */
-    private function getObject()
+    private function getObject(): Post
     {
         return new Post(
             new PostId(9),
@@ -131,6 +141,9 @@ STRING;
         );
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testArraySerialization()
     {
         $arrayOfObjects = [$this->getObject(), $this->getObject()];
@@ -190,6 +203,9 @@ STRING;
         Assert::assertEquals($expected, $serializer->serialize($arrayOfObjects));
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testUnserializeWillThrowException()
     {
         $serialize = new DeepCopySerializer(new JsonTransformer());

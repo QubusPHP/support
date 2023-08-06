@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Support\Serializer;
 
+use Exception;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Qubus\Support\Serializer\Serializer;
@@ -25,11 +26,12 @@ use DateTimeZone;
 use DateInterval;
 use DatePeriod;
 use DateTime;
+use ReflectionException;
 use stdClass;
 
 class SerializerTest extends TestCase
 {
-    protected $serializer;
+    protected Serializer $serializer;
 
     /**
      * Test case setup.
@@ -42,8 +44,9 @@ class SerializerTest extends TestCase
     /**
      * Test serialization of DateTime classes.
      *
-     * Some interal classes, such as DateTime, cannot be initialized with
+     * Some internal classes, such as DateTime, cannot be initialized with
      * ReflectionClass::newInstanceWithoutConstructor()
+     * @throws Exception
      */
     public function testSerializationOfDateTime()
     {
@@ -59,10 +62,11 @@ class SerializerTest extends TestCase
      *
      * @dataProvider scalarDataToJson
      *
-     * @param mixed  $scalar
+     * @param mixed $scalar
      * @param string $jsoned
+     * @throws ReflectionException
      */
-    public function testSerializeScalar($scalar, $jsoned)
+    public function testSerializeScalar(mixed $scalar, string $jsoned)
     {
         Assert::assertSame($jsoned, $this->serializer->serialize($scalar));
     }
@@ -72,10 +76,11 @@ class SerializerTest extends TestCase
      *
      * @dataProvider scalarDataToJson
      *
-     * @param mixed  $scalar
+     * @param mixed $scalar
      * @param string $jsoned
+     * @throws ReflectionException
      */
-    public function testUnserializeScalar($scalar, $jsoned)
+    public function testUnserializeScalar(mixed $scalar, string $jsoned)
     {
         Assert::assertSame($scalar, $this->serializer->unserialize($jsoned));
     }
@@ -85,7 +90,7 @@ class SerializerTest extends TestCase
      *
      * @return array
      */
-    public function scalarDataToJson()
+    public function scalarDataToJson(): array
     {
         return [
             ['testing', '{"@scalar":"string","@value":"testing"}'],
@@ -105,6 +110,7 @@ class SerializerTest extends TestCase
 
     /**
      * Test the serialization of resources.
+     * @throws ReflectionException
      */
     public function testSerializeResource()
     {
@@ -114,6 +120,7 @@ class SerializerTest extends TestCase
 
     /**
      * Test the serialization of closures.
+     * @throws ReflectionException
      */
     public function testSerializeClosure()
     {
@@ -128,10 +135,11 @@ class SerializerTest extends TestCase
      *
      * @dataProvider arrayNoObjectData
      *
-     * @param array  $array
+     * @param array $array
      * @param string $jsoned
+     * @throws ReflectionException
      */
-    public function testSerializeArrayNoObject($array, $jsoned)
+    public function testSerializeArrayNoObject(array $array, string $jsoned)
     {
         Assert::assertSame($jsoned, $this->serializer->serialize($array));
     }
@@ -141,10 +149,11 @@ class SerializerTest extends TestCase
      *
      * @dataProvider arrayNoObjectData
      *
-     * @param array  $array
+     * @param array $array
      * @param string $jsoned
+     * @throws ReflectionException
      */
-    public function testUnserializeArrayNoObject($array, $jsoned)
+    public function testUnserializeArrayNoObject(array $array, string $jsoned)
     {
         Assert::assertSame($array, $this->serializer->unserialize($jsoned));
     }
@@ -154,25 +163,58 @@ class SerializerTest extends TestCase
      *
      * @return array
      */
-    public function arrayNoObjectData()
+    public function arrayNoObjectData(): array
     {
         return [
-            [[1, 2, 3], '{"@map":"array","@value":[{"@scalar":"integer","@value":1},{"@scalar":"integer","@value":2},{"@scalar":"integer","@value":3}]}'],
-            [[1, 'abc', false], '{"@map":"array","@value":[{"@scalar":"integer","@value":1},{"@scalar":"string","@value":"abc"},{"@scalar":"boolean","@value":false}]}'],
-            [['a' => 1, 'b' => 2, 'c' => 3], '{"@map":"array","@value":{"a":{"@scalar":"integer","@value":1},"b":{"@scalar":"integer","@value":2},"c":{"@scalar":"integer","@value":3}}}'],
-            [['integer' => 1, 'string' => 'abc', 'bool' => false], '{"@map":"array","@value":{"integer":{"@scalar":"integer","@value":1},"string":{"@scalar":"string","@value":"abc"},"bool":{"@scalar":"boolean","@value":false}}}'],
-            [[1, ['nested']], '{"@map":"array","@value":[{"@scalar":"integer","@value":1},{"@map":"array","@value":[{"@scalar":"string","@value":"nested"}]}]}'],
-            [['integer' => 1, 'array' => ['nested']], '{"@map":"array","@value":{"integer":{"@scalar":"integer","@value":1},"array":{"@map":"array","@value":[{"@scalar":"string","@value":"nested"}]}}}'],
-            [['integer' => 1, 'array' => ['nested' => 'object']], '{"@map":"array","@value":{"integer":{"@scalar":"integer","@value":1},"array":{"@map":"array","@value":{"nested":{"@scalar":"string","@value":"object"}}}}}'],
-            [[1.0, 2, 3e1], '{"@map":"array","@value":[{"@scalar":"float","@value":1},{"@scalar":"integer","@value":2},{"@scalar":"float","@value":30}]}'],
+            [
+                [1, 2, 3],
+                '{"@map":"array","@value":[{"@scalar":"integer","@value":1},{"@scalar":"integer","@value":2},
+                {"@scalar":"integer","@value":3}]}'
+            ],
+            [
+                [1, 'abc', false],
+                '{"@map":"array","@value":[{"@scalar":"integer","@value":1},{"@scalar":"string","@value":"abc"},
+                {"@scalar":"boolean","@value":false}]}'
+            ],
+            [
+                ['a' => 1, 'b' => 2, 'c' => 3],
+                '{"@map":"array","@value":{"a":{"@scalar":"integer","@value":1},
+                "b":{"@scalar":"integer","@value":2},"c":{"@scalar":"integer","@value":3}}}'
+            ],
+            [
+                ['integer' => 1, 'string' => 'abc', 'bool' => false],
+                '{"@map":"array","@value":{"integer":{"@scalar":"integer","@value":1},
+                "string":{"@scalar":"string","@value":"abc"},"bool":{"@scalar":"boolean","@value":false}}}'
+            ],
+            [
+                [1, ['nested']],
+                '{"@map":"array","@value":[{"@scalar":"integer","@value":1},{"@map":"array",
+                "@value":[{"@scalar":"string","@value":"nested"}]}]}'
+            ],
+            [
+                ['integer' => 1, 'array' => ['nested']],
+                '{"@map":"array","@value":{"integer":{"@scalar":"integer","@value":1},
+                "array":{"@map":"array","@value":[{"@scalar":"string","@value":"nested"}]}}}'
+            ],
+            [
+                ['integer' => 1, 'array' => ['nested' => 'object']],
+                '{"@map":"array","@value":{"integer":{"@scalar":"integer","@value":1},
+                "array":{"@map":"array","@value":{"nested":{"@scalar":"string","@value":"object"}}}}}'
+            ],
+            [
+                [1.0, 2, 3e1],
+                '{"@map":"array","@value":[{"@scalar":"float","@value":1},{"@scalar":"integer","@value":2},
+                {"@scalar":"float","@value":30}]}'
+            ],
         ];
     }
 
     /**
      * Test serialization of DateTimeImmutable classes.
      *
-     * Some interal classes, such as DateTimeImmutable, cannot be initialized with
+     * Some internal classes, such as DateTimeImmutable, cannot be initialized with
      * ReflectionClass::newInstanceWithoutConstructor()
+     * @throws Exception
      */
     public function testSerializationOfDateTimeImmutable()
     {
@@ -190,8 +232,9 @@ class SerializerTest extends TestCase
     /**
      * Test serialization of DateInterval classes.
      *
-     * Some interal classes, such as DateInterval, cannot be initialized with
+     * Some internal classes, such as DateInterval, cannot be initialized with
      * ReflectionClass::newInstanceWithoutConstructor()
+     * @throws ReflectionException
      */
     public function testSerializationOfDateInterval()
     {
@@ -204,8 +247,9 @@ class SerializerTest extends TestCase
     /**
      * Test serialization of DatePeriod classes.
      *
-     * Some interal classes, such as DatePeriod, cannot be initialized with
+     * Some internal classes, such as DatePeriod, cannot be initialized with
      * ReflectionClass::newInstanceWithoutConstructor()
+     * @throws ReflectionException
      */
     public function testSerializationOfDatePeriodException()
     {
@@ -220,6 +264,7 @@ class SerializerTest extends TestCase
 
     /**
      * Test unserialize of unknown class.
+     * @throws ReflectionException
      */
     public function testUnserializeUnknownClass()
     {
@@ -230,13 +275,15 @@ class SerializerTest extends TestCase
 
     /**
      * Test serialization of undeclared properties.
+     * @throws ReflectionException
      */
     public function testSerializationUndeclaredProperties()
     {
         $obj = new stdClass();
         $obj->param1 = true;
         $obj->param2 = 'store me, please';
-        $serialized = '{"@type":"stdClass","param1":{"@scalar":"boolean","@value":true},"param2":{"@scalar":"string","@value":"store me, please"}}';
+        $serialized = '{"@type":"stdClass","param1":{"@scalar":"boolean","@value":true},"param2":{"@scalar":"string",
+        "@value":"store me, please"}}';
         Assert::assertSame($serialized, $this->serializer->serialize($obj));
 
         $obj2 = $this->serializer->unserialize($serialized);
@@ -252,6 +299,7 @@ class SerializerTest extends TestCase
 
     /**
      * Test serialize with recursion.
+     * @throws ReflectionException
      */
     public function testSerializeRecursion()
     {
@@ -262,7 +310,8 @@ class SerializerTest extends TestCase
         $c1->something = 'ok';
         $c1->c2->c3->ok = true;
 
-        $expected = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},"ok":{"@scalar":"boolean","@value":true}}},"something":{"@scalar":"string","@value":"ok"}}';
+        $expected = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},
+        "ok":{"@scalar":"boolean","@value":true}}},"something":{"@scalar":"string","@value":"ok"}}';
         Assert::assertSame($expected, $this->serializer->serialize($c1));
 
         $c1 = new stdClass();
@@ -273,16 +322,19 @@ class SerializerTest extends TestCase
 
     /**
      * Test unserialize with recursion.
+     * @throws ReflectionException
      */
     public function testUnserializeRecursion()
     {
-        $serialized = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},"ok":{"@scalar":"boolean","@value":true}}},"something":{"@scalar":"string","@value":"ok"}}';
+        $serialized = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},
+        "ok":{"@scalar":"boolean","@value":true}}},"something":{"@scalar":"string","@value":"ok"}}';
         $obj = $this->serializer->unserialize($serialized);
         Assert::assertTrue($obj->c2->c3->ok);
         Assert::assertSame($obj, $obj->c2->c3->c1);
         Assert::assertNotSame($obj, $obj->c2);
 
-        $serialized = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},"c2":{"@type":"@1"},"c3":{"@type":"@2"}},"c3_copy":{"@type":"@2"}}}';
+        $serialized = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},
+        "c2":{"@type":"@1"},"c3":{"@type":"@2"}},"c3_copy":{"@type":"@2"}}}';
         $obj = $this->serializer->unserialize($serialized);
         Assert::assertSame($obj, $obj->c2->c3->c1);
         Assert::assertSame($obj->c2, $obj->c2->c3->c2);
@@ -298,6 +350,9 @@ class SerializerTest extends TestCase
         Assert::assertSame($strategy, $serializer->getTransformer());
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testSerializationOfAnArrayOfScalars()
     {
         $scalar = 'a string';

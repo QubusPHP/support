@@ -37,7 +37,7 @@ class JsonSerializerTest extends TestCase
         Assert::assertEquals($object, $serializer->unserialize($serializedObject));
     }
 
-    private function getObject()
+    private function getObject(): Post
     {
         return new Post(
             new PostId(9),

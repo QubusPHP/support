@@ -17,6 +17,8 @@ namespace Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects;
 
 class UserId
 {
+    private mixed $userId;
+
     /**
      * @param $id
      */

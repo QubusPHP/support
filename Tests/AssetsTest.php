@@ -19,18 +19,25 @@ use PHPUnit\Framework\TestCase;
 use Qubus\Support\Assets;
 use ReflectionClass;
 
+use ReflectionException;
+
+use ReflectionMethod;
+
 use function array_pop;
 use function uniqid;
 
 class AssetsTest extends TestCase
 {
-    protected $asset;
+    protected Assets $asset;
 
     protected function setUp(): void
     {
         $this->asset = new Assets();
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testRemoteLinkDetection()
     {
         $method = self::getMethod('isRemoteLink');
@@ -44,6 +51,9 @@ class AssetsTest extends TestCase
         Assert::assertFalse($method->invokeArgs($this->asset, ['foo']));
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testPackageAssetDetection()
     {
         $vendor = '_This-Is-Vendor.0';
@@ -231,7 +241,7 @@ class AssetsTest extends TestCase
         Assert::assertStringEndsWith($asset2, array_pop($assets2));
     }
 
-    protected static function getMethod($name)
+    protected static function getMethod($name): ReflectionMethod
     {
         $class = new ReflectionClass('Qubus\Support\Assets');
         $method = $class->getMethod($name);

@@ -15,36 +15,29 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Support\Serializer\Dummy\Simple;
 
+use Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\CommentId;
+use Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\PostId;
+use Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\UserId;
+
 class Post
 {
-    /**
-     * @var
-     */
-    private $postId;
-    /**
-     * @var
-     */
-    private $title;
-    /**
-     * @var
-     */
-    private $body;
-    /**
-     * @var
-     */
-    private $authorId;
-    /**
-     * @var array
-     */
-    private $comments = [];
+    private PostId $postId;
+
+    private string $title;
+
+    private string $body;
+
+    private UserId $authorId;
+
+    private array $comments = [];
 
     /**
-     * @param $postId
-     * @param $title
-     * @param $body
-     * @param $authorId
+     * @param PostId $postId
+     * @param string $title
+     * @param string $body
+     * @param UserId $authorId
      */
-    public function __construct($postId, $title, $body, $authorId)
+    public function __construct(PostId $postId, string $title, string $body, UserId $authorId)
     {
         $this->postId = $postId;
         $this->title = $title;
@@ -53,12 +46,12 @@ class Post
     }
 
     /**
-     * @param $commentId
-     * @param $user
-     * @param $comment
+     * @param CommentId $commentId
+     * @param UserId $user
+     * @param string $comment
      * @param $created_at
      */
-    public function addComment($commentId, $user, $comment, $created_at)
+    public function addComment(CommentId $commentId, UserId $user, string $comment, $created_at): void
     {
         $this->comments[] = [
             'comment_id' => $commentId,
@@ -73,7 +66,7 @@ class Post
      *
      * @return $this
      */
-    public function setAuthorId($authorId)
+    public function setAuthorId(UserId $authorId): static
     {
         $this->authorId = $authorId;
 
@@ -81,19 +74,19 @@ class Post
     }
 
     /**
-     * @return mixed
+     * @return UserId
      */
-    public function getAuthorId()
+    public function getAuthorId(): UserId
     {
         return $this->authorId;
     }
 
     /**
-     * @param mixed $body
+     * @param string $body
      *
      * @return $this
      */
-    public function setBody($body)
+    public function setBody(string $body): static
     {
         $this->body = $body;
 
@@ -101,39 +94,38 @@ class Post
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getBody()
+    public function getBody(): string
     {
         return $this->body;
     }
 
     /**
-     * @param mixed $commentId
-     *
+     * @param PostId $postId
      * @return $this
      */
-    public function setPostId($commentId)
+    public function setPostId(PostId $postId): static
     {
-        $this->postId = $commentId;
+        $this->postId = $postId;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return PostId
      */
-    public function getPostId()
+    public function getPostId(): PostId
     {
         return $this->postId;
     }
 
     /**
-     * @param mixed $title
+     * @param string $title
      *
      * @return $this
      */
-    public function setTitle($title)
+    public function setTitle(string $title): static
     {
         $this->title = $title;
 
@@ -141,9 +133,9 @@ class Post
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }

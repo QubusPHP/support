@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Support\Serializer\Dummy\Complex;
 
-use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
 use Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\UserId;
 
@@ -51,11 +50,7 @@ class User implements JsonSerializable
         return $this->name;
     }
 
-    #[ArrayShape([
-        'userId' => "mixed|\Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\UserId",
-        'name' => "string"
-    ])]
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return
         [

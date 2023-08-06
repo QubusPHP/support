@@ -6,9 +6,11 @@ namespace Qubus\Tests\Support;
 
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Qubus\Exception\Data\TypeException;
 use Qubus\Support\Collection\Arrayable;
 use Qubus\Support\Collection\ArrayCollection;
 use Qubus\Support\Collection\Collectionable;
+use Qubus\Support\Collection\ValueExtractionException;
 use Qubus\Tests\Support\Mock\Bar;
 use Qubus\Tests\Support\Mock\BarCollection;
 
@@ -76,6 +78,9 @@ class CollectionTest extends TestCase
         Assert::assertEquals(['lion', 'minx'], $reject->all());
     }
 
+    /**
+     * @throws TypeException
+     */
     public function testCollectionGetItem()
     {
         $collection = $this->collection->get('cat');
@@ -127,6 +132,9 @@ class CollectionTest extends TestCase
         );
     }
 
+    /**
+     * @throws TypeException
+     */
     public function testCollectionArrayCanBeFlattened()
     {
         $flatten = $this->collection->merge(
@@ -150,6 +158,9 @@ class CollectionTest extends TestCase
         );
     }
 
+    /**
+     * @throws TypeException
+     */
     public function testCollectionIsSortedAndThenSortedByCallback()
     {
         $uasort = $this->collection->sort(function ($item, $key) {
@@ -239,6 +250,9 @@ class CollectionTest extends TestCase
         Assert::assertEquals('german shepard', $first);
     }
 
+    /**
+     * @throws ValueExtractionException
+     */
     public function testColumnByProperty(): void
     {
         $bar1 = new Bar(1, 'a');
@@ -249,6 +263,9 @@ class CollectionTest extends TestCase
         Assert::assertEquals(['a', 'b', 'c'], $barCollection->column('name'));
     }
 
+    /**
+     * @throws ValueExtractionException
+     */
     public function testColumnByMethod(): void
     {
         $bar1 = new Bar(1, 'a');
