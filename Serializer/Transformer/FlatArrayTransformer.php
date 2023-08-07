@@ -21,12 +21,13 @@ class FlatArrayTransformer extends ArrayTransformer
 {
     /**
      * @param mixed $value
-     * @return string
+     * @return bool|string
      */
-    public function serialize($value)
+    public function serialize(mixed $value): bool|string
     {
         $array = [parent::serialize($value)];
-        return $this->flatten($array);
+        $flattenArray = $this->flatten($array);
+        return json_encode($flattenArray);
     }
 
     /**
@@ -34,7 +35,7 @@ class FlatArrayTransformer extends ArrayTransformer
      * @param string $prefix
      * @return array
      */
-    private function flatten(array $array, $prefix = '')
+    private function flatten(array $array, string $prefix = ''): array
     {
         $result = [];
         foreach ($array as $key => $value) {

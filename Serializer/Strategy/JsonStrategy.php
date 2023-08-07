@@ -22,20 +22,12 @@ use const JSON_UNESCAPED_UNICODE;
 
 class JsonStrategy implements Strategy
 {
-    /**
-     * @param mixed $data
-     * @return string|false
-     */
-    public function serialize($data)
+    public function serialize(mixed $data): bool|string
     {
         return json_encode($data, JSON_UNESCAPED_UNICODE);
     }
 
-    /**
-     * @param $data
-     * @return mixed
-     */
-    public function unserialize($data)
+    public function unserialize(mixed $data): bool|string|array|object
     {
         return json_decode($data, true);
     }

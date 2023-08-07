@@ -10,7 +10,6 @@
  * @since      1.0.0
  */
 
-
 /**
  * @see https://github.com/gajus/dindent for the canonical source repository
  *
@@ -99,6 +98,7 @@ final class Indenter
 
     /**
      * @param array $options
+     * @throws TypeException
      */
     public function __construct(array $options = [])
     {
@@ -113,14 +113,15 @@ final class Indenter
 
     /**
      * @param string $elementName Element name, e.g. "b".
-     * @param ELEMENT_TYPE_BLOCK|ELEMENT_TYPE_INLINE $type
+     * @param Indenter::ELEMENT_TYPE_BLOCK|Indenter::ELEMENT_TYPE_INLINE $type
      * @return void
+     * @throws TypeException
      */
     public function setElementType(string $elementName, $type): void
     {
-        if ($type === static::ELEMENT_TYPE_BLOCK) {
+        if ($type === Indenter::ELEMENT_TYPE_BLOCK) {
             $this->inlineElements = array_diff($this->inlineElements, [$elementName]);
-        } elseif ($type === static::ELEMENT_TYPE_INLINE) {
+        } elseif ($type === Indenter::ELEMENT_TYPE_INLINE) {
             $this->inlineElements[] = $elementName;
         } else {
             throw new TypeException('Unrecognized element type.');
@@ -144,10 +145,10 @@ final class Indenter
         // Indenter does not indent. Instead, it temporarily removes it from the code, indents the input,
         // and restores the script body.
         foreach ($this->ignoreElements as $key) {
-            if (preg_match_all('/<'.$key.'\b[^>]*>([\s\S]*?)<\/'.$key.'>/mi', $input, $matches)) {
+            if (preg_match_all('/<' . $key . '\b[^>]*>([\s\S]*?)<\/' . $key . '>/mi', $input, $matches)) {
                 $this->temporaryReplacementsIgnore[$key] = $matches[0];
                 foreach ($matches[0] as $i => $match) {
-                    $input = str_replace($match, '<'.$key.'>'.($i + 1).'</'.$key.'>', $input);
+                    $input = str_replace($match, '<' . $key . '>' . ($i + 1) . '</' . $key . '>', $input);
                 }
             }
         }
@@ -187,23 +188,23 @@ final class Indenter
 
             $patterns = [
                 // block tag
-                '/^(<([a-z]+)(?:[^>]*)>(?:[^<]*)<\/(?:\2)>)/' => static::MATCH_INDENT_NO,
+                '/^(<([a-z]+)(?:[^>]*)>(?:[^<]*)<\/(?:\2)>)/' => Indenter::MATCH_INDENT_NO,
                 // DOCTYPE
-                '/^<!([^>]*)>/' => static::MATCH_INDENT_NO,
+                '/^<!([^>]*)>/' => Indenter::MATCH_INDENT_NO,
                 // tag with implied closing
-                '/^<(input|link|meta|base|br|img|source|hr)([^>]*)>/' => static::MATCH_INDENT_NO,
+                '/^<(input|link|meta|base|br|img|source|hr)([^>]*)>/' => Indenter::MATCH_INDENT_NO,
                 // self closing SVG tags
-                '/^<(animate|stop|path|circle|line|polyline|rect|use)([^>]*)\/>/' => static::MATCH_INDENT_NO,
+                '/^<(animate|stop|path|circle|line|polyline|rect|use)([^>]*)\/>/' => Indenter::MATCH_INDENT_NO,
                 // opening tag
-                '/^<[^\/]([^>]*)>/' => static::MATCH_INDENT_INCREASE,
+                '/^<[^\/]([^>]*)>/' => Indenter::MATCH_INDENT_INCREASE,
                 // closing tag
-                '/^<\/([^>]*)>/' => static::MATCH_INDENT_DECREASE,
+                '/^<\/([^>]*)>/' => Indenter::MATCH_INDENT_DECREASE,
                 // self-closing tag
-                '/^<(.+)\/>/' => static::MATCH_INDENT_DECREASE,
+                '/^<(.+)\/>/' => Indenter::MATCH_INDENT_DECREASE,
                 // whitespace
-                '/^(\s+)/' => static::MATCH_DISCARD,
+                '/^(\s+)/' => Indenter::MATCH_DISCARD,
                 // text node
-                '/([^<]+)/' => static::MATCH_INDENT_NO
+                '/([^<]+)/' => Indenter::MATCH_INDENT_NO
             ];
 
             $rules = ['NO', 'DECREASE', 'INCREASE', 'DISCARD'];
@@ -219,12 +220,13 @@ final class Indenter
 
                     $subject = mb_substr($subject, mb_strlen($matches[0]));
 
-                    if ($rule === static::MATCH_DISCARD) {
+                    if ($rule === Indenter::MATCH_DISCARD) {
                         break;
                     }
 
-                    if ($rule === static::MATCH_INDENT_NO) {
-                    } elseif ($rule === static::MATCH_INDENT_DECREASE) {
+                    if ($rule === Indenter::MATCH_INDENT_NO) {
+                        // do nothing
+                    } elseif ($rule === Indenter::MATCH_INDENT_DECREASE) {
                         $nextLineIndentationLevel--;
                         $indentationLevel--;
                     } else {
@@ -235,7 +237,10 @@ final class Indenter
                         $indentationLevel = 0;
                     }
 
-                    $output .= str_repeat($this->options['indentation_character'], $indentationLevel) . $matches[0] . "\n";
+                    $output .= str_repeat(
+                        $this->options['indentation_character'],
+                        $indentationLevel
+                    ) . $matches[0] . "\n";
 
                     break;
                 }
@@ -256,7 +261,7 @@ final class Indenter
         foreach ($this->ignoreElements as $key) {
             if (isset($this->temporaryReplacementsIgnore[$key])) {
                 foreach ($this->temporaryReplacementsIgnore[$key] as $i => $original) {
-                    $output = str_replace('<'.$key.'>' . ($i + 1) . '</'.$key.'>', $original, $output);
+                    $output = str_replace('<' . $key . '>' . ($i + 1) . '</' . $key . '>', $original, $output);
                 }
             }
         }

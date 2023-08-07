@@ -15,11 +15,6 @@ declare(strict_types=1);
 
 namespace Qubus\Support\Collection;
 
-use ArrayAccess;
-use Countable;
-use IteratorAggregate;
-use Qubus\Support\Serializable;
-
 interface Collectionable
 {
     /**

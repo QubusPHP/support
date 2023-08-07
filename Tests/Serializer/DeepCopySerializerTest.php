@@ -18,6 +18,7 @@ namespace Qubus\Tests\Support\Serializer;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use DateTime;
+use ReflectionException;
 use SplFixedArray;
 use stdClass;
 use Qubus\Support\Serializer\DeepCopySerializer;
@@ -32,6 +33,9 @@ use Qubus\Tests\Support\Serializer\Dummy\Simple\ChildOfSplFixedArray;
 
 class DeepCopySerializerTest extends TestCase
 {
+    /**
+     * @throws ReflectionException
+     */
     public function testSerialization()
     {
         $object = $this->getObject();
@@ -41,7 +45,7 @@ class DeepCopySerializerTest extends TestCase
         Assert::assertEquals($object, $serializer->unserialize($serializedObject));
     }
 
-    private function getObject()
+    private function getObject(): Post
     {
         return new Post(
             new PostId(9),
@@ -65,6 +69,9 @@ class DeepCopySerializerTest extends TestCase
         );
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testArraySerialization()
     {
         $arrayOfObjects = [$this->getObject(), $this->getObject()];
@@ -74,6 +81,9 @@ class DeepCopySerializerTest extends TestCase
         Assert::assertEquals($arrayOfObjects, $serializer->unserialize($serializedObject));
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testObjectStorageCopyDuringSerialization()
     {
         $post = $this->getObject();
@@ -88,6 +98,9 @@ class DeepCopySerializerTest extends TestCase
         Assert::assertEquals($stdClass, $serializer->unserialize($serializedObject));
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testSplFixedArraySerialization()
     {
         $splFixedArray = new SplFixedArray(3);
@@ -101,6 +114,9 @@ class DeepCopySerializerTest extends TestCase
         Assert::assertEquals($splFixedArray, $serializer->unserialize($serializedObject));
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testSplFixedArrayChildSerialization()
     {
         $splFixedArray = new ChildOfSplFixedArray(3);

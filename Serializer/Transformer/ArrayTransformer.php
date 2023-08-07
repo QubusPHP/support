@@ -26,14 +26,14 @@ class ArrayTransformer extends BaseTransformer
 
     /**
      * @param mixed $value
-     * @return string
+     * @return bool|string
      */
-    public function serialize($value)
+    public function serialize(mixed $value): bool|string
     {
         $this->recursiveSetValues($value);
         $this->recursiveUnset($value, [Serializer::CLASS_IDENTIFIER_KEY]);
         $this->recursiveFlattenOneElementObjectsToScalarType($value);
 
-        return $value;
+        return json_encode($value);
     }
 }

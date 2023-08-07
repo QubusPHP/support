@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Modified Copyright (c) 2020 [Joshua Parker](mailto:josh@joshuaparker.blog)
+Modified Copyright (c) 2020 [Joshua Parker](mailto:joshua@joshuaparker.dev)
 
 Copyright (c) 2015 Nil Portugués Calderó
 

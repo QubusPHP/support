@@ -240,6 +240,7 @@ function remove_trailing_slash(string $string): string
  */
 function explode_array(string|array $string, array|string $delimiters = [',']): array
 {
+    $items = [];
     if (! is_array(value: $delimiters) && ! is_array(value: $string)) {
         //if neither the delimiter nor the string are arrays
         return explode(separator: $delimiters, string: $string);
@@ -259,6 +260,7 @@ function explode_array(string|array $string, array|string $delimiters = [',']): 
         }
         return $stringArray;
     }
+    return $items;
 }
 
 /**
@@ -377,6 +379,7 @@ function compact_unique_array(array $a): array
 {
     $tmparr = array_unique(array: $a);
     $i = 0;
+    $newarr = [];
     foreach ($tmparr as $v) {
         $newarr[$i] = $v;
         $i++;
@@ -483,6 +486,8 @@ function sort_element_callback(array $a, array $b): int
  * Return array specific item.
  *
  * @param array $array
+ * @param string|null $key
+ * @param mixed|null $default
  * @return array|null
  */
 function return_array(array $array, ?string $key, mixed $default = null): ?array
@@ -514,6 +519,7 @@ function return_array(array $array, ?string $key, mixed $default = null): ?array
  * Flatten a multi-dimensional associative array with dots.
  *
  * @param array $array
+ * @param string $prepend
  * @return array
  */
 function array_dot(array $array, string $prepend = ''): array
@@ -597,7 +603,9 @@ function studly_case(string $string): string
 /**
  * Convert a value to camel caps case.
  *
+ * @param string $str
  * @param array $noStrip
+ * @return string
  */
 function camel_case(string $str, array $noStrip = []): string
 {

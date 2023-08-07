@@ -27,9 +27,13 @@ use Qubus\Tests\Support\Serializer\Dummy\Complex\User;
 use Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\UserId;
 use Qubus\Tests\Support\Serializer\Dummy\Complex\Comment;
 use Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\CommentId;
+use ReflectionException;
 
 class ArrayTransformerTest extends TestCase
 {
+    /**
+     * @throws ReflectionException
+     */
     public function testSerialization()
     {
         $object = $this->getObject();
@@ -65,7 +69,7 @@ class ArrayTransformerTest extends TestCase
     /**
      * @return Post
      */
-    private function getObject()
+    private function getObject(): Post
     {
         return new Post(
             new PostId(9),
@@ -89,6 +93,9 @@ class ArrayTransformerTest extends TestCase
         );
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testArraySerialization()
     {
         $arrayOfObjects = [$this->getObject(), $this->getObject()];
@@ -146,6 +153,9 @@ class ArrayTransformerTest extends TestCase
         Assert::assertEquals($expected, $serializer->serialize($arrayOfObjects));
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testUnserializeWillThrowException()
     {
         $serialize = new DeepCopySerializer(new ArrayTransformer());

@@ -15,23 +15,23 @@ declare(strict_types=1);
 
 namespace Qubus\Support\Serializer;
 
-interface Serializeable
+interface Serializable
 {
     /**
      * Serializes data if necessary.
      *
      * @param string|array|object $data Data to be serialized.
-     * @return string Serialized data or original string.
+     * @return bool|string Serialized data or original string.
      * @throws SerializerException
      */
-    public function serialize($data);
+    public function serialize(string|array|object $data): bool|string;
 
     /**
      * Unserializes data if necessary.
      *
      * @since 1.0.0
      * @param string|array|object $data Data that should be unserialzed.
-     * @return string|array|object Unserialized data or original string.
+     * @return mixed Unserialized data or original string.
      */
-    public function unserialize($data);
+    public function unserialize(string|array|object $data): mixed;
 }

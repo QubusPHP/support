@@ -33,7 +33,7 @@ abstract class BaseTransformer implements Strategy
      * @param array $array
      * @param array $unwantedKey
      */
-    protected function recursiveUnset(array &$array, array $unwantedKey)
+    protected function recursiveUnset(array &$array, array $unwantedKey): void
     {
         foreach ($unwantedKey as $key) {
             if (array_key_exists($key, $array)) {
@@ -51,7 +51,7 @@ abstract class BaseTransformer implements Strategy
     /**
      * @param array $array
      */
-    protected function recursiveSetValues(array &$array)
+    protected function recursiveSetValues(array &$array): void
     {
         if (array_key_exists(Serializer::SCALAR_VALUE, $array)) {
             $array = $array[Serializer::SCALAR_VALUE];
@@ -75,7 +75,7 @@ abstract class BaseTransformer implements Strategy
         array &$array,
         $parentKey = null,
         $currentKey = null
-    ) {
+    ): void {
         if (1 === count($array) && is_scalar(end($array))) {
             if ($parentKey === $currentKey) {
                 $array = array_pop($array);
@@ -99,10 +99,10 @@ abstract class BaseTransformer implements Strategy
 
     /**
      * @param mixed $value
+     * @return array
      * @throws TypeException
-     * @return void
      */
-    public function unserialize($value)
+    public function unserialize(mixed $value): array
     {
         throw new TypeException(sprintf('%s does not perform unserializations.', self::class));
     }

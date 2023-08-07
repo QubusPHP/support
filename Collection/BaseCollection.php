@@ -17,7 +17,6 @@ namespace Qubus\Support\Collection;
 
 use Qubus\Exception\Data\TypeException;
 use Qubus\Support\ArrayHelper;
-use ReflectionException;
 
 use function count;
 use function is_callable;
@@ -153,7 +152,6 @@ abstract class BaseCollection extends BaseArray implements Collectionable
      *
      * @param mixed $key
      * @return mixed
-     * @throws ReflectionException
      * @throws TypeException
      */
     public function get(mixed $key): mixed
@@ -253,7 +251,6 @@ abstract class BaseCollection extends BaseArray implements Collectionable
      * flattened array of items.
      *
      * @return self
-     * @throws ReflectionException
      */
     public function flatten(): static
     {
@@ -446,7 +443,6 @@ abstract class BaseCollection extends BaseArray implements Collectionable
     /**
      * Merge items with current collection.
      *
-     * @throws ReflectionException
      * @throws TypeException
      */
     public function merge(array $items): static

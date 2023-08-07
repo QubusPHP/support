@@ -7,6 +7,7 @@ namespace Qubus\Tests\Support;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Qubus\Exception\Data\TypeException;
 use Qubus\Support\Container\ObjectStorageMap;
 use Qubus\Support\DataType;
 
@@ -35,6 +36,9 @@ class ContainerTest extends TestCase
         Assert::assertInstanceOf(expected: DataType::class, actual: $this->container['datatype']);
     }
 
+    /**
+     * @throws TypeException
+     */
     public function testDataTypesShouldBeDifferent()
     {
         $this->container['datatype'] = $this->container->factory(callable: function () {

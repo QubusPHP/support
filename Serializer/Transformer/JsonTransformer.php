@@ -25,9 +25,9 @@ class JsonTransformer extends ArrayTransformer
 {
     /**
      * @param mixed $value
-     * @return string
+     * @return bool|string
      */
-    public function serialize($value)
+    public function serialize(mixed $value): bool|string
     {
         return json_encode(
             parent::serialize($value),

@@ -801,7 +801,9 @@ class Assets
      */
     protected function isRemoteLink(string $link): bool
     {
-        return substr($link, 0, 7) === 'http://' || substr($link, 0, 8) === 'https://' || substr($link, 0, 2) === '//';
+        return substr($link, 0, 7) === 'http://' ||
+        substr($link, 0, 8) === 'https://' ||
+        substr($link, 0, 2) === '//';
     }
 
     /**
