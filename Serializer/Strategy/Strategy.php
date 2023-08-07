@@ -19,13 +19,13 @@ interface Strategy
 {
     /**
      * @param mixed $data
-     * @return string
+     * @return bool|string
      */
-    public function serialize($data);
+    public function serialize(mixed $data): bool|string;
 
     /**
-     * @param $data
-     * @return array
+     * @param mixed $data
+     * @return bool|string|array|object
      */
-    public function unserialize($data);
+    public function unserialize(mixed $data): bool|string|array|object;
 }

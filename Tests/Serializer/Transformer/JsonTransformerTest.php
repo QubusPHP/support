@@ -43,11 +43,7 @@ class JsonTransformerTest extends TestCase
         $serializer = new DeepCopySerializer(new JsonTransformer());
 
         $expected = <<<STRING
-{
-    "payload": {
-        "userId": 1
-    }
-}
+{"payload": {"userId": 1}}
 STRING;
 
         Assert::assertEquals($expected, $serializer->serialize($object));
@@ -67,11 +63,7 @@ STRING;
         $serializer = new DeepCopySerializer(new JsonTransformer());
 
         $expected = <<<STRING
-{
-    "payload": {
-        "userId": 1
-    }
-}
+{"payload": {"userId": 1}}
 STRING;
 
         Assert::assertEquals($expected, $serializer->serialize($object));

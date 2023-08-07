@@ -26,9 +26,9 @@ class XmlTransformer extends ArrayTransformer
 {
     /**
      * @param mixed $value
-     * @return string
+     * @return bool|string
      */
-    public function serialize($value)
+    public function serialize(mixed $value): bool|string
     {
         $array = parent::serialize($value);
 
@@ -48,8 +48,9 @@ class XmlTransformer extends ArrayTransformer
      * Converts an array to XML using SimpleXMLElement.
      *
      * @param array $data
+     * @param SimpleXMLElement $xmlData
      */
-    private function arrayToXml(array $data, SimpleXMLElement $xmlData)
+    private function arrayToXml(array $data, SimpleXMLElement $xmlData): void
     {
         foreach ($data as $key => $value) {
             if (is_array($value)) {

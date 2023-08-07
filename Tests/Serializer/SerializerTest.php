@@ -168,43 +168,35 @@ class SerializerTest extends TestCase
         return [
             [
                 [1, 2, 3],
-                '{"@map":"array","@value":[{"@scalar":"integer","@value":1},{"@scalar":"integer","@value":2},
-                {"@scalar":"integer","@value":3}]}'
+                '{"@map":"array","@value":[{"@scalar":"integer","@value":1},{"@scalar":"integer","@value":2},{"@scalar":"integer","@value":3}]}'
             ],
             [
                 [1, 'abc', false],
-                '{"@map":"array","@value":[{"@scalar":"integer","@value":1},{"@scalar":"string","@value":"abc"},
-                {"@scalar":"boolean","@value":false}]}'
+                '{"@map":"array","@value":[{"@scalar":"integer","@value":1},{"@scalar":"string","@value":"abc"},{"@scalar":"boolean","@value":false}]}'
             ],
             [
                 ['a' => 1, 'b' => 2, 'c' => 3],
-                '{"@map":"array","@value":{"a":{"@scalar":"integer","@value":1},
-                "b":{"@scalar":"integer","@value":2},"c":{"@scalar":"integer","@value":3}}}'
+                '{"@map":"array","@value":{"a":{"@scalar":"integer","@value":1},"b":{"@scalar":"integer","@value":2},"c":{"@scalar":"integer","@value":3}}}'
             ],
             [
                 ['integer' => 1, 'string' => 'abc', 'bool' => false],
-                '{"@map":"array","@value":{"integer":{"@scalar":"integer","@value":1},
-                "string":{"@scalar":"string","@value":"abc"},"bool":{"@scalar":"boolean","@value":false}}}'
+                '{"@map":"array","@value":{"integer":{"@scalar":"integer","@value":1},"string":{"@scalar":"string","@value":"abc"},"bool":{"@scalar":"boolean","@value":false}}}'
             ],
             [
                 [1, ['nested']],
-                '{"@map":"array","@value":[{"@scalar":"integer","@value":1},{"@map":"array",
-                "@value":[{"@scalar":"string","@value":"nested"}]}]}'
+                '{"@map":"array","@value":[{"@scalar":"integer","@value":1},{"@map":"array","@value":[{"@scalar":"string","@value":"nested"}]}]}'
             ],
             [
                 ['integer' => 1, 'array' => ['nested']],
-                '{"@map":"array","@value":{"integer":{"@scalar":"integer","@value":1},
-                "array":{"@map":"array","@value":[{"@scalar":"string","@value":"nested"}]}}}'
+                '{"@map":"array","@value":{"integer":{"@scalar":"integer","@value":1},"array":{"@map":"array","@value":[{"@scalar":"string","@value":"nested"}]}}}'
             ],
             [
                 ['integer' => 1, 'array' => ['nested' => 'object']],
-                '{"@map":"array","@value":{"integer":{"@scalar":"integer","@value":1},
-                "array":{"@map":"array","@value":{"nested":{"@scalar":"string","@value":"object"}}}}}'
+                '{"@map":"array","@value":{"integer":{"@scalar":"integer","@value":1},"array":{"@map":"array","@value":{"nested":{"@scalar":"string","@value":"object"}}}}}'
             ],
             [
                 [1.0, 2, 3e1],
-                '{"@map":"array","@value":[{"@scalar":"float","@value":1},{"@scalar":"integer","@value":2},
-                {"@scalar":"float","@value":30}]}'
+                '{"@map":"array","@value":[{"@scalar":"float","@value":1},{"@scalar":"integer","@value":2},{"@scalar":"float","@value":30}]}'
             ],
         ];
     }
@@ -282,8 +274,7 @@ class SerializerTest extends TestCase
         $obj = new stdClass();
         $obj->param1 = true;
         $obj->param2 = 'store me, please';
-        $serialized = '{"@type":"stdClass","param1":{"@scalar":"boolean","@value":true},"param2":{"@scalar":"string",
-        "@value":"store me, please"}}';
+        $serialized = '{"@type":"stdClass","param1":{"@scalar":"boolean","@value":true},"param2":{"@scalar":"string","@value":"store me, please"}}';
         Assert::assertSame($serialized, $this->serializer->serialize($obj));
 
         $obj2 = $this->serializer->unserialize($serialized);
@@ -310,8 +301,7 @@ class SerializerTest extends TestCase
         $c1->something = 'ok';
         $c1->c2->c3->ok = true;
 
-        $expected = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},
-        "ok":{"@scalar":"boolean","@value":true}}},"something":{"@scalar":"string","@value":"ok"}}';
+        $expected = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},"ok":{"@scalar":"boolean","@value":true}}},"something":{"@scalar":"string","@value":"ok"}}';
         Assert::assertSame($expected, $this->serializer->serialize($c1));
 
         $c1 = new stdClass();
@@ -326,15 +316,13 @@ class SerializerTest extends TestCase
      */
     public function testUnserializeRecursion()
     {
-        $serialized = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},
-        "ok":{"@scalar":"boolean","@value":true}}},"something":{"@scalar":"string","@value":"ok"}}';
+        $serialized = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},"ok":{"@scalar":"boolean","@value":true}}},"something":{"@scalar":"string","@value":"ok"}}';
         $obj = $this->serializer->unserialize($serialized);
         Assert::assertTrue($obj->c2->c3->ok);
         Assert::assertSame($obj, $obj->c2->c3->c1);
         Assert::assertNotSame($obj, $obj->c2);
 
-        $serialized = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},
-        "c2":{"@type":"@1"},"c3":{"@type":"@2"}},"c3_copy":{"@type":"@2"}}}';
+        $serialized = '{"@type":"stdClass","c2":{"@type":"stdClass","c3":{"@type":"stdClass","c1":{"@type":"@0"},"c2":{"@type":"@1"},"c3":{"@type":"@2"}},"c3_copy":{"@type":"@2"}}}';
         $obj = $this->serializer->unserialize($serialized);
         Assert::assertSame($obj, $obj->c2->c3->c1);
         Assert::assertSame($obj->c2, $obj->c2->c3->c2);

@@ -34,7 +34,7 @@ use function strpos;
 class XmlStrategy implements Strategy
 {
     /** @var array */
-    private $replacements = [
+    private array $replacements = [
         Serializer::CLASS_IDENTIFIER_KEY => 'serializer_type',
         Serializer::SCALAR_TYPE          => 'serializer_scalar',
         Serializer::SCALAR_VALUE         => 'serializer_value',
@@ -43,9 +43,9 @@ class XmlStrategy implements Strategy
 
     /**
      * @param mixed $value
-     * @return string
+     * @return bool|string
      */
-    public function serialize($value)
+    public function serialize(mixed $value): bool|string
     {
         $value = $this->replaceKeys($this->replacements, $value);
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><data></data>');
@@ -59,7 +59,7 @@ class XmlStrategy implements Strategy
      * @param array $input
      * @return array
      */
-    private function replaceKeys(array $replacements, array $input)
+    private function replaceKeys(array $replacements, array $input): array
     {
         $return = [];
         foreach ($input as $key => $value) {
@@ -83,7 +83,8 @@ class XmlStrategy implements Strategy
     /**
      * Converts an array to XML using SimpleXMLElement.
      *
-     * @param array            $data
+     * @param array $data
+     * @param SimpleXMLElement $xmlData
      */
     private function arrayToXml(array &$data, SimpleXMLElement $xmlData): void
     {
@@ -102,17 +103,15 @@ class XmlStrategy implements Strategy
 
     /**
      * @param mixed $value
-     * @return array
+     * @return bool|string|array|object
      */
-    public function unserialize($value)
+    public function unserialize(mixed $value): bool|string|array|object
     {
         $array = (array) simplexml_load_string($value);
         $this->castToArray($array);
         $this->recoverArrayNumericKeyValues($array);
         $replacements = array_flip($this->replacements);
-        $array = $this->replaceKeys($replacements, $array);
-
-        return $array;
+        return $this->replaceKeys($replacements, $array);
     }
 
     /**
@@ -155,7 +154,7 @@ class XmlStrategy implements Strategy
      * @param mixed $key
      * @return float|int
      */
-    private static function getNumericKeyValue($key)
+    private static function getNumericKeyValue(mixed $key): float|int
     {
         $newKey = str_replace('serializer_element_', '', $key);
         [$type, $index] = explode('_', $newKey);

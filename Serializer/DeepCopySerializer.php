@@ -16,26 +16,28 @@ declare(strict_types=1);
 namespace Qubus\Support\Serializer;
 
 use ReflectionClass;
+use ReflectionException;
 
 class DeepCopySerializer extends Serializer
 {
     /**
      * Extract the data from an object.
      *
-     * @param mixed $value
+     * @param mixed $data
      * @return array
+     * @throws ReflectionException
      */
-    protected function serializeObject($value)
+    protected function serializeObject(mixed $data): array
     {
-        if ($this->storage->contains($value)) {
-            return $this->storage[$value];
+        if ($this->storage->contains($data)) {
+            return $this->storage[$data];
         }
 
-        $reflection = new ReflectionClass($value);
+        $reflection = new ReflectionClass($data);
         $className = $reflection->getName();
 
-        $serialized = $this->serializeInternalClass($value, $className, $reflection);
-        $this->storage->attach($value, $serialized);
+        $serialized = $this->serializeInternalClass($data, $className, $reflection);
+        $this->storage->attach($data, $serialized);
 
         return $serialized;
     }

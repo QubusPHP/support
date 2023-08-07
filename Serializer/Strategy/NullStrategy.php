@@ -17,20 +17,12 @@ namespace Qubus\Support\Serializer\Strategy;
 
 class NullStrategy implements Strategy
 {
-    /**
-     * @param mixed $value
-     * @return string
-     */
-    public function serialize($value)
+    public function serialize(mixed $value): bool|string
     {
-        return $value;
+        return json_encode($value);
     }
 
-    /**
-     * @param string $value
-     * @return array
-     */
-    public function unserialize($value)
+    public function unserialize(mixed $value): bool|string|array|object
     {
         return $value;
     }
