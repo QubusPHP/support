@@ -20,7 +20,7 @@ use Closure;
 use Countable;
 use IteratorAggregate;
 use OutOfBoundsException;
-use Qubus\Support\DataObjectCollection;
+use Qubus\Exception\Data\TypeException;
 use ReturnTypeWillChange;
 use RuntimeException;
 
@@ -34,7 +34,7 @@ use function uniqid;
 class DataContainer implements ArrayAccess, IteratorAggregate, Countable
 {
     /** @var DataContainer parent container, for inheritance */
-    protected $parent;
+    protected DataContainer $parent;
 
     /** @var bool whether we want to use parent cascading */
     protected bool $parentEnabled = false;
@@ -55,14 +55,17 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
      * @param array                $data     Container data.
      * @param bool                 $readOnly Whether the container is read-only.
      */
-    public function __construct(public readonly DataObjectCollection $dataType, array $data = [], bool $readOnly = false)
-    {
+    public function __construct(
+        public readonly DataObjectCollection $dataType,
+        array $data = [],
+        bool $readOnly = false
+    ) {
         $this->data = $data;
         $this->readOnly = $readOnly;
     }
 
     /**
-     * Get the parent of this container
+     * Get the parent of this container.
      */
     public function getParent(): DataContainer
     {
@@ -70,7 +73,7 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Set the parent of this container, to support inheritance
+     * Set the parent of this container, to support inheritance.
      *
      * @param DataContainer|null $parent the parent container object
      * @return  $this
@@ -89,7 +92,7 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Enable the use of the parent object, if set
+     * Enable the use of the parent object, if set.
      *
      * @return $this
      */
@@ -103,7 +106,7 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Disable the use of the parent object
+     * Disable the use of the parent object.
      *
      * @return $this
      */
@@ -115,7 +118,7 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Check whether this container has an active parent
+     * Check whether this container has an active parent.
      */
     public function hasParent(): bool
     {
@@ -123,7 +126,7 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Retrieve the modified state of the container
+     * Retrieve the modified state of the container.
      */
     public function isModified(): bool
     {
@@ -151,9 +154,10 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Get the container's data
+     * Get the container's data.
      *
      * @return array container's data
+     * @throws TypeException
      */
     public function getContents(): array
     {
@@ -182,7 +186,7 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
      *
      * @param array $arg  array to merge with
      * @return  $this
-     * @throws  RuntimeException
+     * @throws  RuntimeException|TypeException
      */
     public function merge(array $arg): static
     {
@@ -226,6 +230,7 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
 
     /**
      * Check if a key was set upon this bag's data
+     * @throws TypeException
      */
     public function has(string $key): bool
     {
@@ -247,7 +252,8 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Get a key's value from this bag's data
+     * Get a key's value from the container.
+     * @throws TypeException
      */
     public function get(?string $key = null, mixed $default = null): mixed
     {
@@ -275,11 +281,11 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Set a config value
+     * Set a config value.
      *
      * @throws RuntimeException
      */
-    public function set(string $key, mixed $value): static
+    public function set(?string $key, mixed $value): static
     {
         if ($this->readOnly) {
             throw new RuntimeException('Changing values on this Data Container is not allowed.');
@@ -320,9 +326,10 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Allow usage of isset() on the param bag as an array
+     * Allow usage of isset() on the param bag as an array.
      *
-     * @param string  $offset
+     * @param string $offset
+     * @throws TypeException
      */
     public function offsetExists($offset): bool
     {
@@ -330,10 +337,11 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Allow fetching values as an array
+     * Allow fetching values as an array.
      *
      * @param string $offset
      * @throws OutOfBoundsException
+     * @throws TypeException
      */
     #[ReturnTypeWillChange]
     public function offsetGet($offset): mixed
@@ -344,7 +352,7 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Disallow setting values like an array
+     * Disallow setting values like an array.
      *
      * @param string $offset
      */
@@ -354,7 +362,7 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Disallow unsetting values like an array
+     * Disallow unsetting values like an array.
      *
      * @param string $offset
      * @throws RuntimeException
@@ -365,9 +373,10 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * IteratorAggregate implementation
+     * IteratorAggregate implementation.
      *
      * @return  ArrayIterator  iterator
+     * @throws TypeException
      */
     public function getIterator(): ArrayIterator
     {
@@ -375,9 +384,10 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Countable implementation
+     * Countable implementation.
      *
      * @return  int  number of items stored in the container
+     * @throws TypeException
      */
     public function count(): int
     {

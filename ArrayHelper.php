@@ -53,7 +53,6 @@ use function preg_replace;
 use function property_exists;
 use function Qubus\Support\Helpers\call_qubus_func_array;
 use function stripos;
-use function strpos;
 
 use const SORT_REGULAR;
 
@@ -1056,11 +1055,16 @@ class ArrayHelper
      * @param string $key Key of the current entry to use as reference.
      * @param bool $getValue If true, return the previous value instead of the previous key.
      * @param bool $strict If true, do a strict key comparison.
-     * @return string|bool|null The value in the array, null if there is no previous value, or false if the key doesn't exist.
+     * @return string|bool|null The value in the array, null if there is no previous value,
+     *                          or false if the key doesn't exist.
      * @throws TypeException
      */
-    public function previousByKey(array|ArrayAccess $array, string $key, bool $getValue = false, bool $strict = false): string|bool|null
-    {
+    public function previousByKey(
+        array|ArrayAccess $array,
+        string $key,
+        bool $getValue = false,
+        bool $strict = false
+    ): string|bool|null {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
@@ -1088,11 +1092,16 @@ class ArrayHelper
      * @param string $key Key of the current entry to use as reference.
      * @param bool $getValue If true, return the next value instead of the next key.
      * @param bool $strict If true, do a strict key comparison.
-     * @return string|bool|null The value in the array, null if there is no next value, or false if the key doesn't exist.
+     * @return string|bool|null The value in the array, null if there is no next value,
+     *                          or false if the key doesn't exist.
      * @throws TypeException
      */
-    public function nextByKey(array|ArrayAccess $array, string $key, bool $getValue = false, bool $strict = false): string|bool|null
-    {
+    public function nextByKey(
+        array|ArrayAccess $array,
+        string $key,
+        bool $getValue = false,
+        bool $strict = false
+    ): string|bool|null {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
@@ -1123,11 +1132,16 @@ class ArrayHelper
      * @param string $value Value of the current entry to use as reference.
      * @param bool $getValue If true, return the previous value instead of the previous key.
      * @param bool $strict If true, do a strict key comparison.
-     * @return string|bool|null The value in the array, null if there is no previous value, or false if the key doesn't exist.
+     * @return string|bool|null The value in the array, null if there is no previous value,
+     *                          or false if the key doesn't exist.
      * @throws TypeException
      */
-    public function previousByValue(array|ArrayAccess $array, string $value, bool $getValue = true, bool $strict = false): string|bool|null
-    {
+    public function previousByValue(
+        array|ArrayAccess $array,
+        string $value,
+        bool $getValue = true,
+        bool $strict = false
+    ): string|bool|null {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
@@ -1158,11 +1172,16 @@ class ArrayHelper
      * @param string $value Value of the current entry to use as reference.
      * @param bool $getValue If true, return the next value instead of the next key.
      * @param bool $strict If true, do a strict key comparison.
-     * @return string|bool|null The value in the array, null if there is no next value, or false if the key doesn't exist
+     * @return string|bool|null The value in the array, null if there is no next value,
+     *                          or false if the key doesn't exist
      * @throws TypeException
      */
-    public function nextByValue(array|ArrayAccess $array, string $value, bool $getValue = true, bool $strict = false): string|bool|null
-    {
+    public function nextByValue(
+        array|ArrayAccess $array,
+        string $value,
+        bool $getValue = true,
+        bool $strict = false
+    ): string|bool|null {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }

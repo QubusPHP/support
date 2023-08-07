@@ -15,17 +15,11 @@ declare(strict_types=1);
 
 namespace Qubus\Support\Collection;
 
-use ArrayAccess;
 use ArrayIterator;
-use Countable;
-use IteratorAggregate;
-use Serializable;
 use Traversable;
 
 use function json_decode;
 use function json_encode;
-use function serialize;
-use function unserialize;
 
 use const JSON_PRETTY_PRINT;
 

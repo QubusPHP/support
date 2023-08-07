@@ -123,7 +123,12 @@ class QubusDate implements Date
      */
     public static function yearInSeconds(): int
     {
-        return (date('z', mktime(0, 0, 0, 12, 31, date('Y'))) + 1) * static::dayInSeconds();
+        return (
+        (int) date(
+            format: 'z',
+            timestamp: mktime(0, 0, 0, 12, 31, (int) date(format: 'Y'))
+        ) + 1
+        ) * static::dayInSeconds();
     }
 
     /**
@@ -235,7 +240,7 @@ class QubusDate implements Date
     }
 
     /**
-     * Converts timestamp to localized human readable date.
+     * Converts timestamp to localized human-readable date.
      *
      * @param string $format PHP date format string (e.g. 'Y-m-d').
      * @param int $timestamp Timestamp to convert.
@@ -253,7 +258,12 @@ class QubusDate implements Date
     {
         // array of time period chunks
         $chunks = [
-            [60 * 60 * 24 * (date('z', mktime(0, 0, 0, 12, 31, date('Y'))) + 1), 'year'],
+            [60 * 60 * 24 * (
+                (int) date(
+                    format: 'z',
+                    timestamp: mktime(0, 0, 0, 12, 31, (int) date('Y'))
+                ) + 1), 'year'
+            ],
             [60 * 60 * 24 * date('t'), 'month'],
             [60 * 60 * 24 * 7, 'week'],
             [60 * 60 * 24, 'day'],

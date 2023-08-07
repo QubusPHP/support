@@ -16,7 +16,6 @@ namespace Qubus\Support;
 
 use Cocur\Slugify\Slugify;
 
-use function filter_var;
 use function html_entity_decode;
 use function in_array;
 use function is_array;
@@ -38,7 +37,6 @@ use function ucfirst;
 use function ucwords;
 
 use const ENT_QUOTES;
-use const FILTER_SANITIZE_STRING;
 
 /**
  * Pluralize and singularize English words.
@@ -46,7 +44,7 @@ use const FILTER_SANITIZE_STRING;
 class Inflector
 {
     /** @var  array  default list of uncountable words, in English */
-    protected static $uncountableWords = [
+    protected static array $uncountableWords = [
         'equipment',
         'information',
         'rice',
@@ -73,8 +71,8 @@ class Inflector
         'weather',
     ];
 
-    /** @var array Default list of iregular plural words, in English */
-    protected static $pluralRules = [
+    /** @var array Default list of irregular plural words, in English */
+    protected static array $pluralRules = [
         '/^(ox)$/i'                => '\1\2en', // ox
         '/([m|l])ouse$/i'          => '\1ice', // mouse, louse
         '/(matr|vert|ind)ix|ex$/i' => '\1ices', // matrix, vertex, index
@@ -100,8 +98,8 @@ class Inflector
         '/$/'                                                                => 's',
     ];
 
-    /** @var  array  default list of iregular singular words, in English */
-    protected static $singularRules = [
+    /** @var  array  default list of irregular singular words, in English */
+    protected static array $singularRules = [
         '/(matr)ices$/i'     => '\1ix',
         '/(s)tatuses$/i'     => '\1\2tatus',
         '/^(.*)(menu)s$/i'   => '\1\2',
@@ -150,7 +148,7 @@ class Inflector
      * Load any localized rulesets based on the current language configuration
      * If not exists, the current rules remain active
      */
-    public static function initialize()
+    public static function initialize(): void
     {
         /** @todo */
 
@@ -162,32 +160,24 @@ class Inflector
      *
      * @link    http://snipplr.com/view/4627/a-function-to-add-a-prefix-to-numbers-ex-1st-2nd-3rd-4th-5th/
      *
-     * @param   int     $number the number to ordinalize
+     * @param int $number the number to ordinalize
      * @return  string  the ordinalized version of $number
      */
-    public static function ordinalize($number): string
+    public static function ordinalize(int $number): string
     {
         if (! is_numeric($number)) {
-            return $number;
+            return (string) $number;
         }
 
         if (in_array($number % 100, range(11, 13))) {
             return $number . 'th';
         } else {
-            switch ($number % 10) {
-                case 1:
-                    return $number . 'st';
-                break;
-                case 2:
-                    return $number . 'nd';
-                break;
-                case 3:
-                    return $number . 'rd';
-                break;
-                default:
-                    return $number . 'th';
-                break;
-            }
+            return match ($number % 10) {
+                1 => $number . 'st',
+                2 => $number . 'nd',
+                3 => $number . 'rd',
+                default => $number . 'th',
+            };
         }
     }
 
@@ -312,7 +302,7 @@ class Inflector
 
     /**
      * Converts your text to a URL-friendly title so it can be used in the URL.
-     * Only works with UTF8 input and and only outputs 7 bit ASCII characters.
+     * Only works with UTF8 input and only outputs 7 bit ASCII characters.
      *
      * @param string            $string             The text to slugify.
      * @param array             $constructorOptions Options that can be passed to the constructor.

@@ -361,7 +361,7 @@ class StringHelper
     }
 
     /**
-     * Check if a string is serialized.
+     * Check if a string is PHP serialized.
      *
      * @param string $string String to check.
      */
