@@ -16,12 +16,6 @@ namespace Qubus\Support;
 
 class DataType implements DataObjectCollection
 {
-    /** @var StringHelper|null */
-    public ?StringHelper $string = null;
-
-    /** @var ArrayHelper|null */
-    public ?ArrayHelper $array = null;
-
     /**
      * list of instances
      *
@@ -29,6 +23,10 @@ class DataType implements DataObjectCollection
      */
     protected array $instances = [];
 
+    /**
+     * @property StringHelper $string
+     * @property ArrayHelper $array
+     */
     public function __construct()
     {
         $this->add('array', ArrayHelper::getInstance());
