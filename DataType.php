@@ -17,10 +17,10 @@ namespace Qubus\Support;
 class DataType implements DataObjectCollection
 {
     /** @var StringHelper|null */
-    public ?StringHelper $string;
+    public ?StringHelper $string = null;
 
     /** @var ArrayHelper|null */
-    public ?ArrayHelper $array;
+    public ?ArrayHelper $array = null;
 
     /**
      * list of instances

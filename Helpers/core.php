@@ -488,9 +488,9 @@ function sort_element_callback(array $a, array $b): int
  * @param array $array
  * @param string|null $key
  * @param mixed|null $default
- * @return array|null
+ * @return mixed
  */
-function return_array(array $array, ?string $key, mixed $default = null): ?array
+function return_array(array $array, ?string $key, mixed $default = null): mixed
 {
     if (! array_accessible(value: $array)) {
         return value(value: $default);
