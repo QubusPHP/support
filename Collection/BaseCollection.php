@@ -5,9 +5,8 @@
  *
  * @link       https://github.com/QubusPHP/support
  * @copyright  2022
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @author     Joshua Parker <josh@joshuaparker.blog>
  * @since      2.2.2
  */
 
@@ -17,6 +16,7 @@ namespace Qubus\Support\Collection;
 
 use Qubus\Exception\Data\TypeException;
 use Qubus\Support\ArrayHelper;
+use ReflectionException;
 
 use function count;
 use function is_callable;
@@ -153,6 +153,7 @@ abstract class BaseCollection extends BaseArray implements Collectionable
      * @param mixed $key
      * @return mixed
      * @throws TypeException
+     * @throws ReflectionException
      */
     public function get(mixed $key): mixed
     {
@@ -251,6 +252,7 @@ abstract class BaseCollection extends BaseArray implements Collectionable
      * flattened array of items.
      *
      * @return self
+     * @throws ReflectionException
      */
     public function flatten(): static
     {
@@ -443,7 +445,7 @@ abstract class BaseCollection extends BaseArray implements Collectionable
     /**
      * Merge items with current collection.
      *
-     * @throws TypeException
+     * @throws TypeException|ReflectionException
      */
     public function merge(array $items): static
     {

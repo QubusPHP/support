@@ -4,11 +4,10 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
- * @copyright  2015 Nil Portugués Calderó
+ * @copyright  2022
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @since      1.0.0
+ * @since      2.2.2
  */
 
 declare(strict_types=1);
@@ -385,7 +384,7 @@ class Serializer implements Serializable
     }
 
     /**
-     * @param $data
+     * @param mixed $data
      * @return array|string
      */
     protected function serializeScalar(mixed $data): array|string

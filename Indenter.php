@@ -4,10 +4,10 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2022
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @since      1.0.0
+ * @since      2.2.2
  */
 
 /**
@@ -163,7 +163,7 @@ final class Indenter
         }
 
         // Removing double whitespaces to make the source code easier to read.
-        // With exception of <pre>/ CSS white-space changing the default behaviour, double whitespace
+        // With the exception of <pre>/ CSS white-space changing the default behaviour, double whitespace
         // is meaningless in HTML output.
         // This reason alone is sufficient not to use Indenter in production.
         $input = str_replace("\t", '', $input);

@@ -4,15 +4,17 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2022
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @since      1.0.0
+ * @since      2.2.2
  */
 
 declare(strict_types=1);
 
 namespace Qubus\Support;
+
+use ReflectionException;
 
 class DataType implements DataObjectCollection
 {
@@ -24,8 +26,9 @@ class DataType implements DataObjectCollection
     protected array $instances = [];
 
     /**
-     * @property StringHelper $string
+     * @throws ReflectionException
      * @property ArrayHelper $array
+     * @property StringHelper $string
      */
     public function __construct()
     {

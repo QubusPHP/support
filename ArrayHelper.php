@@ -4,10 +4,10 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2022
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @since      1.0.0
+ * @since      2.2.2
  */
 
 declare(strict_types=1);
@@ -165,12 +165,14 @@ class ArrayHelper
 
         if (! $index) {
             foreach ($array as $i => $a) {
-                $return[] = is_object($a) && ! $a instanceof ArrayAccess ? $a->{$key} : ($getDeep ? $this->get($a, $key) : $a[$key]);
+                $return[] = is_object($a) &&
+                ! $a instanceof ArrayAccess ? $a->{$key} : ($getDeep ? $this->get($a, $key) : $a[$key]);
             }
         } else {
             foreach ($array as $i => $a) {
                 $index !== true && $i = is_object($a) && ! $a instanceof ArrayAccess ? $a->{$index} : $a[$index];
-                $return[$i] = is_object($a) && ! $a instanceof ArrayAccess ? $a->{$key} : ($getDeep ? $this->get($a, $key) : $a[$key]);
+                $return[$i] = is_object($a) &&
+                ! $a instanceof ArrayAccess ? $a->{$key} : ($getDeep ? $this->get($a, $key) : $a[$key]);
             }
         }
 
