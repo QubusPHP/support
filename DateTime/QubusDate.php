@@ -4,10 +4,10 @@
  * Qubus\Support
  *
  * @link       https://github.com/QubusPHP/support
- * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2022
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @since      1.0.0
+ * @since      2.2.2
  */
 
 declare(strict_types=1);
@@ -27,28 +27,28 @@ use function str_replace;
 use function strtotime;
 use function time;
 
-class QubusDate implements Date
+readonly class QubusDate implements Date
 {
     /**
      * TimeZone
      */
-    public readonly string|DateTimeZone $timezone;
+    public string|DateTimeZone $timezone;
 
     /**
      * Locale
      */
-    public readonly ?string $locale;
+    public ?string $locale;
 
     /**
      * Date object.
      */
-    public readonly mixed $date;
+    public mixed $date;
 
     /**
      * Returns new Datetime object.
      */
     private function __construct(
-        public readonly string|int $time,
+        public string|int $time,
         string|DateTimeZone|null $timezone = null,
         ?string $locale = null
     ) {

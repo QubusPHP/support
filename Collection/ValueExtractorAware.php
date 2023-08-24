@@ -5,9 +5,8 @@
  *
  * @link       https://github.com/QubusPHP/support
  * @copyright  2022
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @author     Joshua Parker <josh@joshuaparker.blog>
  * @since      2.2.2
  */
 

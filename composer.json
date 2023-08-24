@@ -13,11 +13,11 @@
     "authors": [
         {
             "name": "Joshua Parker",
-            "email": "josh@joshuaparker.blog"
+            "email": "joshua@joshuaparker.dev"
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "ext-ctype": "*",
         "ext-dom": "*",
         "ext-libxml": "*",
@@ -29,8 +29,8 @@
         "nesbot/carbon": "^2.60",
         "psr/container": "^2",
         "psr/log": "^3",
-        "qubus/exception": "^2.0",
-        "qubus/inheritance": "^2.0",
+        "qubus/exception": "^3.0",
+        "qubus/inheritance": "^3.0",
         "symfony/var-dumper": "^5.4",
         "webmozart/assert": "^1.11"
     },
