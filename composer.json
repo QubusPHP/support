@@ -19,10 +19,7 @@
     "require": {
         "php": ">=8.2",
         "ext-ctype": "*",
-        "ext-dom": "*",
-        "ext-libxml": "*",
         "ext-mbstring": "*",
-        "ext-simplexml": "*",
         "ext-zlib": "*",
         "cocur/slugify": "^4.1",
         "mrclay/minify": "^3.0",
