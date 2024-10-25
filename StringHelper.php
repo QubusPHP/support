@@ -15,7 +15,6 @@ namespace Qubus\Support;
 
 use Closure;
 use Qubus\Exception\Exception;
-use Qubus\Inheritance\StaticProxyAware;
 
 use function array_pop;
 use function array_rand;
@@ -69,8 +68,6 @@ use const PREG_SET_ORDER;
 
 class StringHelper
 {
-    use StaticProxyAware;
-
     /**
      * Truncates a string to the given length. It will optionally preserve
      * HTML tags if $isHtml is set to true.
