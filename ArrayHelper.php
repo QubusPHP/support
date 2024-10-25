@@ -18,7 +18,6 @@ use BadMethodCallException;
 use Closure;
 use Iterator;
 use Qubus\Exception\Data\TypeException;
-use Qubus\Inheritance\StaticProxyAware;
 
 use function abs;
 use function array_combine;
@@ -57,8 +56,6 @@ use const SORT_REGULAR;
 
 class ArrayHelper
 {
-    use StaticProxyAware;
-
     /**
      * Gets a dot-notated key from an array, with a default value if it does
      * not exist.

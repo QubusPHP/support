@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Qubus\Support;
 
-use ReflectionException;
-
 class DataType implements DataObjectCollection
 {
     /**
@@ -25,14 +23,13 @@ class DataType implements DataObjectCollection
     protected array $instances = [];
 
     /**
-     * @throws ReflectionException
      * @property ArrayHelper $array
      * @property StringHelper $string
      */
     public function __construct()
     {
-        $this->add('array', ArrayHelper::getInstance());
-        $this->add('string', StringHelper::getInstance());
+        $this->add('array', new ArrayHelper());
+        $this->add('string', new StringHelper());
     }
 
     /**
