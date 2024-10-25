@@ -29,7 +29,9 @@
         "qubus/exception": "^3.0",
         "qubus/inheritance": "^3.0",
         "symfony/var-dumper": "^5.4",
-        "webmozart/assert": "^1.11"
+        "webmozart/assert": "^1.11",
+      "ext-libxml": "*",
+      "ext-simplexml": "*"
     },
     "require-dev": {
         "mockery/mockery": "^1.3.1",
