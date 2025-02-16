@@ -68,6 +68,7 @@ trait ValueToStringAware
         }
 
         // From here, $value should be an object.
+        assert(is_object($value));
 
         // __toString() is implemented
         if (is_callable([$value, '__toString'])) {
