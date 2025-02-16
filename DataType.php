@@ -13,6 +13,10 @@ declare(strict_types=1);
 
 namespace Qubus\Support;
 
+/**
+ * @property ArrayHelper $array
+ * @property StringHelper $string
+ */
 class DataType implements DataObjectCollection
 {
     /**
@@ -22,10 +26,6 @@ class DataType implements DataObjectCollection
      */
     protected array $instances = [];
 
-    /**
-     * @property ArrayHelper $array
-     * @property StringHelper $string
-     */
     public function __construct()
     {
         $this->add('array', new ArrayHelper());
