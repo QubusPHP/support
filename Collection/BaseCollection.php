@@ -14,9 +14,7 @@ declare(strict_types=1);
 namespace Qubus\Support\Collection;
 
 use Qubus\Exception\Data\TypeException;
-use Qubus\Support\ArrayHelper;
 use Qubus\Support\DataType;
-use ReflectionException;
 
 use function count;
 use function is_callable;
@@ -264,7 +262,7 @@ abstract class BaseCollection extends BaseArray implements Collectionable
      * @param callable|null $callback
      * @return static
      */
-    public function sort(callable $callback = null): static
+    public function sort(?callable $callback = null): static
     {
         $items = $this->items;
 
@@ -282,7 +280,7 @@ abstract class BaseCollection extends BaseArray implements Collectionable
      * @param callable|null $callback
      * @return static
      */
-    public function sortByKey(callable $callback = null): static
+    public function sortByKey(?callable $callback = null): static
     {
         $items = $this->items;
 

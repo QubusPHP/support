@@ -303,7 +303,7 @@ class Inflector
      * Converts your text to a URL-friendly title so it can be used in the URL.
      * Only works with UTF8 input and only outputs 7 bit ASCII characters.
      *
-     * @param string            $string             The text to slugify.
+     * @param string|array      $string             The text to slugify.
      * @param array             $constructorOptions Options that can be passed to the constructor.
      * @param string|array|null $onTheFlyOptions    Override options that can be passed to slugify method.
      * @return string The slugified text.

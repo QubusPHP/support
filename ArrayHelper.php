@@ -154,7 +154,7 @@ class ArrayHelper
      * @return array Array of plucked values.
      * @throws TypeException
      */
-    public function pluck(array $array, string $key, bool|int|string $index = null): array
+    public function pluck(array $array, string $key, bool|int|string|null $index = null): array
     {
         $return = [];
         $getDeep = str_contains($key, '.') !== false;

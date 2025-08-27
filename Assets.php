@@ -81,7 +81,7 @@ class Assets
      * Required if you enable the pipeline.
      * No trailing slash!.
      */
-    protected string $publicDir;
+    protected ?string $publicDir = null;
 
     /**
      * Directory for local CSS assets.
@@ -136,7 +136,7 @@ class Assets
      * The closure will receive as the only parameter a string with the path/URL of the asset, and
      * it should return the content of the asset file as a string.
      */
-    protected Closure $fetchCommand;
+    protected ?Closure $fetchCommand = null;
 
     /**
      * Closure invoked by the pipeline whenever new assets are pipelined for the first time.
@@ -151,17 +151,17 @@ class Assets
      * - Array containing the assets included in the file.
      * - Boolean indicating whether a gzipped version of the file was also created.
      */
-    protected Closure $notifyCommand;
+    protected ?Closure $notifyCommand = null;
 
     /**
      * Closure used by the pipeline to minify CSS assets.
      */
-    protected Closure $cssMinifier;
+    protected ?Closure $cssMinifier = null;
 
     /**
      * Closure used by the pipeline to minify JavaScript assets.
      */
-    protected Closure $jsMinifier;
+    protected ?Closure $jsMinifier = null;
 
     /**
      * Available collections.
@@ -458,8 +458,9 @@ class Assets
      * providing a closure that will receive an array of assets.
      *
      * @param array|Closure|null $attributes
+     * @return string
      */
-    public function css(array|Closure $attributes = null): string
+    public function css(array|Closure|null $attributes = null): string
     {
         if (! $this->css) {
             return '';
@@ -502,8 +503,9 @@ class Assets
      * providing a closure that will receive an array of assets.
      *
      * @param array|Closure|null $attributes
+     * @return string
      */
-    public function js(array|Closure $attributes = null): string
+    public function js(array|Closure|null $attributes = null): string
     {
         if (! $this->js) {
             return '';
