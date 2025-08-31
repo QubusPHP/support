@@ -23,7 +23,7 @@
         "ext-zlib": "*",
         "cocur/slugify": "^4.1",
         "mrclay/minify": "^3.0",
-        "nesbot/carbon": "^2.60",
+        "nesbot/carbon": "^2",
         "psr/container": "^2",
         "psr/log": "^3",
         "qubus/exception": "^3.0",
