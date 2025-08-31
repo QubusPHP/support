@@ -23,15 +23,15 @@
         "ext-zlib": "*",
         "cocur/slugify": "^4",
         "mrclay/minify": "^4",
-        "nesbot/carbon": "^2",
+        "nesbot/carbon": "^3",
         "psr/container": "^2",
         "psr/log": "^3",
         "qubus/exception": "^3.0",
         "qubus/inheritance": "^3",
         "symfony/var-dumper": "^7",
         "webmozart/assert": "^1",
-      "ext-libxml": "*",
-      "ext-simplexml": "*"
+        "ext-libxml": "*",
+        "ext-simplexml": "*"
     },
     "require-dev": {
         "mockery/mockery": "^1",
