@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Support\Serializer;
 
+use DateMalformedPeriodStringException;
 use Exception;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
@@ -39,7 +40,7 @@ class SerializerTest extends TestCase
      */
     public function testSerializationOfDateTime()
     {
-        $date = (new DateTime('2014-06-15 12:00:00', new DateTimeZone('UTC')))->format('c');
+        $date = new DateTime('2014-06-15 12:00:00', new DateTimeZone('UTC'))->format('c');
 
         $obj = $this->serializer->unserialize($this->serializer->serialize($date));
         Assert::assertSame($date, $obj);
@@ -79,7 +80,7 @@ class SerializerTest extends TestCase
      *
      * @return array
      */
-    public function scalarDataToJson(): array
+    public static function scalarDataToJson(): array
     {
         return [
             ['testing', '{"@scalar":"string","@value":"testing"}'],
@@ -152,7 +153,7 @@ class SerializerTest extends TestCase
      *
      * @return array
      */
-    public function arrayNoObjectData(): array
+    public static function arrayNoObjectData(): array
     {
         return [
             [
@@ -203,7 +204,7 @@ class SerializerTest extends TestCase
             $this->markTestSkipped('Supported for PHP 5.5.0 and above');
         }
 
-        $date = (new DateTimeImmutable('2014-06-15 12:00:00', new DateTimeZone('UTC')))->format('c');
+        $date = new DateTimeImmutable('2014-06-15 12:00:00', new DateTimeZone('UTC'))->format('c');
         $obj = $this->serializer->unserialize($this->serializer->serialize($date));
 
         Assert::assertSame($date, $obj);
@@ -231,6 +232,7 @@ class SerializerTest extends TestCase
      * Some internal classes, such as DatePeriod, cannot be initialized with
      * ReflectionClass::newInstanceWithoutConstructor()
      * @throws ReflectionException
+     * @throws DateMalformedPeriodStringException
      */
     public function testSerializationOfDatePeriodException()
     {

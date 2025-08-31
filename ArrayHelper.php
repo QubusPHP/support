@@ -337,12 +337,7 @@ class ArrayHelper
     public function isAssoc(array $arr): bool
     {
         $counter = 0;
-        foreach ($arr as $key => $unused) {
-            if (! is_int($key) || $key !== $counter++) {
-                return true;
-            }
-        }
-        return false;
+        return array_any($arr, fn($key) => !is_int($key) || $key !== $counter++);
     }
 
     /**
@@ -698,11 +693,9 @@ class ArrayHelper
             return $array;
         }
 
-        $b = [];
-
-        foreach ($array as $k => $v) {
-            $b[$k] = $this->get($v, $key);
-        }
+        $b = array_map(function ($v) use ($key) {
+            return $this->get($v, $key);
+        }, $array);
 
         switch ($order) {
             case 'asc':
@@ -949,7 +942,7 @@ class ArrayHelper
     public function search(
         array|ArrayAccess $array,
         mixed $value,
-        ?string $default = null,
+        string|int|null $default = null,
         bool $recursive = true,
         string $delimiter = '.',
         bool $strict = false

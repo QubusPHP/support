@@ -314,7 +314,7 @@ class StringHelper
             $trArr = [];
 
             foreach ($array as $from => $to) {
-                substr($from, 0, 1) !== ':' && $from = ':' . $from;
+                !str_starts_with($from, ':') && $from = ':' . $from;
                 $trArr[$from] = $to;
             }
             unset($array);
@@ -332,8 +332,7 @@ class StringHelper
      */
     public function isJson(string $string): bool
     {
-        json_decode($string);
-        return json_last_error() === JSON_ERROR_NONE;
+        return json_validate($string);
     }
 
     /**

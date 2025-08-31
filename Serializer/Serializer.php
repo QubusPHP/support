@@ -49,12 +49,12 @@ use function unserialize;
 
 class Serializer implements Serializable
 {
-    public const CLASS_IDENTIFIER_KEY = '@type';
-    public const CLASS_PARENT_KEY = '@parent';
-    public const SCALAR_TYPE = '@scalar';
-    public const SCALAR_VALUE = '@value';
-    public const NULL_VAR = null;
-    public const MAP_TYPE = '@map';
+    public const string CLASS_IDENTIFIER_KEY = '@type';
+    public const string CLASS_PARENT_KEY = '@parent';
+    public const string SCALAR_TYPE = '@scalar';
+    public const string SCALAR_VALUE = '@value';
+    public const null NULL_VAR = null;
+    public const string MAP_TYPE = '@map';
 
     /**
      * Storage for object.
@@ -579,7 +579,7 @@ class Serializer implements Serializable
                     if ('"' !== substr($data, -2, 1)) {
                         return false;
                     }
-                } elseif (false === strpos($data, '"')) {
+                } elseif (!str_contains($data, '"')) {
                     return false;
                 }
                 break;

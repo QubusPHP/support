@@ -9,13 +9,19 @@ use Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\CommentId;
 
 class Comment implements JsonSerializable
 {
-    private CommentId $commentId;
+    public CommentId $commentId {
+        get => $this->commentId;
+    }
 
     private array $dates;
 
-    private string $comment;
+    public string $comment {
+        get => $this->comment;
+    }
 
-    private User $user;
+    public User $user {
+        get => $this->user;
+    }
 
     /**
      * @param CommentId $id
@@ -31,36 +37,12 @@ class Comment implements JsonSerializable
         $this->dates = $dates;
     }
 
-    /**
-     * @return CommentId
-     */
-    public function getCommentId(): CommentId
-    {
-        return $this->commentId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getComment(): string
-    {
-        return $this->comment;
-    }
-
-    /**
-     * @return User
-     */
-    public function getUser(): \Qubus\Tests\Support\Serializer\Dummy\Complex\User
-    {
-        return $this->user;
-    }
-
     public function jsonSerialize(): array
     {
         return
         [
-            'commentId'   => $this->getCommentId(),
-            'comment' => $this->getComment()
+            'commentId'   => $this->commentId,
+            'comment' => $this->comment
         ];
     }
 }

@@ -6,7 +6,9 @@ namespace Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects;
 
 class PostId
 {
-    private mixed $postId;
+    private mixed $postId {
+        get => $this->postId;
+    }
 
     /**
      * @param $id
@@ -14,13 +16,5 @@ class PostId
     public function __construct($id)
     {
         $this->postId = $id;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPostId(): PostId
-    {
-        return $this->postId;
     }
 }

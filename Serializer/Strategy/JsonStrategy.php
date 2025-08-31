@@ -16,17 +16,18 @@ namespace Qubus\Support\Serializer\Strategy;
 use function json_decode;
 use function json_encode;
 
+use const JSON_PRETTY_PRINT;
 use const JSON_UNESCAPED_UNICODE;
 
 class JsonStrategy implements Strategy
 {
     public function serialize(mixed $data): bool|string
     {
-        return json_encode($data, JSON_UNESCAPED_UNICODE);
+        return json_encode(value: $data, flags: JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
     public function unserialize(mixed $data): bool|string|array|object
     {
-        return json_decode($data, true);
+        return json_decode(json: $data, associative: true);
     }
 }

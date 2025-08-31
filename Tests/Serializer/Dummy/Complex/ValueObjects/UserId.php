@@ -6,7 +6,9 @@ namespace Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects;
 
 class UserId
 {
-    private mixed $userId;
+    private mixed $userId {
+        get => $this->userId;
+    }
 
     /**
      * @param $id
@@ -14,13 +16,5 @@ class UserId
     public function __construct($id)
     {
         $this->userId = $id;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getUserId(): UserId
-    {
-        return $this->userId;
     }
 }

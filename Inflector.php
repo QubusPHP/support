@@ -328,7 +328,7 @@ class Inflector
         // Decode all entities to their simpler forms
         $string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 
-        return (new Slugify($constructorOptions))->slugify($string, $onTheFlyOptions);
+        return new Slugify($constructorOptions)->slugify($string, $onTheFlyOptions);
     }
 
     /**

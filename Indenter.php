@@ -24,16 +24,18 @@ use RuntimeException;
 
 final class Indenter
 {
-    public const ELEMENT_TYPE_BLOCK = 0;
-    public const ELEMENT_TYPE_INLINE = 1;
+    public const int ELEMENT_TYPE_BLOCK = 0;
+    public const int ELEMENT_TYPE_INLINE = 1;
 
-    public const MATCH_INDENT_NO = 0;
-    public const MATCH_INDENT_DECREASE = 1;
-    public const MATCH_INDENT_INCREASE = 2;
-    public const MATCH_DISCARD = 3;
+    public const int MATCH_INDENT_NO = 0;
+    public const int MATCH_INDENT_DECREASE = 1;
+    public const int MATCH_INDENT_INCREASE = 2;
+    public const int MATCH_DISCARD = 3;
 
     /** @var array $log */
-    private array $log = [];
+    public array $log = [] {
+        &get => $this->log;
+    }
 
     /** @var array $options */
     private array $options = [
@@ -274,15 +276,5 @@ final class Indenter
         }
 
         return trim($output);
-    }
-
-    /**
-     * Debugging utility. Get log for the last indent operation.
-     *
-     * @return array
-     */
-    public function getLog(): array
-    {
-        return $this->log;
     }
 }

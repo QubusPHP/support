@@ -229,6 +229,9 @@ class AssetsTest extends TestCase
         Assert::assertStringEndsWith($asset2, array_pop($assets2));
     }
 
+    /**
+     * @throws ReflectionException
+     */
     protected static function getMethod($name): ReflectionMethod
     {
         $class = new ReflectionClass('Qubus\Support\Assets');

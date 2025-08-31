@@ -135,7 +135,7 @@ class XmlStrategy implements Strategy
     {
         $newArray = [];
         foreach ($array as $key => &$value) {
-            if (false !== strpos($key, 'serializer_element_')) {
+            if (str_contains($key, 'serializer_element_')) {
                 $key = $this->getNumericKeyValue($key);
             }
 

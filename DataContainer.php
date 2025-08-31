@@ -32,8 +32,8 @@ use function uniqid;
 
 class DataContainer implements ArrayAccess, IteratorAggregate, Countable
 {
-    /** @var DataContainer parent container, for inheritance */
-    protected DataContainer $parent;
+    /** @var ?DataContainer parent container, for inheritance */
+    protected ?DataContainer $parent = null;
 
     /** @var bool whether we want to use parent cascading */
     protected bool $parentEnabled = false;
@@ -45,7 +45,9 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     protected bool $readOnly = false;
 
     /** @var bool whether the container data has been modified */
-    protected bool $isModified = false;
+    public bool $isModified = false {
+        get =>$this->isModified;
+    }
 
     /**
      * Constructor
@@ -122,14 +124,6 @@ class DataContainer implements ArrayAccess, IteratorAggregate, Countable
     public function hasParent(): bool
     {
         return $this->parentEnabled;
-    }
-
-    /**
-     * Retrieve the modified state of the container.
-     */
-    public function isModified(): bool
-    {
-        return $this->isModified;
     }
 
     /**

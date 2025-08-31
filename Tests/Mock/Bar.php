@@ -6,24 +6,17 @@ namespace Qubus\Tests\Support\Mock;
 
 class Bar
 {
-    public int $id;
+    public int $id {
+        get => $this->id;
+    }
 
-    public string $name;
+    public string $name {
+        get => $this->name;
+    }
 
     public function __construct(int $id, string $name)
     {
         $this->id = $id;
         $this->name = $name;
-    }
-
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
     }
 }

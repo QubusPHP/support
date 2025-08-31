@@ -154,7 +154,7 @@ abstract class BaseCollection extends BaseArray implements Collectionable
      */
     public function get(mixed $key): mixed
     {
-        return (new DataType())->array->get($this->items, $key);
+        return new DataType()->array->get($this->items, $key);
     }
 
     /**
@@ -252,7 +252,7 @@ abstract class BaseCollection extends BaseArray implements Collectionable
      */
     public function flatten(): static
     {
-        return new static((new DataType())->array->flatten($this->items));
+        return new static(new DataType()->array->flatten($this->items));
     }
 
     /**
@@ -445,7 +445,7 @@ abstract class BaseCollection extends BaseArray implements Collectionable
      */
     public function merge(array $items): static
     {
-        return new static((new DataType())->array->merge($this->items, $items));
+        return new static(new DataType()->array->merge($this->items, $items));
     }
 
     /**

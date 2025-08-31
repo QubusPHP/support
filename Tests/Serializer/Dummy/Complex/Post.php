@@ -8,11 +8,19 @@ use Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\PostId;
 
 class Post
 {
-    private PostId $postId;
-    private string $title;
-    private string $content;
-    private User $author;
-    private array $comments;
+    public PostId $postId {
+        get => $this->postId;
+    }
+    public string $title {
+        get => $this->title;
+    }
+    public string $content {
+        get => $this->content;
+    }
+    public User $author;
+    public array $comments {
+        get => $this->comments;
+    }
 
     /**
      * @param PostId $id
@@ -28,38 +36,6 @@ class Post
         $this->content = $content;
         $this->author = $user;
         $this->comments = $comments;
-    }
-
-    /**
-     * @return array
-     */
-    public function getComments(): array
-    {
-        return $this->comments;
-    }
-
-    /**
-     * @return string
-     */
-    public function getContent(): string
-    {
-        return $this->content;
-    }
-
-    /**
-     * @return PostId
-     */
-    public function getPostId(): PostId
-    {
-        return $this->postId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTitle(): string
-    {
-        return $this->title;
     }
 
     /**

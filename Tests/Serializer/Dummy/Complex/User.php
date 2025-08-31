@@ -9,9 +9,13 @@ use Qubus\Tests\Support\Serializer\Dummy\Complex\ValueObjects\UserId;
 
 class User implements JsonSerializable
 {
-    private UserId $userId;
+    private UserId $userId {
+        get => $this->userId;
+    }
 
-    private string $name;
+    private string $name {
+        get => $this->name;
+    }
 
     /**
      * @param UserId $id
@@ -23,28 +27,12 @@ class User implements JsonSerializable
         $this->name = $name;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getUserId(): UserId
-    {
-        return $this->userId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
     public function jsonSerialize(): array
     {
         return
         [
-            'userId'   => $this->getUserId(),
-            'name' => $this->getName()
+            'userId'   => $this->userId,
+            'name' => $this->name
         ];
     }
 }

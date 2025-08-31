@@ -50,8 +50,8 @@ class DeepCopySerializerTest extends TestCase
                     'Have no fear, sers, your king is safe.',
                     new User(new UserId(2), 'Barristan Selmy'),
                     [
-                        'created_at' => (new DateTime('2015/07/18 12:13:00'))->format('c'),
-                        'accepted_at' => (new DateTime('2015/07/19 00:00:00'))->format('c'),
+                        'created_at' => new DateTime('2015/07/18 12:13:00')->format('c'),
+                        'accepted_at' => new DateTime('2015/07/19 00:00:00')->format('c'),
                     ]
                 ),
             ]

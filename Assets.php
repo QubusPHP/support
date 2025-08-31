@@ -708,7 +708,7 @@ class Assets
             // Get real link path
             if ($this->isRemoteLink($link)) {
                 // Add current protocol to agnostic links
-                if (substr($link, 0, 2) === '//') {
+                if (str_starts_with($link, '//')) {
                     $protocol = isset($_SERVER['HTTPS']) &&
                     ! empty($_SERVER['HTTPS']) &&
                     $_SERVER['HTTPS'] !== 'off' ? 'https:' : 'http:';
@@ -801,9 +801,9 @@ class Assets
      */
     protected function isRemoteLink(string $link): bool
     {
-        return substr($link, 0, 7) === 'http://' ||
-        substr($link, 0, 8) === 'https://' ||
-        substr($link, 0, 2) === '//';
+        return str_starts_with($link, 'http://') ||
+        str_starts_with($link, 'https://') ||
+        str_starts_with($link, '//');
     }
 
     /**
