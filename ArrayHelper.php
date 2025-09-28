@@ -932,11 +932,11 @@ class ArrayHelper
      *
      * @param array|ArrayAccess $array $array     The search array.
      * @param mixed $value The searched value.
-     * @param string|null $default The default value.
+     * @param string|int|null $default The default value.
      * @param bool $recursive Whether to get keys recursive.
      * @param string $delimiter The delimiter, when $recursive is true.
      * @param bool $strict If true, do a strict key comparison.
-     * @return string|bool|null
+     * @return string|bool|null|int
      * @throws TypeException
      */
     public function search(
@@ -946,7 +946,7 @@ class ArrayHelper
         bool $recursive = true,
         string $delimiter = '.',
         bool $strict = false
-    ): string|bool|null {
+    ): string|bool|null|int {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
@@ -1043,19 +1043,19 @@ class ArrayHelper
      * Get the previous value or key from an array using the current array key.
      *
      * @param array|ArrayAccess $array $array    The array containing the values.
-     * @param string $key Key of the current entry to use as reference.
+     * @param mixed $key Key of the current entry to use as reference.
      * @param bool $getValue If true, return the previous value instead of the previous key.
      * @param bool $strict If true, do a strict key comparison.
-     * @return string|bool|null The value in the array, null if there is no previous value,
+     * @return string|bool|null|int The value in the array, null if there is no previous value,
      *                          or false if the key doesn't exist.
      * @throws TypeException
      */
     public function previousByKey(
         array|ArrayAccess $array,
-        string $key,
+        mixed $key,
         bool $getValue = false,
         bool $strict = false
-    ): string|bool|null {
+    ): string|bool|null|int {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
@@ -1080,19 +1080,19 @@ class ArrayHelper
      * Get the next value or key from an array using the current array key.
      *
      * @param array|ArrayAccess $array $array The array containing the values.
-     * @param string $key Key of the current entry to use as reference.
+     * @param mixed $key Key of the current entry to use as reference.
      * @param bool $getValue If true, return the next value instead of the next key.
      * @param bool $strict If true, do a strict key comparison.
-     * @return string|bool|null The value in the array, null if there is no next value,
+     * @return string|bool|null|int The value in the array, null if there is no next value,
      *                          or false if the key doesn't exist.
      * @throws TypeException
      */
     public function nextByKey(
         array|ArrayAccess $array,
-        string $key,
+        mixed $key,
         bool $getValue = false,
         bool $strict = false
-    ): string|bool|null {
+    ): string|bool|null|int {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
@@ -1120,19 +1120,19 @@ class ArrayHelper
      * Get the previous value or key from an array using the current array value
      *
      * @param array|ArrayAccess $array $array    The array containing the values.
-     * @param string $value Value of the current entry to use as reference.
+     * @param mixed $value Value of the current entry to use as reference.
      * @param bool $getValue If true, return the previous value instead of the previous key.
      * @param bool $strict If true, do a strict key comparison.
-     * @return string|bool|null The value in the array, null if there is no previous value,
+     * @return string|bool|null|int The value in the array, null if there is no previous value,
      *                          or false if the key doesn't exist.
      * @throws TypeException
      */
     public function previousByValue(
         array|ArrayAccess $array,
-        string $value,
+        mixed $value,
         bool $getValue = true,
         bool $strict = false
-    ): string|bool|null {
+    ): string|bool|null|int {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
@@ -1160,19 +1160,19 @@ class ArrayHelper
      * Get the next value or key from an array using the current array value.
      *
      * @param array|ArrayAccess $array $array    The array containing the values.
-     * @param string $value Value of the current entry to use as reference.
+     * @param mixed $value Value of the current entry to use as reference.
      * @param bool $getValue If true, return the next value instead of the next key.
      * @param bool $strict If true, do a strict key comparison.
-     * @return string|bool|null The value in the array, null if there is no next value,
+     * @return string|bool|null|int The value in the array, null if there is no next value,
      *                          or false if the key doesn't exist
      * @throws TypeException
      */
     public function nextByValue(
         array|ArrayAccess $array,
-        string $value,
+        mixed $value,
         bool $getValue = true,
         bool $strict = false
-    ): string|bool|null {
+    ): string|bool|null|int {
         if (! is_array($array) && ! $array instanceof ArrayAccess) {
             throw new TypeException('First parameter must be an array or ArrayAccess object.');
         }
