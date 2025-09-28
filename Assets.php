@@ -241,7 +241,7 @@ class Assets
             $propertyOption = camel_case($option);
 
             if (isset($config[$option])) {
-                $this->$propertyOption = $config[$option];
+                $this->{$propertyOption} = $config[$option];
             }
         }
 
@@ -257,7 +257,7 @@ class Assets
             $propertyOption = camel_case($option);
 
             if (isset($config[$option]) && $config[$option] instanceof Closure) {
-                $this->$propertyOption = $config[$option];
+                $this->{$propertyOption} = $config[$option];
             }
         }
 
