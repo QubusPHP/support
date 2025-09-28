@@ -16,6 +16,7 @@ namespace Qubus\Support\Helpers;
 use ArrayAccess;
 use Closure;
 use Qubus\Exception\Data\TypeException;
+use Qubus\Exception\IO\FileSystem\FileNotFoundException;
 use Qubus\Support\Collection\ArrayCollection;
 use Qubus\Support\Collection\Collection;
 use Qubus\Support\DataType;
@@ -77,28 +78,6 @@ use const E_USER_NOTICE;
 use const ENT_NOQUOTES;
 use const PHP_OS;
 use const PREG_SPLIT_NO_EMPTY;
-
-/**
- * Wrapper function for the core PHP function: trigger_error.
- *
- * This function makes the error a little more understandable for the
- * end user to track down the issue.
- *
- * @param string $message Custom message to print.
- * @param int $level Predefined PHP error constant.
- */
-function trigger_error__(string $message, int $level = E_USER_NOTICE): void
-{
-    $debug = debug_backtrace();
-    $caller = next($debug);
-    echo '<div class="alerts alerts-error center">';
-    trigger_error(
-        message: $message . ' used <strong>' . $caller['function'] . '()</strong> called from <strong>'
-            . $caller['file'] . '</strong> on line <strong>' . $caller['line'] . '</strong>' . "\n<br />error handler",
-        error_level: $level
-    );
-    echo '</div>';
-}
 
 /**
  * Returns false.
@@ -178,16 +157,16 @@ function return_void__(): void
  *                                 if Closure - only Closure will be called.
  *                                 Default true.
  */
-function load_file(string $file, bool $once = true, bool|Closure $showErrors = true): mixed
+function load_file(string $file, bool $once = true, bool|Closure $showErrors = true): bool
 {
-    if (file_exists(filename: "'$file'")) {
+    if (file_exists(filename: $file)) {
         if ($once) {
-            return require_once "'$file'";
+            require_once $file;
         } else {
-            return require "'$file'";
+            require $file;
         }
     } elseif (is_bool(value: $showErrors) && $showErrors) {
-        trigger_error__(
+        throw new FileNotFoundException(
             message: sprintf(
                 'Invalid file name: <strong>%s</strong> does not exist. <br />',
                 $file
@@ -352,7 +331,7 @@ function is_false__(mixed $var): bool
  */
 function truncate_string(string $string, int $limit, string $continuation = '...', bool $isHtml = false): string
 {
-    return (new DataType())->string->truncate($string, $limit, $continuation, $isHtml);
+    return new DataType()->string->truncate($string, $limit, $continuation, $isHtml);
 }
 
 /**
@@ -542,24 +521,6 @@ function array_dot(array $array, string $prepend = ''): array
 function array_accessible(mixed $value): bool
 {
     return is_array(value: $value) || $value instanceof ArrayAccess;
-}
-
-/**
- * Checks if the given key or index exists in the array.
- *
- * @param array $array An array with keys to check.
- * @param string $key Value to check.
- */
-function array_exists(array $array, string $key): bool
-{
-    trigger_deprecation(
-        functionName: __FUNCTION__,
-        deprecatedVersion: '1.0',
-        removedVersion: '2.0',
-        replacement: __NAMESPACE__ . '\\' . 'array_key_exists__'
-    );
-
-    return array_key_exists__(key: $key, array: $array);
 }
 
 /**
@@ -765,55 +726,6 @@ function is_writable(string $path): bool
     } else {
         return \is_writable(filename: $path);
     }
-}
-
-/**
- * Used to trigger code deprecation warnings.
- *
- * @param string $functionName Name of function that is deprecated.
- * @param string $deprecatedVersion Version for which code becomes deprecated.
- * @param string $removedVersion Version for when deprecated code will be removed.
- * @param string|null $replacement Replacement of deprecated code if any.
- */
-function trigger_deprecation(
-    string $functionName,
-    string $deprecatedVersion,
-    string $removedVersion,
-    ?string $replacement = null
-): bool {
-    if (! defined(constant_name: 'QUBUS_ENVIRONMENT')) {
-        define(constant_name: 'QUBUS_ENVIRONMENT', value: 'production');
-    }
-
-    if (QUBUS_ENVIRONMENT === 'development') {
-        if (! is_null__(var: $replacement)) {
-            trigger_error__(
-                message: sprintf(
-                    '%1$s() is <strong>deprecated</strong> since version %2$s and will be removed in version %3$s. 
-                    Use %4$s() instead. <br />',
-                    $functionName,
-                    $deprecatedVersion,
-                    $removedVersion,
-                    $replacement
-                ),
-                level: E_USER_DEPRECATED
-            );
-        } else {
-            trigger_error__(
-                message: sprintf(
-                    '%1$s() is <strong>deprecated</strong> since version %2$s and will be removed in version %3$s. 
-                    No alternative is available.<br />',
-                    $functionName,
-                    $deprecatedVersion,
-                    $removedVersion
-                ),
-                level: E_USER_DEPRECATED
-            );
-        }
-        return true;
-    }
-
-    return false;
 }
 
 /**
