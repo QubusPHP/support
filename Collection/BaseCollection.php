@@ -469,6 +469,28 @@ abstract class BaseCollection extends BaseArray implements Collectionable
     }
 
     /**
+     * Replace the collection items with the given items.
+     *
+     * @param array $items
+     * @return static
+     */
+    public function replace(array $items): static
+    {
+        return new static(array_replace($this->items, $items));
+    }
+
+    /**
+     * Recursively replace the collection items with the given items.
+     *
+     * @param array $items
+     * @return static
+     */
+    public function replaceRecursive(array $items): static
+    {
+        return new static(array_replace_recursive($this->items, $items));
+    }
+
+    /**
      * Set the given array value with the provided key or index.
      *
      * @param mixed $value
