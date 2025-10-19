@@ -1219,6 +1219,42 @@ class ArrayHelper
     }
 
     /**
+     * Return a new array containing only the specified keys.
+     *
+     * @param array $array
+     * @param array $keys
+     * @return array
+     */
+    public function only(array $array, array $keys): array
+    {
+        // Use array_intersect_key for efficiency with array_flip
+        $filtered = array_intersect_key($array, array_flip($keys));
+
+        // Maintain order of keys as provided in $keys
+        $result = [];
+        foreach ($keys as $key) {
+            if (array_key_exists($key, $filtered)) {
+                $result[$key] = $filtered[$key];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Return a new array excluding the specified keys.
+     *
+     * @param array $array
+     * @param array $keys
+     * @return array
+     */
+    public function except(array $array, array $keys): array
+    {
+        // Use array_diff_key for performance
+        return array_diff_key($array, array_flip($keys));
+    }
+
+    /**
      * Takes a value and checks if it is a Closure or not, if it is it
      * will return the result of the closure, if not, it will simply return the
      * value.

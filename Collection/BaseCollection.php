@@ -491,6 +491,28 @@ abstract class BaseCollection extends BaseArray implements Collectionable
     }
 
     /**
+     * Return a new array containing only the specified keys.
+     *
+     * @param array $keys
+     * @return static
+     */
+    public function only(array $keys): static
+    {
+        return new static(new DataType()->array->only($this->items, $keys));
+    }
+
+    /**
+     * Return a new array excluding the specified keys.
+     *
+     * @param array $keys
+     * @return static
+     */
+    public function except(array $keys): static
+    {
+        return new static(new DataType()->array->except($this->items, $keys));
+    }
+
+    /**
      * Set the given array value with the provided key or index.
      *
      * @param mixed $value
