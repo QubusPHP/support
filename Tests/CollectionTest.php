@@ -273,7 +273,7 @@ class CollectionTest extends TestCase
         $bar3 = new Bar(3, 'c');
         $barCollection = new BarCollection([$bar1, $bar2, $bar3]);
 
-        Assert::assertEquals([1, 2, 3], $barCollection->column('getId'));
+        Assert::assertEquals([1, 2, 3], $barCollection->column('id'));
     }
 
     public function testFirst(): void
