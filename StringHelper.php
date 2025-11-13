@@ -285,6 +285,29 @@ class StringHelper
     }
 
     /**
+     * Replace the first occurrence of a given value in the string.
+     *
+     * @param string $search
+     * @param string $replace
+     * @param string $subject
+     * @return string
+     */
+    public function replaceFirst(string $search, string $replace, string $subject): string
+    {
+        if ($search === '') {
+            return $subject;
+        }
+
+        $position = strpos($subject, $search);
+
+        if ($position !== false) {
+            return substr_replace($subject, $replace, $position, strlen($search));
+        }
+
+        return $subject;
+    }
+
+    /**
      * Returns a closure that will alternate between the args which to return.
      * If you call the closure with false as the arg it will return the value without
      * alternating the next time.
