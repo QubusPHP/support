@@ -50,6 +50,7 @@ use function preg_match;
 use function preg_replace;
 use function property_exists;
 use function Qubus\Support\Helpers\call_qubus_func_array;
+use function Qubus\Support\Helpers\is_null__;
 use function stripos;
 
 use const SORT_REGULAR;
@@ -1265,5 +1266,21 @@ class ArrayHelper
     public function value(mixed $var): mixed
     {
         return $var instanceof Closure ? $var() : $var;
+    }
+
+    /**
+     * If the given value is not an array and not null,
+     * wrap it in one.
+     *
+     * @param  mixed  $value
+     * @return array
+     */
+    public function wrap(mixed $value): array
+    {
+        if (is_null__($value)) {
+            return [];
+        }
+
+        return is_array($value) ? $value : [$value];
     }
 }
