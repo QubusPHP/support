@@ -1283,4 +1283,28 @@ class ArrayHelper
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Run an associative map over each of the items.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @param array $array
+     * @param callable $callback
+     * @return array
+     */
+    public function mapWithKeys(array $array, callable $callback): array
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            $assoc = $callback($value, $key);
+
+            foreach ($assoc as $mapKey => $mapValue) {
+                $result[$mapKey] = $mapValue;
+            }
+        }
+
+        return $result;
+    }
 }

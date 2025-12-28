@@ -100,6 +100,19 @@ abstract class BaseCollection extends BaseArray implements Collectionable
     }
 
     /**
+     * Run an associative map over each of the items.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @param callable $callback
+     * @return static
+     */
+    public function mapWithKeys(callable $callback): static
+    {
+        return new static(new DataType()->array->mapWithKeys($this->items, $callback));
+    }
+
+    /**
      * Applies the callback function $callable to each item in the collection.
      *
      * @param callable $callable
@@ -129,20 +142,22 @@ abstract class BaseCollection extends BaseArray implements Collectionable
     /**
      * Filter the collection items through the callable.
      *
-     * @param callable $callable
+     * @param callable|null $callable $callable
      * @return BaseCollection
      */
-    public function filter(callable $callable): BaseCollection
+    public function filter(?callable $callable = null): BaseCollection
     {
-        $results = [];
-
-        foreach ($this->items as $key => $item) {
-            if ($callable($item, $key)) {
-                $results[] = $item;
+        if ($callable) {
+            $results = [];
+            foreach ($this->items as $key => $item) {
+                if ($callable($item, $key)) {
+                    $results[] = $item;
+                }
             }
+            return new static($results);
         }
 
-        return new static($results);
+        return new static(array_filter($this->items));
     }
 
     /**

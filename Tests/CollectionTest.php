@@ -56,6 +56,30 @@ class CollectionTest extends TestCase
         Assert::assertSame($collection->items(), ['LION', 'GERMAN SHEPARD', 'MINX']);
     }
 
+    public function testCollectionMapWithKeys()
+    {
+        $array = [
+            [
+                'name' => 'John',
+                'department' => 'Sales',
+                'email' => 'john@example.com',
+            ],
+            [
+                'name' => 'Jane',
+                'department' => 'Marketing',
+                'email' => 'jane@example.com',
+            ]
+        ];
+
+        $collection = new ArrayCollection($array);
+
+        $keyed = $collection->mapWithKeys(function (array $item, int $key) {
+            return [$item['email'] => $item['name']];
+        });
+
+        Assert::assertSame($keyed->all(), ['john@example.com' => 'John', 'jane@example.com' => 'Jane',]);
+    }
+
     public function testCollectionItemsAreFlipped()
     {
         $collection = $this->collection->flip();
@@ -76,6 +100,13 @@ class CollectionTest extends TestCase
         Assert::assertEquals(['lion', 'minx'], $filtered->all());
 
         Assert::assertEquals(['lion', 'minx'], $reject->all());
+    }
+
+    public function testCollectionItemsAreFilteredWithoutCallback()
+    {
+        $collection = new ArrayCollection([1, 2, 3, null, false, '', 0, []]);
+
+        Assert::assertEquals([1, 2, 3], $collection->filter()->all());
     }
 
     /**
