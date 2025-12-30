@@ -14,12 +14,19 @@ declare(strict_types=1);
 namespace Qubus\Support\Helpers;
 
 use ArrayAccess;
+use BackedEnum;
+use Carbon\Carbon;
 use Closure;
+use DateTimeZone;
 use Qubus\Exception\Data\TypeException;
 use Qubus\Exception\IO\FileSystem\FileNotFoundException;
 use Qubus\Support\Collection\ArrayCollection;
 use Qubus\Support\Collection\Collection;
 use Qubus\Support\DataType;
+
+use Qubus\Support\DateTime\QubusDateTime;
+use Throwable;
+use UnitEnum;
 
 use function array_key_exists;
 use function array_map;
@@ -767,4 +774,51 @@ function classname_to_delimited_string(
 function collect(array $items = []): Collection
 {
     return new ArrayCollection($items);
+}
+
+/**
+ * Catch a potential exception and return a default value.
+ *
+ * @since 4.3.1
+ * @param callable $callback
+ * @param callable|Throwable|bool|null $rescue
+ * @return mixed
+ */
+function rescue(callable $callback, callable|Throwable|bool|null $rescue = null): mixed
+{
+    try {
+        return $callback();
+    } catch (Throwable $e) {
+        return value($rescue, $e);
+    }
+}
+
+/**
+ * Return a scalar value for the given value that might be an enum.
+ *
+ * @since 4.3.1
+ * @param mixed $value
+ * @param mixed|null $default
+ * @return mixed
+ */
+function enum_value(mixed $value, mixed $default = null): mixed
+{
+    return match (true) {
+        $value instanceof BackedEnum => $value->value,
+        $value instanceof UnitEnum => $value->name,
+
+        default => $value ?? value($default),
+    };
+}
+
+/**
+ * Create a new Carbon instance for the current datetime.
+ *
+ * @since 4.3.1
+ * @param DateTimeZone|UnitEnum|string|null $timezone
+ * @return Carbon
+ */
+function now(DateTimeZone|UnitEnum|string|null $timezone = null): Carbon
+{
+    return QubusDateTime::now(enum_value($timezone));
 }
