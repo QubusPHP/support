@@ -585,9 +585,9 @@ function camel_case(string $str, array $noStrip = []): string
 /**
  * Return the default value of the given value.
  */
-function value(mixed $value): mixed
+function value(mixed $value, ...$args): mixed
 {
-    return $value instanceof Closure ? $value() : $value;
+    return $value instanceof Closure ? $value(...$args) : $value;
 }
 
 /**
