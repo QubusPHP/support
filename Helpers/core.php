@@ -825,7 +825,7 @@ function now(DateTimeZone|UnitEnum|string|null $timezone = null): Carbon
 }
 
 /**
- * Return a collection based on array type.
+ * Return a collection based on type.
  *
  * @since 4.4
  * @param string $type
