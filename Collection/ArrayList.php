@@ -12,8 +12,10 @@ use function class_exists;
 use function interface_exists;
 use function is_array;
 use function is_bool;
+use function is_callable;
 use function is_float;
 use function is_int;
+use function is_iterable;
 use function is_object;
 use function is_string;
 use function sprintf;
@@ -164,7 +166,9 @@ class ArrayList extends Collection
                 ($expected === 'double' && is_float($value)) ||
                 ($expected === 'bool' && is_bool($value)) ||
                 ($expected === 'array' && is_array($value)) ||
-                ($expected === 'object' && is_object($value))
+                ($expected === 'object' && is_object($value)) ||
+                ($expected === 'callable' && is_callable($value)) ||
+                ($expected === 'iterable' && is_iterable($value))
         ) {
             return;
         }
