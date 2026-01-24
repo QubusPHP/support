@@ -21,6 +21,7 @@ use DateTimeZone;
 use Qubus\Exception\Data\TypeException;
 use Qubus\Exception\IO\FileSystem\FileNotFoundException;
 use Qubus\Support\Collection\ArrayCollection;
+use Qubus\Support\Collection\ArrayList;
 use Qubus\Support\Collection\Collection;
 use Qubus\Support\DataType;
 
@@ -821,4 +822,16 @@ function enum_value(mixed $value, mixed $default = null): mixed
 function now(DateTimeZone|UnitEnum|string|null $timezone = null): Carbon
 {
     return QubusDateTime::now(enum_value($timezone));
+}
+
+/**
+ * Return a collection based on array type.
+ *
+ * @since 4.4
+ * @param string $type
+ * @return ArrayList
+ */
+function array_list(string $type): ArrayList
+{
+    return new ArrayList($type);
 }
