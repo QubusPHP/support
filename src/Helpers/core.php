@@ -199,7 +199,7 @@ function load_file(string $file, bool $once = true, bool|Closure $showErrors = t
  */
 function add_trailing_slash(string $string): string
 {
-    return remove_trailing_slash(string: $string) . 'core.php/';
+    return remove_trailing_slash(string: $string) . '/';
 }
 
 /**
