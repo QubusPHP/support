@@ -35,14 +35,15 @@
         "webmozart/assert": "^1"
     },
     "require-dev": {
+        "phpstan/phpstan": "^2.1",
         "qubus/qubus-coding-standard": "^2"
     },
     "autoload": {
         "psr-4": {
-            "Qubus\\Support\\": ""
+            "Qubus\\Support\\": "src/"
         },
         "files": [
-            "Helpers/core.php"
+            "src/Helpers/core.php"
         ]
     },
     "autoload-dev": {
@@ -53,7 +54,8 @@
     "scripts": {
         "test": "vendor/bin/phpunit",
         "cs-check": "phpcs",
-        "cs-fix": "phpcbf"
+        "cs-fix": "phpcbf",
+        "qubestan": "phpstan analyse -l 3"
     },
     "config": {
         "optimize-autoloader": true,
