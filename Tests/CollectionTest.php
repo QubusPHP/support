@@ -22,9 +22,9 @@ class CollectionTest extends TestCase
 
     protected function setUp(): void
     {
-        $array = ['cat' => 'lion', 'dog' => 'german shepard', 'feline' => 'minx'];
+        $animals = ['cat' => 'lion', 'dog' => 'german shepard', 'feline' => 'minx'];
 
-        $this->collection = new ArrayCollection($array);
+        $this->collection = new ArrayCollection($animals);
     }
 
     public function testClassInstanceOfCollectionable()
@@ -39,7 +39,7 @@ class CollectionTest extends TestCase
 
     public function testGetTypeIsArray()
     {
-        Assert::assertSame($this->collection->getType(), 'array');
+        Assert::assertSame('array', $this->collection->getType());
     }
 
     public function testCollectionContainsElement()
@@ -53,7 +53,7 @@ class CollectionTest extends TestCase
     {
         $collection = $this->collection->map(fn($item) => strtoupper($item));
 
-        Assert::assertSame($collection->items(), ['LION', 'GERMAN SHEPARD', 'MINX']);
+        Assert::assertSame(['LION', 'GERMAN SHEPARD', 'MINX'], $collection->items());
     }
 
     public function testCollectionMapWithKeys()
@@ -77,7 +77,7 @@ class CollectionTest extends TestCase
             return [$item['email'] => $item['name']];
         });
 
-        Assert::assertSame($keyed->all(), ['john@example.com' => 'John', 'jane@example.com' => 'Jane',]);
+        Assert::assertSame(['john@example.com' => 'John', 'jane@example.com' => 'Jane',], $keyed->all());
     }
 
     public function testCollectionItemsAreFlipped()

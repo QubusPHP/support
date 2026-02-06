@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Qubus\Support\Tests;
+namespace Qubus\Tests\Support;
 
 use ArrayIterator;
 use DateTimeInterface;
@@ -37,6 +37,8 @@ class ArrayListTest extends TestCase
         $this->list = new ArrayList('string');
 
         Assert::assertTrue($this->list->type() === 'string');
+        Assert::assertTrue($this->list->getType() === 'string');
+        Assert::assertTrue($this->list->getType() === $this->list->type());
         Assert::assertFalse($this->list->type() === 'object');
         Assert::assertFalse($this->list->type() === 'array');
         Assert::assertFalse($this->list->type() === DateTimeInterface::class);
