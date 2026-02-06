@@ -32,7 +32,7 @@
         "qubus/exception": "^4",
         "qubus/inheritance": "^4",
         "symfony/var-dumper": "^7",
-        "webmozart/assert": "^1"
+        "webmozart/assert": "^2"
     },
     "require-dev": {
         "phpstan/phpstan": "^2.1",
