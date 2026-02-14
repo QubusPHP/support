@@ -632,6 +632,7 @@ function remove_accents(string $string, string $encoding = 'utf-8'): string
  *
  * @param mixed $callback
  * @param array<mixed> $args
+ * @return mixed
  */
 function call_qubus_func_array(mixed $callback, array $args): mixed
 {
