@@ -29,9 +29,15 @@ use function is_object;
 use function method_exists;
 use function sprintf;
 
+/**
+ * @template TKey of array-key
+ * @template TValue
+ * @implements ArrayAccess<TKey, TValue>
+ * @implements IteratorAggregate<TKey, TValue>
+ */
 class ObjectStorageMap implements ContainerInterface, ArrayAccess, Countable, IteratorAggregate
 {
-    /** @var array<mixed> $items */
+    /** @var array<TKey, TValue> */
     private array $items = [];
     private SplObjectStorage $factories;
     private SplObjectStorage $protected;
@@ -43,7 +49,7 @@ class ObjectStorageMap implements ContainerInterface, ArrayAccess, Countable, It
     private array $keys = [];
 
     /**
-     * @param array<mixed> $items Pre-populate set with this key-value array
+     * @param array<string, mixed> $items Pre-populate set with this key-value array
      */
     public function __construct(array $items = [])
     {
@@ -91,7 +97,7 @@ class ObjectStorageMap implements ContainerInterface, ArrayAccess, Countable, It
     /**
      * Fetch set data.
      *
-     * @return array<mixed> This set's key-value data array
+     * @return array<TKey, TValue> This set's key-value data array
      */
     public function all(): array
     {
@@ -101,7 +107,7 @@ class ObjectStorageMap implements ContainerInterface, ArrayAccess, Countable, It
     /**
      * Fetch set data keys.
      *
-     * @return array<mixed> This set's key-value data array keys
+     * @return list<TKey> This set's key-value data array keys
      */
     public function keys(): array
     {
@@ -121,7 +127,7 @@ class ObjectStorageMap implements ContainerInterface, ArrayAccess, Countable, It
     /**
      * Remove value with key from this set.
      *
-     * @param  string $key The data key
+     * @param string $key The data key
      */
     public function remove(string $key): void
     {
@@ -179,7 +185,10 @@ class ObjectStorageMap implements ContainerInterface, ArrayAccess, Countable, It
     }
 
     /**
-     * Array Access
+     * Array Access.
+     *
+     * @param TKey $offset
+     * @return bool
      */
     public function offsetExists(mixed $offset): bool
     {
@@ -187,6 +196,8 @@ class ObjectStorageMap implements ContainerInterface, ArrayAccess, Countable, It
     }
 
     /**
+     * @param TKey $key
+     * @return TValue
      * @throws TypeException
      */
     public function offsetGet(mixed $key): mixed
@@ -217,6 +228,11 @@ class ObjectStorageMap implements ContainerInterface, ArrayAccess, Countable, It
         return $value;
     }
 
+    /**
+     * @param TKey $key
+     * @param TValue $value
+     * @return void
+     */
     public function offsetSet(mixed $key, mixed $value): void
     {
         if (isset($this->frozen[$key])) {
@@ -243,7 +259,7 @@ class ObjectStorageMap implements ContainerInterface, ArrayAccess, Countable, It
     /**
      * IteratorAggregate
      *
-     * @return ArrayIterator<array<mixed>>
+     * @return ArrayIterator<TKey, TValue>
      */
     public function getIterator(): ArrayIterator
     {
