@@ -36,9 +36,6 @@ use function array_unique;
 use function array_values;
 use function count;
 use function ctype_lower;
-use function debug_backtrace;
-use function define;
-use function defined;
 use function end;
 use function explode;
 use function fclose;
@@ -57,7 +54,6 @@ use function is_string;
 use function lcfirst;
 use function ltrim;
 use function mt_rand;
-use function next;
 use function ord;
 use function preg_match;
 use function preg_quote;
@@ -73,15 +69,12 @@ use function strlen;
 use function strtolower;
 use function strtoupper;
 use function substr;
-use function trigger_error;
 use function trim;
 use function ucwords;
 use function uniqid;
 use function unlink;
 
 use const DIRECTORY_SEPARATOR;
-use const E_USER_DEPRECATED;
-use const E_USER_NOTICE;
 use const ENT_NOQUOTES;
 use const PHP_OS;
 use const PREG_SPLIT_NO_EMPTY;
@@ -408,6 +401,7 @@ function php_where(string $key, string $operator, mixed $pattern): bool
 {
     return match ($operator) {
         '='  => $key === $pattern,
+        '!=', '<>'  => $key !== $pattern,
         '>'  => $key > $pattern,
         '>=' => $key >= $pattern,
         '<'  => $key < $pattern,
