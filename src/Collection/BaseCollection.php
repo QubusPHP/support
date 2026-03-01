@@ -16,8 +16,12 @@ namespace Qubus\Support\Collection;
 use Qubus\Exception\Data\TypeException;
 use Qubus\Support\DataType;
 
+use function array_filter;
 use function count;
+use function in_array;
 use function is_callable;
+use function is_string;
+use function Qubus\Support\Helpers\enum_value;
 use function Qubus\Support\Helpers\is_null__;
 
 class BaseCollection extends BaseArray implements Collectionable
@@ -531,6 +535,59 @@ class BaseCollection extends BaseArray implements Collectionable
     public function except(array $keys): self
     {
         return new self($this->getType(), new DataType()->array->except($this->items, $keys));
+    }
+
+    /**
+     * Filter items by the given key value pair.
+     *
+     * @param string $key
+     * @param string $operator
+     * @param mixed $value
+     * @return self
+     * @throws TypeException
+     */
+    public function where(string $key, string $operator, mixed $value): self
+    {
+        return $this->filter(function ($item) use ($value, $key, $operator) {
+            $retrieved = enum_value(new DataType()->array->get($item, $key));
+            $value = enum_value($value);
+
+            $strings = array_filter([$retrieved, $value], function ($value) {
+                return match (true) {
+                    is_string($value) => true,
+                    $value instanceof \Stringable => true,
+                    default => false,
+                };
+            });
+
+            if (count($strings) < 2 && count(array_filter([$retrieved, $value], 'is_object')) == 1) {
+                return in_array($operator, ['!=', '<>', '!==']);
+            }
+
+            switch ($operator) {
+                default:
+                case '=':
+                case '==':
+                    return $retrieved == $value;
+                case '!=':
+                case '<>':
+                    return $retrieved != $value;
+                case '<':
+                    return $retrieved < $value;
+                case '>':
+                    return $retrieved > $value;
+                case '<=':
+                    return $retrieved <= $value;
+                case '>=':
+                    return $retrieved >= $value;
+                case '===':
+                    return $retrieved === $value;
+                case '!==':
+                    return $retrieved !== $value;
+                case '<=>':
+                    return $retrieved <=> $value;
+            }
+        });
     }
 
     /**
