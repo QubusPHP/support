@@ -6,10 +6,14 @@ namespace Qubus\Tests\Support;
 
 use ArrayIterator;
 use DateTimeInterface;
+use OutOfRangeException;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Qubus\Exception\Data\TypeException;
 use Qubus\Support\ArrayHelper;
 use Qubus\Support\Collection\ArrayList;
+use Qubus\Support\Collection\BaseCollection;
+use Qubus\Support\Collection\Collectionable;
 use Qubus\Support\DataType;
 use Qubus\Support\DateTime\QubusDate;
 use Qubus\Support\DateTime\QubusDateTime;
@@ -128,5 +132,91 @@ class ArrayListTest extends TestCase
         Assert::assertTrue($this->list->type() === DateTimeInterface::class);
         Assert::assertInstanceOf(DateTimeInterface::class, $this->list->get(0));
         Assert::assertInstanceOf(DateTimeInterface::class, $this->list->get(1));
+    }
+
+    public function testRejectsWrongTypeThroughEveryMutationPath(): void
+    {
+        $mutations = [
+            static fn (ArrayList $list) => $list->add(1),
+            static fn (ArrayList $list) => $list->set(0, 1),
+            static fn (ArrayList $list) => $list->push(1),
+            static fn (ArrayList $list) => $list->put(0, 1),
+            static function (ArrayList $list): void {
+                $list[] = 1;
+            },
+        ];
+
+        foreach ($mutations as $mutation) {
+            $list = new ArrayList('string');
+            $list->add('original');
+
+            try {
+                $mutation($list);
+                self::fail('A mutation accepted a value of the wrong type.');
+            } catch (TypeException) {
+                self::assertSame(['original'], $list->all());
+            }
+        }
+    }
+
+    public function testArrayAccessCanAppendAndReplaceWithoutCreatingSparseIndexes(): void
+    {
+        $list = new ArrayList('string');
+        $list[] = 'first';
+        $list[] = 'second';
+        $list[1] = 'changed';
+
+        self::assertSame(['first', 'changed'], $list->all());
+
+        $this->expectException(OutOfRangeException::class);
+        $list[3] = 'sparse';
+    }
+
+    public function testArrayAccessUnsetReindexesTheList(): void
+    {
+        $list = new ArrayList('int');
+        $list->add(10)->add(20)->add(30);
+
+        unset($list[1]);
+
+        self::assertSame([10, 30], $list->all());
+        self::assertSame(30, $list->get(1));
+    }
+
+    public function testNullIsAReadableAndRemovableElement(): void
+    {
+        $list = new ArrayList('null');
+        $list->add(null);
+
+        self::assertNull($list->get(0));
+        $list->remove(0);
+        self::assertTrue($list->isEmpty());
+    }
+
+    public function testRemoveRangeAllowsEmptyRangesIncludingAtEnd(): void
+    {
+        $list = new ArrayList('int');
+        $list->add(1)->add(2);
+
+        $list->removeRange(1, 1);
+        $list->removeRange(2, 2);
+
+        self::assertSame([1, 2], $list->all());
+    }
+
+    public function testUnserializeValidatesAtomicallyAndReindexesInput(): void
+    {
+        $list = new ArrayList('string');
+        $list->add('original');
+        $list->unserialize([5 => 'first', 9 => 'second']);
+
+        self::assertSame(['first', 'second'], $list->all());
+
+        try {
+            $list->unserialize(['valid', 1]);
+            self::fail('Unserialize accepted an invalid value.');
+        } catch (TypeException) {
+            self::assertSame(['first', 'second'], $list->all());
+        }
     }
 }

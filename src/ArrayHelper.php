@@ -18,10 +18,12 @@ use BadMethodCallException;
 use Closure;
 use Iterator;
 use Qubus\Exception\Data\TypeException;
+use Traversable;
 
 use function abs;
 use function array_combine;
 use function array_filter;
+use function array_is_list;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
@@ -43,15 +45,20 @@ use function implode;
 use function in_array;
 use function is_array;
 use function is_int;
+use function is_iterable;
 use function is_numeric;
 use function is_object;
 use function is_string;
-use function preg_match;
-use function preg_replace;
+use function iterator_to_array;
 use function property_exists;
 use function Qubus\Support\Helpers\call_qubus_func_array;
 use function Qubus\Support\Helpers\is_null__;
 use function stripos;
+use function str_ends_with;
+use function str_starts_with;
+use function strlen;
+use function strtolower;
+use function substr;
 
 use const SORT_REGULAR;
 
@@ -187,7 +194,10 @@ class ArrayHelper
             return false;
         }
 
-        if (array_key_exists($key, $array)) {
+        if (
+            (is_array($array) && array_key_exists($key, $array))
+            || ($array instanceof ArrayAccess && $array->offsetExists($key))
+        ) {
             return true;
         }
 
@@ -234,6 +244,10 @@ class ArrayHelper
         $thisKey = array_shift($keyParts);
 
         if (! empty($keyParts)) {
+            if (! is_array($array[$thisKey])) {
+                return false;
+            }
+
             $key = implode('.', $keyParts);
             return $this->delete($array[$thisKey], $key);
         } else {
@@ -318,8 +332,7 @@ class ArrayHelper
      */
     public function isAssoc(array $arr): bool
     {
-        $counter = 0;
-        return array_any($arr, fn($key) => !is_int($key) || $key !== $counter++);
+        return ! array_is_list($arr);
     }
 
     /**
@@ -416,9 +429,9 @@ class ArrayHelper
     {
         $return = [];
         foreach ($array as $key => $val) {
-            if (preg_match('/^' . $prefix . '/', $key)) {
+            if (str_starts_with((string) $key, $prefix)) {
                 if ($removePrefix === true) {
-                    $key = preg_replace('/^' . $prefix . '/', '', $key);
+                    $key = substr((string) $key, strlen($prefix));
                 }
                 $return[$key] = $val;
             }
@@ -456,7 +469,7 @@ class ArrayHelper
     public function removePrefixed(array $array, string $prefix): array
     {
         foreach ($array as $key => $val) {
-            if (preg_match('/^' . $prefix . '/', $key)) {
+            if (str_starts_with((string) $key, $prefix)) {
                 unset($array[$key]);
             }
         }
@@ -475,9 +488,9 @@ class ArrayHelper
     {
         $return = [];
         foreach ($array as $key => $val) {
-            if (preg_match('/' . $suffix . '$/', $key)) {
+            if (str_ends_with((string) $key, $suffix)) {
                 if ($removeSuffix === true) {
-                    $key = preg_replace('/' . $suffix . '$/', '', $key);
+                    $key = $suffix === '' ? $key : substr((string) $key, 0, -strlen($suffix));
                 }
                 $return[$key] = $val;
             }
@@ -495,7 +508,7 @@ class ArrayHelper
     public function removeSuffixed(array $array, string $suffix): array
     {
         foreach ($array as $key => $val) {
-            if (preg_match('/' . $suffix . '$/', $key)) {
+            if (str_ends_with((string) $key, $suffix)) {
                 unset($array[$key]);
             }
         }
@@ -558,7 +571,7 @@ class ArrayHelper
      */
     public function insertAssoc(array &$original, mixed $values, int $pos): bool
     {
-        if (count($original) < abs($pos)) {
+        if (! is_array($values) || count($original) < abs($pos)) {
             return false;
         }
 
@@ -710,6 +723,10 @@ class ArrayHelper
      */
     public function multisort(array $array, array $conditions, bool $ignoreCase = false): array
     {
+        if ($array === [] || $conditions === []) {
+            return $array;
+        }
+
         $temp = [];
         $keys = array_keys($conditions);
 
@@ -720,7 +737,9 @@ class ArrayHelper
 
         $args = [];
         foreach ($keys as $key) {
-            $args[] = $ignoreCase ? array_map('strtolower', $temp[$key]) : $temp[$key];
+            $args[] = $ignoreCase
+            ? array_map(static fn ($value) => is_string($value) ? strtolower($value) : $value, $temp[$key])
+            : $temp[$key];
             foreach ($conditions[$key] as $flag) {
                 $args[] = $flag;
             }
@@ -878,7 +897,7 @@ class ArrayHelper
     public function inArrayRecursive(mixed $needle, array $haystack, bool $strict = false): bool
     {
         foreach ($haystack as $value) {
-            if (! $strict && $needle === $value) {
+            if (! $strict && $needle == $value) {
                 return true;
             } elseif ($needle === $value) {
                 return true;
@@ -928,21 +947,10 @@ class ArrayHelper
         string $delimiter = '.',
         bool $strict = false
     ): string|bool|null|int {
-        $key = array_search($value, $array, $strict);
-
-        if ($recursive && $key === false) {
-            $keys = [];
-            foreach ($array as $k => $v) {
-                if (is_array($v)) {
-                    $rk = $this->search($v, $value, $default, true, $delimiter, $strict);
-                    if ($rk !== $default) {
-                        $keys = [$k, $rk];
-                        break;
-                    }
-                }
-            }
-            $key = count($keys) ? implode($delimiter, $keys) : false;
-        }
+        $array = $this->arrayFromAccessible($array);
+        $key = $recursive
+        ? $this->searchRecursive($array, $value, $delimiter, $strict)
+        : array_search($value, $array, $strict);
 
         return $key === false ? $default : $key;
     }
@@ -955,17 +963,16 @@ class ArrayHelper
      */
     public function unique(array $arr): array
     {
-        // filter out all duplicate values
-        return array_filter($arr, function ($item) {
-            // contrary to popular belief, this is not as static as you think...
-            static $vars = [];
+        $seen = [];
 
-            if (in_array($item, $vars, true)) {
+        // filter out all duplicate values
+        return array_filter($arr, function ($item) use (&$seen) {
+            if (in_array($item, $seen, true)) {
                 // duplicate
                 return false;
             } else {
                 // record we've had this value
-                $vars[] = $item;
+                $seen[] = $item;
 
                 // unique
                 return true;
@@ -983,7 +990,7 @@ class ArrayHelper
      */
     public function sum(array|ArrayAccess $array, string $key): float|int
     {
-        return array_sum($this->pluck($array, $key));
+        return array_sum($this->pluck($this->arrayFromAccessible($array), $key));
     }
 
     /**
@@ -1012,14 +1019,16 @@ class ArrayHelper
      * @param bool $getValue If true, return the previous value instead of the previous key.
      * @param bool $strict If true, do a strict key comparison.
      * @return string|bool|null|int The value in the array, null if there is no previous value,
-     *                          or false if the key doesn't exist.
+     *                              or false if the key doesn't exist.
+     * @throws TypeException
      */
     public function previousByKey(
         array|ArrayAccess $array,
         mixed $key,
         bool $getValue = false,
         bool $strict = false
-    ): string|bool|null|int {
+    ): mixed {
+        $array = $this->arrayFromAccessible($array);
         // get the keys of the array
         $keys = array_keys($array);
 
@@ -1044,14 +1053,16 @@ class ArrayHelper
      * @param bool $getValue If true, return the next value instead of the next key.
      * @param bool $strict If true, do a strict key comparison.
      * @return string|bool|null|int The value in the array, null if there is no next value,
-     *                          or false if the key doesn't exist.
+     *                              or false if the key doesn't exist.
+     * @throws TypeException
      */
     public function nextByKey(
         array|ArrayAccess $array,
         mixed $key,
         bool $getValue = false,
         bool $strict = false
-    ): string|bool|null|int {
+    ): mixed {
+        $array = $this->arrayFromAccessible($array);
         // get the keys of the array
         $keys = array_keys($array);
 
@@ -1079,14 +1090,16 @@ class ArrayHelper
      * @param bool $getValue If true, return the previous value instead of the previous key.
      * @param bool $strict If true, do a strict key comparison.
      * @return string|bool|null|int The value in the array, null if there is no previous value,
-     *                          or false if the key doesn't exist.
+     *                              or false if the key doesn't exist.
+     * @throws TypeException
      */
     public function previousByValue(
         array|ArrayAccess $array,
         mixed $value,
         bool $getValue = true,
         bool $strict = false
-    ): string|bool|null|int {
+    ): mixed {
+        $array = $this->arrayFromAccessible($array);
         // find the current value in the array
         if (($key = array_search($value, $array, $strict)) === false) {
             // bail out if not found
@@ -1114,14 +1127,16 @@ class ArrayHelper
      * @param bool $getValue If true, return the next value instead of the next key.
      * @param bool $strict If true, do a strict key comparison.
      * @return string|bool|null|int The value in the array, null if there is no next value,
-     *                          or false if the key doesn't exist
+     *                              or false if the key doesn't exist
+     * @throws TypeException
      */
     public function nextByValue(
         array|ArrayAccess $array,
         mixed $value,
         bool $getValue = true,
         bool $strict = false
-    ): string|bool|null|int {
+    ): mixed {
+        $array = $this->arrayFromAccessible($array);
         // find the current value in the array
         if (($key = array_search($value, $array, $strict)) === false) {
             // bail out if not found
@@ -1172,14 +1187,11 @@ class ArrayHelper
      */
     public function only(array $array, array $keys): array
     {
-        // Use array_intersect_key for efficiency with array_flip
-        $filtered = array_intersect_key($array, array_flip($keys));
-
         // Maintain order of keys as provided in $keys
         $result = [];
         foreach ($keys as $key) {
-            if (array_key_exists($key, $filtered)) {
-                $result[$key] = $filtered[$key];
+            if ((is_int($key) || is_string($key)) && array_key_exists($key, $array)) {
+                $result[$key] = $array[$key];
             }
         }
 
@@ -1195,8 +1207,13 @@ class ArrayHelper
      */
     public function except(array $array, array $keys): array
     {
-        // Use array_diff_key for performance
-        return array_diff_key($array, array_flip($keys));
+        foreach ($keys as $key) {
+            if (is_int($key) || is_string($key)) {
+                unset($array[$key]);
+            }
+        }
+
+        return $array;
     }
 
     /**
@@ -1236,6 +1253,7 @@ class ArrayHelper
      * @param array<mixed> $array
      * @param callable $callback
      * @return array<mixed>
+     * @throws TypeException
      */
     public function mapWithKeys(array $array, callable $callback): array
     {
@@ -1244,11 +1262,59 @@ class ArrayHelper
         foreach ($array as $key => $value) {
             $assoc = $callback($value, $key);
 
+            if (! is_iterable($assoc)) {
+                throw new TypeException('Map callback must return an iterable key/value pair.');
+            }
+
             foreach ($assoc as $mapKey => $mapValue) {
                 $result[$mapKey] = $mapValue;
             }
         }
 
         return $result;
+    }
+
+    /**
+     * Convert an enumerable ArrayAccess implementation to a PHP array.
+     *
+     * @param array<mixed>|ArrayAccess $array
+     * @return array<mixed>
+     * @throws TypeException
+     */
+    private function arrayFromAccessible(array|ArrayAccess $array): array
+    {
+        if (is_array($array)) {
+            return $array;
+        }
+
+        if ($array instanceof Traversable) {
+            return iterator_to_array($array);
+        }
+
+        throw new TypeException('ArrayAccess value must also be iterable for this operation.');
+    }
+
+    /**
+     * @param array<mixed> $array
+     */
+    private function searchRecursive(array $array, mixed $value, string $delimiter, bool $strict): int|string|false
+    {
+        $key = array_search($value, $array, $strict);
+        if ($key !== false) {
+            return $key;
+        }
+
+        foreach ($array as $parentKey => $nested) {
+            if (! is_array($nested)) {
+                continue;
+            }
+
+            $nestedKey = $this->searchRecursive($nested, $value, $delimiter, $strict);
+            if ($nestedKey !== false) {
+                return $parentKey . $delimiter . $nestedKey;
+            }
+        }
+
+        return false;
     }
 }

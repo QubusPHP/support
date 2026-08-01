@@ -25,6 +25,7 @@ use Qubus\Support\Collection\ArrayList;
 use Qubus\Support\Collection\Collection;
 use Qubus\Support\DataType;
 use Qubus\Support\DateTime\QubusDateTime;
+use Random\RandomException;
 use Throwable;
 use UnitEnum;
 
@@ -34,6 +35,7 @@ use function array_merge;
 use function array_slice;
 use function array_unique;
 use function array_values;
+use function bin2hex;
 use function count;
 use function ctype_lower;
 use function end;
@@ -49,33 +51,37 @@ use function in_array;
 use function is_array;
 use function is_bool;
 use function is_dir;
+use function is_file;
 use function is_object;
+use function is_readable;
 use function is_string;
 use function lcfirst;
 use function ltrim;
-use function mt_rand;
-use function ord;
+use function mb_ord;
+use function mb_str_split;
 use function preg_match;
 use function preg_quote;
 use function preg_replace;
 use function preg_split;
 use function print_r;
+use function random_bytes;
 use function rtrim;
 use function sprintf;
 use function str_contains;
 use function str_replace;
-use function str_split;
 use function strlen;
 use function strtolower;
 use function strtoupper;
 use function substr;
 use function trim;
 use function ucwords;
-use function uniqid;
 use function unlink;
 
 use const DIRECTORY_SEPARATOR;
+use const ENT_HTML5;
 use const ENT_NOQUOTES;
+use const ENT_QUOTES;
+use const ENT_SUBSTITUTE;
 use const PHP_OS;
 use const PREG_SPLIT_NO_EMPTY;
 
@@ -159,17 +165,19 @@ function return_void__(): void
  */
 function load_file(string $file, bool $once = true, bool|Closure $showErrors = true): bool
 {
-    if (file_exists(filename: $file)) {
+    if (is_file(filename: $file) && is_readable(filename: $file)) {
         if ($once) {
             require_once $file;
         } else {
             require $file;
         }
+
+        return true;
     } elseif (is_bool(value: $showErrors) && $showErrors) {
         throw new FileNotFoundException(
             message: sprintf(
                 'Invalid file name: <strong>%s</strong> does not exist. <br />',
-                $file
+                htmlentities($file, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
             )
         );
     } elseif ($showErrors instanceof Closure) {
@@ -331,11 +339,12 @@ function truncate_string(string $string, int $limit, string $continuation = '...
  */
 function unicoder(string $string): string
 {
-    $p = str_split(string: trim(string: $string));
+    $characters = mb_str_split(trim(string: $string), encoding: 'UTF-8');
     $newString = '';
-    foreach ($p as $val) {
-        $newString .= '&#' . ord(character: $val) . ';';
+    foreach ($characters as $character) {
+        $newString .= '&#' . mb_ord(string: $character, encoding: 'UTF-8') . ';';
     }
+
     return $newString;
 }
 
@@ -419,10 +428,10 @@ function php_where(string $key, string $operator, mixed $pattern): bool
             strict: true
         ),
 
-        'match' => (bool) preg_match(
+        'match' => @preg_match(
             pattern: $pattern,
             subject: $key
-        ),
+        ) === 1,
 
         'between' => (function () use ($key, $pattern): bool {
             if (! is_array($pattern) || count($pattern) !== 2) {
@@ -524,10 +533,10 @@ function array_accessible(mixed $value): bool
 /**
  * Checks if the given key or index exists in the array.
  *
- * @param string $key Value to check.
+ * @param int|string $key Value to check.
  * @param array<mixed>|ArrayAccess $array $array An array with keys to check.
  */
-function array_key_exists__(string $key, array|ArrayAccess $array): bool
+function array_key_exists__(int|string $key, array|ArrayAccess $array): bool
 {
     if ($array instanceof ArrayAccess) {
         return $array->offsetExists($key);
@@ -567,9 +576,11 @@ function studly_case(string $string): string
  */
 function camel_case(string $str, array $noStrip = []): string
 {
+    $allowedCharacters = preg_quote(implode(separator: '', array: $noStrip), delimiter: '/');
+
     // non-alpha and non-numeric characters become spaces
     $str = preg_replace(
-        pattern: '/[^a-z0-9' . implode(separator: "", array: $noStrip) . ']+/i',
+        pattern: '/[^a-z0-9' . $allowedCharacters . ']+/i',
         replacement: ' ',
         subject: $str
     );
@@ -585,6 +596,7 @@ function camel_case(string $str, array $noStrip = []): string
  *
  * @param mixed $value
  * @param mixed ...$args
+ * @return mixed
  */
 function value(mixed $value, ...$args): mixed
 {
@@ -603,19 +615,23 @@ function value(mixed $value, ...$args): mixed
 function remove_accents(string $string, string $encoding = 'utf-8'): string
 {
     // converting accents in HTML entities
-    $string = htmlentities(string: $string, flags: ENT_NOQUOTES, encoding: $encoding);
+    $string = htmlentities(
+        string: $string,
+        flags: ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML5,
+        encoding: $encoding
+    );
 
     // replacing the HTML entities to extract the first letter
     // examples: "&ecute;" => "e", "&Ecute;" => "E", "à" => "a" ...
     $string = preg_replace(
-        pattern: '#&([A-za-z])(?:acute|grave|cedil|circ|orn|ring|slash|th|tilde|uml);#',
+        pattern: '#&([A-Za-z])(?:acute|grave|cedil|circ|orn|ring|slash|th|tilde|uml);#',
         replacement: '\1',
         subject: $string
     );
 
     // replacing ligatures
     // Example "œ" => "oe", "Æ" => "AE"
-    $string = preg_replace(pattern: '#&([A-za-z]{2})(?:lig);#', replacement: '\1', subject: $string);
+    $string = preg_replace(pattern: '#&([A-Za-z]{2})lig;#', replacement: '\1', subject: $string);
 
     // removing the remaining bits
     return preg_replace(pattern: '#&[^;]+;#', replacement: '', subject: $string);
@@ -689,6 +705,8 @@ function pd(mixed $x, bool $pre = true, bool $return = false): never
 /**
  * Single file writable attribute check.
  * Thanks to legolas558.users.sf.net
+ *
+ * @throws RandomException
  */
 function win_is_writable(string $path): bool
 {
@@ -697,22 +715,26 @@ function win_is_writable(string $path): bool
     // see http://bugs.php.net/bug.php?id=27609
     // see http://bugs.php.net/bug.php?id=30931
 
-    $randString = (string) mt_rand();
+    if ($path === '') {
+        return false;
+    }
 
-    if ($path[strlen(string: $path) - 1] === '/') { // recursively return a temporary file path
-        return win_is_writable(path: $path . uniqid($randString) . '.tmp');
+    $randString = bin2hex(random_bytes(16));
+
+    if (in_array($path[strlen(string: $path) - 1], ['/', '\\'], true)) {
+        return win_is_writable(path: $path . $randString . '.tmp');
     } elseif (is_dir(filename: $path)) {
-        return win_is_writable(path: $path . DIRECTORY_SEPARATOR . uniqid($randString) . '.tmp');
+        return win_is_writable(path: $path . DIRECTORY_SEPARATOR . $randString . '.tmp');
     }
     // check tmp file for read/write capabilities
     $rm = file_exists(filename: $path);
-    $f = fopen(filename: $path, mode: 'a');
+    $f = @fopen(filename: $path, mode: 'a');
     if ($f === false) {
         return false;
     }
     fclose(stream: $f);
     if (! $rm) {
-        unlink(filename: $path);
+        @unlink(filename: $path);
     }
     return true;
 }
@@ -721,6 +743,7 @@ function win_is_writable(string $path): bool
  * Alternative to PHP's native is_writable function due to a Window's bug.
  *
  * @param string $path Path to check.
+ * @throws RandomException
  */
 function is_writable(string $path): bool
 {
@@ -741,6 +764,10 @@ function classname_to_delimited_string(
     callable|string|null $callback = 'strtolower',
     string $delimiter = '-'
 ): string {
+    if (is_object($className)) {
+        $className = $className::class;
+    }
+
     // Remove namespace from class if present.
     $explode = explode(separator: '\\', string: $className);
     $classNameWithoutNamespace = end($explode);
