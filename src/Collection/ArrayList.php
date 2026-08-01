@@ -7,17 +7,11 @@ namespace Qubus\Support\Collection;
 use OutOfRangeException;
 use Qubus\Exception\Data\TypeException;
 
+use function array_key_exists;
 use function array_splice;
-use function class_exists;
-use function interface_exists;
-use function is_array;
-use function is_bool;
-use function is_callable;
-use function is_float;
+use function array_values;
 use function is_int;
 use function is_iterable;
-use function is_object;
-use function is_string;
 use function sprintf;
 
 final class ArrayList extends Collection
@@ -58,10 +52,8 @@ final class ArrayList extends Collection
      */
     public function set(int $index, mixed $element): self
     {
+        $this->assertExistingIndex($index);
         $this->assertType($element);
-        if (!isset($this->items[$index])) {
-            throw new OutOfRangeException(sprintf("Index %s does not exist.", $index));
-        }
         $this->items[$index] = $element;
 
         return $this;
@@ -77,14 +69,48 @@ final class ArrayList extends Collection
     public function get(mixed $key): mixed
     {
         if (!is_int($key)) {
-            throw new TypeException(sprintf("Index %s must be an integer.", $key));
+            throw new TypeException(sprintf("Index must be an integer; got %s.", get_debug_type($key)));
         }
 
-        if (!isset($this->items[$key])) {
-            throw new OutOfRangeException(sprintf("Index %s does not exist.", $key));
-        }
+        $this->assertExistingIndex($key);
 
         return parent::get($key);
+    }
+
+    /**
+     * Set an element using array-access syntax.
+     *
+     * A null offset appends; an integer offset must already exist so that the
+     * list can never become sparse.
+     *
+     * @throws TypeException
+     */
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        if ($offset === null) {
+            $this->add($value);
+            return;
+        }
+
+        if (!is_int($offset)) {
+            throw new TypeException(sprintf("Index must be an integer; got %s.", get_debug_type($offset)));
+        }
+
+        $this->set($offset, $value);
+    }
+
+    /**
+     * Remove an element using array-access syntax and reindex the list.
+     *
+     * @throws TypeException
+     */
+    public function offsetUnset(mixed $offset): void
+    {
+        if (!is_int($offset)) {
+            throw new TypeException(sprintf("Index must be an integer; got %s.", get_debug_type($offset)));
+        }
+
+        $this->remove($offset);
     }
 
     /**
@@ -95,9 +121,7 @@ final class ArrayList extends Collection
      */
     public function remove(int $index): self
     {
-        if (!isset($this->items[$index])) {
-            throw new OutOfRangeException(sprintf("Index %s does not exist.", $index));
-        }
+        $this->assertExistingIndex($index);
         array_splice($this->items, $index, 1);
 
         return $this;
@@ -116,12 +140,12 @@ final class ArrayList extends Collection
             throw new OutOfRangeException("Indices cannot be negative.");
         }
 
-        if ($fromIndex >= $toIndex) {
-            throw new TypeException("fromIndex must be less than toIndex.");
+        if ($fromIndex > $toIndex) {
+            throw new TypeException("fromIndex must not be greater than toIndex.");
         }
 
         $size = $this->size();
-        if ($fromIndex >= $size || $toIndex > $size) {
+        if ($fromIndex > $size || $toIndex > $size) {
             throw new OutOfRangeException(
                 sprintf(
                     "Range [%d, %d) is out of bounds for list of size %d.",
@@ -130,6 +154,10 @@ final class ArrayList extends Collection
                     $size
                 )
             );
+        }
+
+        if ($fromIndex === $toIndex) {
+            return;
         }
 
         $length = $toIndex - $fromIndex;
@@ -147,6 +175,48 @@ final class ArrayList extends Collection
     }
 
     /**
+     * Add an element to the end of the list.
+     *
+     * @throws TypeException
+     */
+    public function push(mixed $value): self
+    {
+        return $this->add($value);
+    }
+
+    /**
+     * Replace the element at an existing integer index.
+     *
+     * @throws TypeException
+     */
+    public function put(mixed $key, mixed $value): self
+    {
+        if (!is_int($key)) {
+            throw new TypeException(sprintf("Index must be an integer; got %s.", get_debug_type($key)));
+        }
+
+        return $this->set($key, $value);
+    }
+
+    /**
+     * Replace the contents after validating every value.
+     *
+     * Validation is completed before mutation, so a failure leaves the list
+     * unchanged. Keys are discarded to maintain list semantics.
+     *
+     * @param array<mixed> $items
+     * @throws TypeException
+     */
+    public function unserialize(array $items): void
+    {
+        foreach ($items as $item) {
+            $this->assertType($item);
+        }
+
+        $this->items = array_values($items);
+    }
+
+    /**
      * Type check helper.
      *
      * @param mixed $value
@@ -154,36 +224,20 @@ final class ArrayList extends Collection
      */
     private function assertType(mixed $value): void
     {
-        $expected = $this->type;
-        $actual = get_debug_type($value);
-
-        // Handle primitive types
-        if (
-                ($expected === 'int' && is_int($value)) ||
-                ($expected === 'integer' && is_int($value)) ||
-                ($expected === 'string' && is_string($value)) ||
-                ($expected === 'float' && is_float($value)) ||
-                ($expected === 'double' && is_float($value)) ||
-                ($expected === 'bool' && is_bool($value)) ||
-                ($expected === 'array' && is_array($value)) ||
-                ($expected === 'object' && is_object($value)) ||
-                ($expected === 'callable' && is_callable($value)) ||
-                ($expected === 'iterable' && is_iterable($value))
-        ) {
-            return;
-        }
-
-        // Handle specific class names
-        if (
-                class_exists($expected) && $value instanceof $expected
-                || interface_exists($expected) && $value instanceof $expected
-        ) {
+        if ($this->checkType($this->type, $value) || ($this->type === 'iterable' && is_iterable($value))) {
             return;
         }
 
         throw new TypeException(
-            sprintf("Invalid type: expected %s, got %s.", $expected, $actual)
+            sprintf("Invalid type: expected %s, got %s.", $this->type, get_debug_type($value))
         );
+    }
+
+    private function assertExistingIndex(int $index): void
+    {
+        if ($index < 0 || !array_key_exists($index, $this->items)) {
+            throw new OutOfRangeException(sprintf("Index %s does not exist.", $index));
+        }
     }
 
     /**

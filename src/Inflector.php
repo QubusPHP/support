@@ -14,11 +14,17 @@ declare(strict_types=1);
 namespace Qubus\Support;
 
 use Cocur\Slugify\Slugify;
+use Qubus\Exception\Data\TypeException;
+use Stringable;
 
+use function abs;
 use function html_entity_decode;
+use function implode;
 use function in_array;
 use function is_array;
-use function is_numeric;
+use function is_bool;
+use function is_float;
+use function is_int;
 use function preg_match;
 use function preg_replace;
 use function preg_replace_callback;
@@ -35,6 +41,7 @@ use function trim;
 use function ucfirst;
 use function ucwords;
 
+use const ENT_HTML5;
 use const ENT_QUOTES;
 
 /**
@@ -53,7 +60,6 @@ class Inflector
         'fish',
         'meta',
         'feedback',
-        'people',
         'stadia',
         'chassis',
         'clippers',
@@ -72,9 +78,13 @@ class Inflector
 
     /** @var array<string> $pluralRules Default list of irregular plural words, in English */
     protected static array $pluralRules = [
-        '/^(ox)$/i'                => '\1\2en', // ox
-        '/([m|l])ouse$/i'          => '\1ice', // mouse, louse
-        '/(matr|vert|ind)ix|ex$/i' => '\1ices', // matrix, vertex, index
+        '/^(people|men|children|mice|geese|feet|teeth|oxen)$/i' => '\1',
+        '/^(ox)$/i'                => '\1en', // ox
+        '/(g)oose$/i'              => '\1eese', // goose
+        '/(f)oot$/i'               => '\1eet', // foot
+        '/(t)ooth$/i'              => '\1eeth', // tooth
+        '/([ml])ouse$/i'            => '\1ice', // mouse, louse
+        '/(matr|vert|ind)(?:ix|ex)$/i' => '\1ices', // matrix, vertex, index
         '/(x|ch|ss|sh)$/i'         => '\1es', // search, switch, fix, box, process, address
         '/([^aeiouy]|qu)y$/i'      => '\1ies', // query, ability, agency
         '/(hive)$/i'               => '\1s', // archive, hive
@@ -85,8 +95,8 @@ class Inflector
         '/(p)erson$/i'             => '\1eople', // person, salesperson
         '/(m)an$/i'                => '\1en', // man, woman, spokesman
         '/(c)hild$/i'              => '\1hildren', // child
-        '/(buffal|tomat)o$/i'      => '\1\2oes', // buffalo, tomato
-        '/(bu|campu)s$/i'          => '\1\2ses', // bus, campus
+        '/(buffal|tomat)o$/i'      => '\1oes', // buffalo, tomato
+        '/(bu|campu)s$/i'          => '\1ses', // bus, campus
         '/(alumn|bacill|cact|foc|fung|nucle|radi|stimul|syllab|termin)us$/i' => '\1i', // alumnus, cactus, fungus
         '/(alias|status|virus)$/i'                                           => '\1es', // alias
         '/(octop)us$/i'                                                      => '\1i', // octopus
@@ -100,25 +110,28 @@ class Inflector
     /** @var array<string> $singularRules  default list of irregular singular words, in English */
     protected static array $singularRules = [
         '/(matr)ices$/i'     => '\1ix',
-        '/(s)tatuses$/i'     => '\1\2tatus',
+        '/(s)tatuses$/i'     => '\1tatus',
         '/^(.*)(menu)s$/i'   => '\1\2',
         '/(quiz)zes$/i'      => '\\1',
         '/(vert|ind)ices$/i' => '\1ex',
-        '/^(ox)en/i'         => '\1',
+        '/^(ox)en$/i'        => '\1',
+        '/(g)eese$/i'        => '\1oose',
+        '/(f)eet$/i'         => '\1oot',
+        '/(t)eeth$/i'        => '\1ooth',
         '/(alias)es$/i'      => '\1',
-        '/([octop|vir])i$/i' => '\1us',
+        '/(octop|vir)i$/i'    => '\1us',
         '/(alumn|bacill|cact|foc|fung|nucle|radi|stimul|syllab|termin|viri?)i$/i' => '\1us',
-        '/([ftw]ax)es/i'        => '\1',
+        '/([ftw]ax)es$/i'       => '\1',
         '/(cris|ax|test)es$/i'  => '\1is',
         '/(shoe)s$/i'           => '\1',
         '/(o)es$/i'             => '\1',
         '/(bus|campus)es$/i'    => '\1',
-        '/([^a])uses$/'         => '\1us',
+        '/([^a])uses$/i'        => '\1us',
         '/ouses$/'              => 'ouse',
-        '/([m|l])ice$/i'        => '\1ouse',
+        '/([ml])ice$/i'         => '\1ouse',
         '/(x|ch|ss|sh)es$/i'    => '\1',
-        '/(m)ovies$/i'          => '\1\2ovie',
-        '/(s)eries$/i'          => '\1\2eries',
+        '/(m)ovies$/i'          => '\1ovie',
+        '/(s)eries$/i'          => '\1eries',
         '/([^aeiouy]|qu)ies$/i' => '\1y',
         '/([lr])ves$/i'         => '\1f',
         '/(tive)s$/i'           => '\1',
@@ -130,11 +143,11 @@ class Inflector
         '/(^analy)ses$/i'       => '\1sis',
         '/((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$/i' => '\1\2sis',
         '/([ti])a$/i'    => '\1um',
-        '/(p)eople$/i'   => '\1\2erson',
+        '/(p)eople$/i'   => '\1erson',
         '/(m)en$/i'      => '\1an',
-        '/(c)hildren$/i' => '\1\2hild',
-        '/(n)ews$/i'     => '\1\2ews',
-        '/eaus$/'        => 'eau',
+        '/(c)hildren$/i' => '\1hild',
+        '/(n)ews$/i'     => '\1ews',
+        '/eaus$/i'       => 'eau',
         '/([^us])s$/i'   => '\1',
         '/^(.*us)$/'     => '\\1',
         '/s$/i'          => '',
@@ -163,10 +176,12 @@ class Inflector
      */
     public static function ordinalize(int $number): string
     {
-        if (in_array($number % 100, range(11, 13))) {
+        $absolute = abs($number);
+
+        if (in_array($absolute % 100, range(11, 13), true)) {
             return $number . 'th';
         } else {
-            return match ($number % 10) {
+            return match ($absolute % 10) {
                 1 => $number . 'st',
                 2 => $number . 'nd',
                 3 => $number . 'rd',
@@ -284,7 +299,7 @@ class Inflector
      */
     public static function ascii(string $str, bool $allowNonAscii = false): string
     {
-        // Translate unicode characters to their simpler counterparts
+        // Translate Unicode characters to their simpler counterparts
         $str = remove_accents($str);
 
         if (! $allowNonAscii) {
@@ -298,30 +313,24 @@ class Inflector
      * Converts your text to a URL-friendly title so it can be used in the URL.
      * Only works with UTF8 input and only outputs 7 bit ASCII characters.
      *
-     * @param string|array<mixed>      $string             The text to slugify.
-     * @param array<mixed>             $constructorOptions Options that can be passed to the constructor.
-     * @param string|array<mixed>|null $onTheFlyOptions    Override options that can be passed to slugify method.
+     * @param string|array<mixed> $string The text to slugify.
+     * @param array<mixed> $constructorOptions Options that can be passed to the constructor.
+     * @param string|array<mixed>|null $onTheFlyOptions Override options that can be passed to slugify method.
      * @return string The slugified text.
+     * @throws TypeException
      */
     public static function slugify(
         string|array $string,
         array $constructorOptions = [],
         string|array|null $onTheFlyOptions = null
     ): string {
-        // Sanitize string.
-        if (! is_array($string)) {
-            $string = htmlspecialchars($string);
-        }
-
-        // Remove tags
         if (is_array($string)) {
-            foreach ($string as $k => $v) {
-                $string[$k] = strip_tags($v);
-            }
+            $string = self::stringifyArray($string);
         }
 
-        // Decode all entities to their simpler forms
-        $string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
+        // Decode entities before stripping tags so encoded markup cannot pass
+        // through when a caller supplies a permissive slug regular expression.
+        $string = strip_tags(html_entity_decode($string, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 
         return new Slugify($constructorOptions)->slugify($string, $onTheFlyOptions);
     }
@@ -340,7 +349,7 @@ class Inflector
         $sep = $sep !== '-' ? '_' : $sep;
 
         if ($lowercase === true) {
-            $str = ucfirst($str);
+            $str = ucfirst(strtolower($str));
         }
 
         return str_replace($sep, " ", strval($str));
@@ -421,7 +430,7 @@ class Inflector
     public static function classify(string $name, bool $forceSingular = true): string
     {
         $class = $forceSingular ? static::singularize($name) : $name;
-        return static::wordsToUpper($class);
+        return static::camelize(str_replace('-', '_', $class));
     }
 
     /**
@@ -435,5 +444,36 @@ class Inflector
         static::$init || static::initialize();
 
         return ! in_array(strtolower(strval($word)), static::$uncountableWords);
+    }
+
+    /**
+     * Convert an array input into the text consumed by the slugifier.
+     *
+     * @param array<mixed> $values
+     * @throws TypeException
+     */
+    private static function stringifyArray(array $values): string
+    {
+        $parts = [];
+
+        foreach ($values as $value) {
+            if (is_array($value)) {
+                $parts[] = self::stringifyArray($value);
+            } elseif ($value === null) {
+                continue;
+            } elseif (
+                is_string($value)
+                || is_int($value)
+                || is_float($value)
+                || is_bool($value)
+                || $value instanceof Stringable
+            ) {
+                $parts[] = (string) $value;
+            } else {
+                throw new TypeException('Slug array values must be scalar, stringable, or nested arrays.');
+            }
+        }
+
+        return implode(' ', $parts);
     }
 }

@@ -13,22 +13,21 @@ declare(strict_types=1);
 
 namespace Qubus\Support;
 
+use BadMethodCallException;
 use Closure;
 use Qubus\Exception\Exception;
+use Random\RandomException;
 
 use function array_pop;
-use function array_rand;
 use function array_reverse;
+use function bin2hex;
 use function count;
 use function defined;
 use function end;
 use function func_get_args;
-use function hash;
 use function implode;
 use function in_array;
-use function is_string;
-use function json_decode;
-use function json_last_error;
+use function libxml_clear_errors;
 use function libxml_use_internal_errors;
 use function mb_convert_case;
 use function mb_stripos;
@@ -43,13 +42,12 @@ use function mb_strtolower;
 use function mb_strtoupper;
 use function mb_substr;
 use function mb_substr_count;
-use function md5;
 use function min;
-use function mt_rand;
 use function preg_match;
 use function preg_match_all;
 use function preg_quote;
-use function sha1;
+use function random_bytes;
+use function random_int;
 use function simplexml_load_string;
 use function sprintf;
 use function strip_tags;
@@ -57,12 +55,11 @@ use function strlen;
 use function strpos;
 use function strtok;
 use function strtr;
-use function substr;
-use function uniqid;
 use function unserialize;
 
-use const JSON_ERROR_NONE;
+use const LIBXML_NONET;
 use const MB_CASE_TITLE;
+use const PHP_INT_MAX;
 use const PREG_OFFSET_CAPTURE;
 use const PREG_SET_ORDER;
 
@@ -165,9 +162,9 @@ class StringHelper
      */
     public function increment(string $str, int $first = 1, string $separator = '_'): string
     {
-        preg_match('/(.+)' . $separator . '([0-9]+)$/', $str, $match);
+        preg_match('/(.+)' . preg_quote($separator, '/') . '([0-9]+)$/', $str, $match);
 
-        return isset($match[2]) ? $match[1] . $separator . ($match[2] . 1) : $str . $separator . $first;
+        return isset($match[2]) ? $match[1] . $separator . ((int) $match[2] + 1) : $str . $separator . $first;
     }
 
     /**
@@ -180,7 +177,11 @@ class StringHelper
      */
     public function startsWith(string $str, string $start, bool $ignoreCase = false): bool
     {
-        return (bool) preg_match('/^' . preg_quote($start, '/') . '/m' . ($ignoreCase ? 'i' : ''), $str);
+        if ($ignoreCase) {
+            return mb_stripos($str, $start, 0, 'UTF-8') === 0;
+        }
+
+        return str_starts_with($str, $start);
     }
 
     /**
@@ -193,7 +194,14 @@ class StringHelper
      */
     public function endsWith(string $str, string $end, bool $ignoreCase = false): bool
     {
-        return (bool) preg_match('/' . preg_quote($end, '/') . '$/m' . ($ignoreCase ? 'i' : ''), $str);
+        if ($ignoreCase) {
+            $endLength = mb_strlen($end, 'UTF-8');
+            $stringEnd = mb_substr($str, -$endLength, encoding: 'UTF-8');
+
+            return $endLength === 0 || mb_strtolower($stringEnd, 'UTF-8') === mb_strtolower($end, 'UTF-8');
+        }
+
+        return str_ends_with($str, $end);
     }
 
     /**
@@ -202,14 +210,13 @@ class StringHelper
      * @param string $type The type of string.
      * @param int $length The number of characters.
      * @return string|int|false The random string.
+     * @throws RandomException
      */
     public function random(string $type = 'alnum', int $length = 16): string|int|false
     {
-        $randString = (string) mt_rand();
-
         switch ($type) {
             case 'basic':
-                return mt_rand();
+                return random_int(0, PHP_INT_MAX);
 
             default:
             case 'alnum':
@@ -247,21 +254,21 @@ class StringHelper
 
                 $str = '';
                 for ($i = 0; $i < $length; $i++) {
-                    $str .= substr($pool, mt_rand(0, strlen($pool) - 1), 1);
+                    $str .= $pool[random_int(0, strlen($pool) - 1)];
                 }
                 return $str;
 
             case 'unique':
-                return md5(uniqid($randString));
+                return bin2hex(random_bytes(16));
 
             case 'sha1':
-                return sha1(uniqid($randString, true));
+                return bin2hex(random_bytes(20));
 
             case 'sha256':
-                return hash('sha256', uniqid($randString, true));
+                return bin2hex(random_bytes(32));
 
             case 'sha512':
-                return hash('sha512', uniqid($randString, true));
+                return bin2hex(random_bytes(64));
 
             case 'uuid':
                 $pool = ['8', '9', 'a', 'b'];
@@ -270,7 +277,7 @@ class StringHelper
                     $this->random('hexdec', 8),
                     $this->random('hexdec', 4),
                     $this->random('hexdec', 3),
-                    $pool[array_rand($pool)],
+                    $pool[random_int(0, count($pool) - 1)],
                     $this->random('hexdec', 3),
                     $this->random('hexdec', 12)
                 );
@@ -311,6 +318,9 @@ class StringHelper
     {
         // the args are the values to alternate
         $args = func_get_args();
+        if ($args === []) {
+            throw new BadMethodCallException('StringHelper::alternator() requires at least one value.');
+        }
 
         return function ($next = true) use ($args) {
             static $i = 0;
@@ -361,8 +371,12 @@ class StringHelper
 
         $internalErrors = libxml_use_internal_errors();
         libxml_use_internal_errors(true);
-        $result = simplexml_load_string($string) !== false;
-        libxml_use_internal_errors($internalErrors);
+        try {
+            $result = simplexml_load_string($string, options: LIBXML_NONET) !== false;
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($internalErrors);
+        }
 
         return $result;
     }
@@ -374,12 +388,17 @@ class StringHelper
      */
     public function isSerialized(string $string): bool
     {
-        $array = unserialize($string);
-        return ! ($array === false && $string !== 'b:0;');
+        try {
+            $value = @unserialize($string, ['allowed_classes' => false]);
+        } catch (\Throwable) {
+            return false;
+        }
+
+        return ! ($value === false && $string !== 'b:0;');
     }
 
     /**
-     * Check if a string is html.
+     * Check if a string is HTML.
      *
      * @param string $string String to check.
      */
